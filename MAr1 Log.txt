@@ -1,0 +1,7 @@
+MAr1 Board Changes/Issues
+
+1. SW7 footprint is incorrect (decide on toggle switch)
+2. D2 footprint is incorrect (too small for SMA)
+3. R68 -> 220R
+4. Add an LED and 200R on VC3 for debug
+5. Add through-hole power jack footprint for debug
