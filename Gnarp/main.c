@@ -36,9 +36,9 @@ void serial_midi_send(MidiDevice * device, uint8_t cnt, uint8_t inByte0, uint8_t
 void arp_fallthrough_callback(MidiDevice * device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
     int i;
     uint8_t bytes[3] = {inByte0, inByte1, inByte2};
-    for (i=0; i<cnt; i++)
-        printf("%d ", bytes[i]);
-    printf("\n");
+    for (i=0; i<cnt; i++);
+  //      printf("%d ", bytes[i]);
+  //  printf("\n");
 }
 
 
@@ -141,44 +141,103 @@ void mcuStartup(){
 
 }
 
+void testLED() {
+	PORTC.DIR = 0x08;
 
+	uint32_t n = 0x0FF0;
+	uint32_t i = 0;
+
+	while (1){
+		if (i > n/2)
+			PORTC.OUTSET = 0x08;
+		else
+			PORTC.OUTCLR = 0x08;
+
+		i++;
+
+		if (i > n){
+			i = 0;
+			n = 3*n/4;
+		}
+
+		if (n < 0x000F)
+			n = 0x0FF0;
+	}
+}
+
+void testLED_TOGGLESW(){
+	PORTC.DIRSET = 0x08;
+	PORTE.DIRCLR = 0x08;
+
+	uint32_t n;
+	uint32_t i;
+
+	while (1){
+		n = 0xFFF0;
+		i = 0;
+		PORTC.OUTSET = 0x08;
+
+		while (PORTE.IN & 0x08){
+			if (i > n/2)
+				PORTC.OUTSET = 0x08;
+			else
+				PORTC.OUTCLR = 0x08;
+
+			i++;
+
+			if (i > n){
+				i = 0;
+				n = 3*n/4;
+			}
+
+			if (n < 0x000F)
+				n = 0xFFF0;
+		}
+	}
+}
+
+void testOUTTGL() {
+	PORTC.DIRSET = 0x08;
+	PORTE.DIRCLR = 0x08;
+
+	uint32_t n;
+	uint32_t i = 0;
+
+	while (1){
+		if (PORTE.IN & 0x08)
+			n = 0x0EF0;
+		else
+			n = 0x0900;
+		i++;
+		if (i > n){
+			PORTC.OUTTGL = 0x08;
+			i = 0;
+		}
+	}
+
+	while (1){
+		if (i > n/2)
+			PORTC.OUTTGL = 0x08;
+//		else
+	//		PORTC.OUTTGL = 0x08;
+
+		i++;
+
+		if (i > n){
+			i = 0;
+			n = 3*n/4;
+		}
+
+		if (n < 0x000F)
+			n = 0x0FF0;
+	}
+}
 
 int main(void) {
 
-    printf("initialize device\n");
-	//init midi, give the clock rate setting, indicate that we want only output
-	MidiDevice * myMidiDevice = serial_midi_init(MIDI_CLOCK_RATE, true, true);
-
-    printf("\n");
-    midi_send_noteon(myMidiDevice, 1, 40, 127);
-    printf("\n");
-    midi_send_noteoff(myMidiDevice, 1, 40, 0);
-    printf("\n");
-    printf("\n");
-
-    int i=0;
- /*   for (i=0;i<12;i++){
-        printf("%d: ",i);
-        switch(i%4){
-            case 0:   USART_RX[0] = 0x90;
-                        break;
-            case 1:   USART_RX[0] = i;
-                        break;
-            case 2:   USART_RX[0] = 127;
-                        break;
-            case 3:   USART_RX[0] = 0xF8;
-                        break;
-        }
-        printf("%d\n", USART_RX[0]);
-        midi_device_process(myMidiDevice);
-    }*/
-
-/*	while(1){
-      //processes input from the midi device
-      //and calls the appropriate callbacks
-      midi_device_process(&myMidiDevice);
-   }
-*/
+	//testLED();
+	//testLED_TOGGLESW();
+	testOUTTGL();
 
 	return 0;
 }
