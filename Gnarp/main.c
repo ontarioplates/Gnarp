@@ -233,11 +233,120 @@ void testOUTTGL() {
 	}
 }
 
+void testLEDfade(){
+	PORTC.DIRSET = 0x08;
+	PORTE.DIRCLR = 0x08;
+
+	uint32_t n = 100;
+	uint32_t x = 1;
+	uint32_t i = 0;
+
+	while(1){
+		if (PORTE.IN & 0x08)
+			x = n;
+		else
+			x = 10;
+
+		if (i <= x)
+			PORTC.OUTCLR = 0x08;
+		else
+			PORTC.OUTSET = 0x08;
+
+		i++;
+		if (i>n)
+			i=0;
+
+	}
+
+
+
+}
+
+void testADC(){
+	PORTC.DIRSET = 0x08;
+	PORTE.DIRCLR = 0x08;
+
+	PORTA.DIRCLR = 0xF8;
+
+	ADCA.CTRLA 		= 0x00;	//disable ADC
+	ADCA.CTRLB 		= 0x04;
+	ADCA.EVCTRL		= 0x00;
+	ADCA.PRESCALER	= 0x00;
+	ADCA.INTFLAGS	= 0x00;
+	ADCA.CTRLA		= 0x01;	//enable ADC
+
+	ACA.AC0MUXCTRL	= 0x00;
+
+
+//	ADCCH0.CTRL		= 0x01;	//set input as extrernal
+//	ADCA.MUXCTRL	= 0x70;	//set pin 7 as input
+//	ADCMUXCTRL = 0x00;
+}
+
+void test7Seg(){
+	PORTA.DIRSET = 0x06;
+	PORTA.OUTSET = 0x06;
+
+	PORTC.DIRSET = 0xF8;
+	PORTD.DIRSET = 0xBF;
+	PORTE.DIRCLR = 0x08;
+
+	uint32_t tick = 0;
+	uint32_t tickM = 0x09FF;
+	uint32_t n = 100;
+	uint32_t x = 0;
+	uint32_t i = 0;
+
+	uint32_t LEDout;
+
+
+
+
+
+	while(1){
+
+		if (PORTE.IN & 0x08){
+			PORTD.OUTCLR = 0x04;
+		}
+		else{
+			PORTD.OUTSET = 0x04;
+		}
+
+		if (i <= x)
+			PORTC.OUTCLR = 0x08;
+		else
+			PORTC.OUTSET = 0x08;
+
+
+
+
+		i++;
+		tick++;
+		if (i>n)
+			i=0;
+		if (tick > tickM){
+			tick = 0;
+			x+=10;
+			if (x>n)
+				x = 0;
+		}
+
+		LEDout = x/10;
+		PORTD.OUTCLR = 0xF0;
+		PORTC.OUTCLR = 0xF0;
+		PORTC.OUTSET = LEDout << 4;
+		PORTD.OUTSET = 0xF0;
+	}
+}
+
 int main(void) {
 
 	//testLED();
 	//testLED_TOGGLESW();
-	testOUTTGL();
+	//testOUTTGL();
+	//testLEDfade();
+	test7Seg();
+
 
 	return 0;
 }
