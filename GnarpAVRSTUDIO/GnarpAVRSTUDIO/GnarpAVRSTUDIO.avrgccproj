@@ -28,7 +28,7 @@
       <ToolNumber>00A20002303C</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1679</port>
+        <port>1310</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -48,13 +48,13 @@
     </com_atmel_avrdbg_tool_avrdragon>
     <avrtoolinterface>PDI</avrtoolinterface>
     <com_atmel_avrdbg_tool_simulator>
-      <ToolType xmlns="">com.atmel.avrdbg.tool.simulator</ToolType>
-      <ToolName xmlns="">AVR Simulator</ToolName>
-      <ToolNumber xmlns="">
+      <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolName>AVR Simulator</ToolName>
+      <ToolNumber>
       </ToolNumber>
-      <Channel xmlns="">
+      <Channel>
         <host>127.0.0.1</host>
-        <port>1679</port>
+        <port>1310</port>
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>

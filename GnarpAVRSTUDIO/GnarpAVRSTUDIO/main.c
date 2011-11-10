@@ -218,47 +218,73 @@ void testLEDfade(){
 void test7Seg(){
 	PORTA.DIRSET = 0x06;
 	PORTA.OUTSET = 0x06;
-
+	
 	PORTC.DIRSET = 0xF8;
+	
 	PORTD.DIRSET = 0xBF;
+	PORTD.OUTSET = 0x38;
+	PORTC.OUTSET = 0xF0;
+	PORTD.OUTCLR = 0x3F;
+	
 	PORTE.DIRCLR = 0x08;
 
 	uint32_t tick = 0;
-	uint32_t tickM = 0x09FF;
+	uint32_t tickM = 0x008F;
 	uint32_t i = 0;
 
-	uint32_t LEDout;
+	uint32_t LED1=0;
+	uint32_t LED10=0;
+	uint32_t LED100=0;
 
 	while(1){
-/*
-		if (PORTE.IN & 0x08){
-			PORTD.OUTCLR = 0x04;
-		}
-		else{
-			PORTD.OUTSET = 0x04;
-		}
-*/
-		if (i >= LEDout)
+		if (i >= (LED10*1+LED100*10))
+		{
 			PORTC.OUTCLR = 0x08;
+			PORTD.OUTCLR = 0x07;
+		}			
 		else
+		{
 			PORTC.OUTSET = 0x08;
+			PORTD.OUTSET = 0x07;
+		}			
 			
-		PORTD.OUTCLR = 0xF0;
+		PORTD.OUTCLR = 0x10;
 		PORTC.OUTCLR = 0xF0;
-		PORTC.OUTSET = LEDout << 4;
-		PORTD.OUTSET = 0xF0;
+		PORTC.OUTSET = LED100 << 4;
+		PORTD.OUTSET = 0x10;
+		
+		PORTD.OUTCLR = 0x08;
+		PORTC.OUTCLR = 0xF0;
+		PORTC.OUTSET = LED10 << 4;
+		PORTD.OUTSET = 0x08;
+		
+		PORTD.OUTCLR = 0x20;
+		PORTC.OUTCLR = 0xF0;
+		PORTC.OUTSET = LED1 << 4;
+		PORTD.OUTSET = 0x20;
 
 		i++;
-		if (i>9)
+		if (i>99)
 			i = 0;
 		
 		tick++;
 		if (tick>tickM)
 		{
 			tick = 0;
-			LEDout++;
-			if (LEDout>9)
-				LEDout = 0;
+			LED1++;
+			if (LED1>9)
+			{
+				LED1 = 0;
+				LED10++;
+				if (LED10>9)
+				{
+					LED10 = 0;
+					LED100++;
+					if (LED100 > 9)
+						LED100 = 0;
+				}
+			}				
+				
 		}		
 
 	}
@@ -314,14 +340,16 @@ void testADC(){
 		result = ADCA.CH0.RESL;
 		result |= ADCA.CH0.RESH << 8;
 		
-		temp = result*10.0;
+		temp = result*9.0;
 		temp = temp/0xFFF;
 		
-		LEDout = (uint16_t)temp % 10;
+		LEDout = (uint16_t)temp % 9;
+		
 		PORTD.OUTCLR = 0xF0;
 		PORTC.OUTCLR = 0xF0;
 		PORTC.OUTSET = LEDout << 4;
 		PORTD.OUTSET = 0xF0;
+		
 		
 		
 	}
@@ -334,8 +362,8 @@ int main(void) {
 	//testLED_TOGGLESW();
 	//testOUTTGL();
 	//testLEDfade();
-	//test7Seg();
-	testADC();
+	test7Seg();
+	//testADC();
 
 
 	return 0;
