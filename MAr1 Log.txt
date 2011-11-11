@@ -13,3 +13,4 @@ MAr1 Board Changes/Issues
 11. Add 0.1uF capacitors at all 7 segment pins
 12. Larger potentiometer holes
 13. Fix footprint for pushbutton switch
+14. Connect LED 7 segments and DPs in correct order to MCU (0: 1's, 1: 10's, 2: 100's)

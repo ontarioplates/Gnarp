@@ -6,6 +6,8 @@
 
 #define MIDI_CLOCK_RATE 11250
 
+uint16_t _runLED[5] = {0,0,0,0,0};
+
 
 	// Set baud rate
 /*	UBRRH = (uint8_t)(clockScale >> 8);
@@ -356,14 +358,77 @@ void testADC(){
 	
 }
 
+void initLED(){
+	//initialize all LED outputs, set all as blank
+	
+	PORTA.DIRSET = 0x06;	//~LT and ~BL output
+	PORTA.OUTSET = 0x06;	//~LT and ~BL high
+	
+	PORTC.DIRSET = 0xF8;	//STATLED and LED0:3 output
+	PORTD.DIRSET = 0x3F;	//DSEL0:2 and DP0:2 output
+	
+	
+	//All LEDs off
+	PORTD.OUTSET = 0x38;	//DSEL0:2 high (arm all 7 segments)
+	PORTC.OUTSET = 0xF0;	//LED0:3 high (blank all 7 segments)
+	PORTD.OUTCLR = 0x38;	//DSEL0: low (disarm all 7 segments)
+	
+	PORTD.OUTCLR = 0x07;	//DP0:2 low (blank all dps)
+	PORTC.OUTSET = 0x08;	//STATLED high (blank statled)
+}
+
+void runLED(){
+	//Convert global array _runLED[dp0, dp1, dp2, statled, digits] to LED out
+	
+	uint8_t i;
+	uint8_t digit;
+	uint16_t threeDigits;
+	
+	threeDigits = _runLED[4];					//copy 7seg number
+	
+	for (i=0 ; i<3 ; i++){
+		digit = threeDigits%10;					//extract lowest current digit of 7seg
+		if (threeDigits==0 && (i>0))			//if the rest of the 7seg is zero, blank LEDS (except for 1st digit)
+			digit = 10;
+			
+		PORTD.OUTCLR = 0x08 << (i+2)%3;			//arm appropriate 7 segment		(CHANGE INDEX SCALING FOR NEXT REVISION)
+		PORTC.OUTCLR = 0xF0;					//clear digit select
+		PORTC.OUTSET = digit << 4;				//set digit select #
+		PORTD.OUTSET = 0x38;					//disarm all 7 segments
+		
+		threeDigits = threeDigits/10;			//shift 7seg number down to next digit
+		
+		if (_runLED[i])							//light appropriate decimal points  (CHANGE INDEX SCALING FOR NEXT REVISION)
+			PORTD.OUTSET = 1 << (i+2)%3;
+		else
+			PORTD.OUTCLR = 1 << (i+2)%3;
+	}
+	
+	if (_runLED[3])								//light STATLED if necessary
+		PORTC.OUTCLR = 0x08;
+	else
+		PORTC.OUTSET = 0x08;
+	
+}
+
 int main(void) {
 
 	//testLED();
 	//testLED_TOGGLESW();
 	//testOUTTGL();
 	//testLEDfade();
-	test7Seg();
+	//test7Seg();
 	//testADC();
+	initLED();
+	
+	while(1){
+		_runLED[0] = 1;
+		_runLED[1] = 0;
+		_runLED[2] = 0;
+		_runLED[3] = 1;
+		_runLED[4] = 0;
+		runLED();
+	}
 
 
 	return 0;
