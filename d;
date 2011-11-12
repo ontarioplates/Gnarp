@@ -1,0 +1,77 @@
+[33mcommit bf89acf5f78033d3674f66ade220b777b857f989[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Wed Nov 9 22:53:46 2011 -0500
+
+    ADC is working with P4 and LED1 (counting routine)
+
+[33mcommit 05d78775179435741ed9769fb43bc28ab2c9add6[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Wed Oct 26 00:54:53 2011 -0400
+
+    Update log with LED info
+
+[33mcommit f283b3819c55dea0db25e9fa1f49fff2cb0d59a4[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Wed Oct 26 00:51:10 2011 -0400
+
+    7 Segment Led testing
+
+[33mcommit 02ba5386d7380482de8c02bd728ec83ce7c14b81[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Thu Oct 20 00:41:55 2011 -0400
+
+    I/O test for PortE and PortD
+
+[33mcommit 873a106899094e673f81052b3e35bb9aa7b93d39[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Tue Oct 18 17:46:59 2011 -0400
+
+    PDI issue
+
+[33mcommit 5491c088307b210ec68f2717c2b9360c9a9682a1[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Mon Oct 17 17:26:19 2011 -0400
+
+    CD4511 and pot issue
+
+[33mcommit 061607125b04728c28612abe2cda4d322d7657e6[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Mon Oct 17 12:31:13 2011 -0400
+
+    Add plaintext AVR setup and circuit log
+
+[33mcommit 5eed226156ecaf94789a38b4de06a44a4b1a4d81[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Sun Oct 16 22:40:09 2011 -0400
+
+    Add AVR Setup info
+
+[33mcommit 788327c15c2b8ffd449ebc05782cc042fc23b533[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Sun Oct 16 21:24:16 2011 -0400
+
+    First upload of AVR project
+
+[33mcommit e715940575fcd16093ecfcd5d15a9052d1c09bf9[m
+Author: David Whitely <davidwhitely@David-Whitelys-iMac.local>
+Date:   Fri Oct 14 12:41:06 2011 -0400
+
+    adding schematic
+
+[33mcommit 3351b22a84fbf599f4f1e94836ccb0bf89f686a1[m
+Author: David Whitely <davidwhitely@David-Whitelys-iMac.local>
+Date:   Fri Oct 14 12:28:46 2011 -0400
+
+    I am testing
+
+[33mcommit a4fec5260f85aa7a113267bc2f71b5230df99e28[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Fri Oct 14 11:33:52 2011 -0400
+
+    second?
+
+[33mcommit 1fdd03da2069f826980f4719aad3cfc851693d35[m
+Author: David Tuzman <david.tuzman@gmail.com>
+Date:   Fri Oct 14 11:15:19 2011 -0400
+
+    first commit

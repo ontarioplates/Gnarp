@@ -1,12 +1,37 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include "stdbool.h"
 #include "stdlib.h"
 #include "main.h"
 
 
 #define MIDI_CLOCK_RATE 11250
+#define DEBOUNCE 8
 
-uint16_t _runLED[5] = {0,0,0,0,0};
+bool i_SWPUSHstate	= 0;
+bool i_SWPUSHon		= 0;
+bool i_SWPUSHoff	= 0;
+
+bool i_SWENCstate	= 0;
+bool i_SWENCon		= 0;
+bool i_SWENCoff		= 0;
+
+bool i_SWTOGstate	= 0;
+bool i_SWTOGon		= 0;
+bool i_SWTOGoff		= 0;
+
+bool o_LEDDP0		= 0;
+bool o_LEDDP1		= 0;
+bool o_LEDDP2		= 0;
+bool o_LEDSTAT		= 0;
+
+uint16_t o_LED7SEG	= 0x0000;
+
+uint8_t _i_SW0 = 0x00;
+uint8_t _i_SW1 = 0x00;
+uint8_t _i_SW = 0x00;
+uint8_t _i_SWc[3] = {0,0,0};
+
 
 
 	// Set baud rate
@@ -215,8 +240,6 @@ void testLEDfade(){
 
 }
 
-
-
 void test7Seg(){
 	PORTA.DIRSET = 0x06;
 	PORTA.OUTSET = 0x06;
@@ -378,13 +401,14 @@ void initLED(){
 }
 
 void runLED(){
-	//Convert global array _runLED[dp0, dp1, dp2, statled, digits] to LED out
+	//booleans and such convert to LED out
+	bool DP[3] = {o_LEDDP0, o_LEDDP1, o_LEDDP2};
 	
 	uint8_t i;
 	uint8_t digit;
 	uint16_t threeDigits;
 	
-	threeDigits = _runLED[4];					//copy 7seg number
+	threeDigits = o_LED7SEG;					//copy 7seg number
 	
 	for (i=0 ; i<3 ; i++){
 		digit = threeDigits%10;					//extract lowest current digit of 7seg
@@ -398,37 +422,146 @@ void runLED(){
 		
 		threeDigits = threeDigits/10;			//shift 7seg number down to next digit
 		
-		if (_runLED[i])							//light appropriate decimal points  (CHANGE INDEX SCALING FOR NEXT REVISION)
+		if (DP[i])							//light appropriate decimal points  (CHANGE INDEX SCALING FOR NEXT REVISION)
 			PORTD.OUTSET = 1 << (i+2)%3;
 		else
 			PORTD.OUTCLR = 1 << (i+2)%3;
 	}
 	
-	if (_runLED[3])								//light STATLED if necessary
+	if (o_LEDSTAT)								//light STATLED if necessary
 		PORTC.OUTCLR = 0x08;
 	else
 		PORTC.OUTSET = 0x08;
 	
 }
 
-int main(void) {
+void initSW(){
+	PORTB.DIRCLR = 0x0C;				//SW8(push) and Encoder pushbutton input
+	PORTE.DIRCLR = 0x08;				//SW7(toggle) input
+}
 
-	//testLED();
-	//testLED_TOGGLESW();
-	//testOUTTGL();
-	//testLEDfade();
-	//test7Seg();
-	//testADC();
+void runSW(){
+	//_i_SW1 = current [x, x, x, x, x, encoder, pushmom, toggle]
+	//_i_SW0 = last ["]
+	//_i_SW	 = final ["]
+	//_i_SWc[] = count for ["]
+	
+	uint8_t i;
+	
+	_i_SW1 = 0x00;									//capture current physical switch positions
+	_i_SW1 |= !(PORTE.IN >> 3) & 0x01;
+	_i_SW1 |= !((PORTB.IN >> 2) & 0x01) << 1;
+	_i_SW1 |= !((PORTB.IN >> 3) & 0x01) << 2;
+	
+	for (i = 0; i < 3; i++){
+		if (_i_SW1 >> i == _i_SW0 >> i)			//if switch didn't change
+			_i_SWc[i]++;							//increment count		
+		else
+			_i_SWc[i] = 0;							//else reset count			
+		if (_i_SWc[i] > DEBOUNCE){					//if count is over debounce value
+			_i_SW &= ~(1 << i);
+			_i_SW |= _i_SW1 & (1 << i);				//set final switch to current position
+			_i_SWc[i] = 0;							//and reset count
+		}
+	}	
+	
+	_i_SW0 = _i_SW1;								//set last switch position to current switch position
+	
+					//set booleans
+	
+	if (_i_SW & 0x01){			//if toggle IS on
+		i_SWTOGoff = 0;				//not a new off
+		if (i_SWTOGstate)			//if toggle WAS on
+			i_SWTOGon = 0;				//not a new on
+		else							//else (toggle WAS off)
+			i_SWTOGon = 1;				//new on
+		i_SWTOGstate = 1;		//set current value
+	}		
+	else{						//if toggle IS off
+		i_SWTOGon = 0;				//not a new on
+		if (i_SWTOGstate)			//if toggle WAS on
+			i_SWTOGoff = 1;				//new off
+		else
+			i_SWTOGoff = 0;
+		i_SWTOGstate = 0;
+	}		
+	
+	if (_i_SW & 0x02){		
+		i_SWPUSHoff = 0;		
+		if (i_SWPUSHstate)		
+			i_SWPUSHon = 0;		
+		else						
+			i_SWPUSHon = 1;				
+		i_SWPUSHstate = 1;		
+	}		
+	else{						
+		i_SWPUSHon = 0;				
+		if (i_SWPUSHstate)			
+			i_SWPUSHoff = 1;		
+		else
+			i_SWPUSHoff = 0;
+		i_SWPUSHstate = 0;
+	}
+	
+	if (_i_SW & 0x04){		
+		i_SWENCoff = 0;		
+		if (i_SWENCstate)		
+			i_SWENCon = 0;		
+		else						
+			i_SWENCon = 1;				
+		i_SWENCstate = 1;		
+	}		
+	else{						
+		i_SWENCon = 0;				
+		if (i_SWENCstate)			
+			i_SWENCoff = 1;		
+		else
+			i_SWENCoff = 0;
+		i_SWENCstate = 0;
+	}		
+	
+	
+}
+
+void test_switches_and_LEDs(){
 	initLED();
+	initSW();
+	
+	o_LED7SEG = 500;
 	
 	while(1){
-		_runLED[0] = 1;
-		_runLED[1] = 0;
-		_runLED[2] = 0;
-		_runLED[3] = 1;
-		_runLED[4] = 0;
+		runSW();
+		
+		o_LEDDP0 = i_SWENCstate;
+		o_LEDDP1 = i_SWPUSHstate;
+		o_LEDDP2 = i_SWTOGstate;
+		
+		if (i_SWTOGstate){
+			if (i_SWPUSHon)
+				o_LED7SEG += 10;
+			if (i_SWENCon)
+				o_LED7SEG += 1;
+		}
+		else{
+			if (i_SWPUSHoff)
+				o_LED7SEG += -10;
+			if (i_SWENCoff)
+				o_LED7SEG += -1;
+		}
+		
+		if (o_LED7SEG > 999)
+			o_LED7SEG = 0;
+		
+		if (o_LED7SEG < 1)
+			o_LED7SEG = 999; 
+		
 		runLED();
 	}
+}
+
+int main(void) {
+
+	test_switches_and_LEDs();
 
 
 	return 0;
