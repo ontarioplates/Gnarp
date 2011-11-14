@@ -25,13 +25,14 @@ bool o_LEDDP1		= 0;
 bool o_LEDDP2		= 0;
 bool o_LEDSTAT		= 0;
 
+uint8_t _i_SW0		= 0x00;
+uint8_t _i_SW1		= 0x00;
+uint8_t _i_SW		= 0x00;
+uint8_t _i_SWc[3]	= {0,0,0};
+
 uint16_t o_LED7SEG	= 0x0000;
 
-uint8_t _i_SW0 = 0x00;
-uint8_t _i_SW1 = 0x00;
-uint8_t _i_SW = 0x00;
-uint8_t _i_SWc[3] = {0,0,0};
-
+uint16_t i_POT[5]	= {0,0,0,0,0};
 
 
 	// Set baud rate
@@ -381,6 +382,39 @@ void testADC(){
 	
 }
 
+void initPOT(){
+	PORTA.DIRCLR	= 0xF9;		//ADC3:7 and VREF input
+
+	ADCA.CTRLA 		= 0x00;		//disable ADC
+	ADCA.CTRLB 		= 0x00;
+	ADCA.REFCTRL	= 0x20;		//set PORTA reference voltage
+	ADCA.EVCTRL		= 0x00;
+	ADCA.PRESCALER	= 0x00;
+	ADCA.INTFLAGS	= 0x00;
+	ADCA.CTRLA		|= 0x01;	//enable ADC
+
+	ADCA.CH0.CTRL	= 0x01;		//select external single-ended input
+	ADCA.CH0.MUXCTRL= 0x00;
+	ADCA.CH0.INTCTRL= 0x00;
+}
+
+void runPOT(){
+	uint8_t i;
+	
+	for(i = 0; i < 5; i++){
+		ADCA.CH0.INTFLAGS	|= 0x01;			//clear interrupt flag
+		ADCA.CH0.MUXCTRL	&= ~(0x07 << 3);	//clear pin select
+		ADCA.CH0.MUXCTRL	|= ((i+3) << 3);		//set pin select to current input
+		ADCA.CH0.CTRL		|=	0x80;			//start conversion
+		
+		while(!(ADCA.CH0.INTFLAGS & 0x01)){}
+		
+		i_POT[i] = ADCA.CH0.RESL;
+		i_POT[i] |= ADCA.CH0.RESH << 8;		
+	}
+	
+}
+
 void initLED(){
 	//initialize all LED outputs, set all as blank
 	
@@ -467,7 +501,7 @@ void runSW(){
 	
 	_i_SW0 = _i_SW1;								//set last switch position to current switch position
 	
-					//set booleans
+	//set booleans
 	
 	if (_i_SW & 0x01){			//if toggle IS on
 		i_SWTOGoff = 0;				//not a new off
@@ -559,9 +593,39 @@ void test_switches_and_LEDs(){
 	}
 }
 
+void test_pots(){
+	initLED();
+	initSW();
+	initPOT();
+	
+	uint8_t selPOT = 0;
+	double temp;
+	
+	while(1){
+	runSW();
+	runPOT();
+	
+	if(i_SWENCon){
+		selPOT++;
+		if (selPOT>4)
+			selPOT = 0;
+	}
+	
+	temp = 1.0*i_POT[selPOT]/0x0FFF;
+	temp = temp*99.0;
+	
+	o_LED7SEG = 100*(selPOT+1) + (int)temp;
+			
+	
+	
+	runLED();
+	
+	}	
+}
+
 int main(void) {
 
-	test_switches_and_LEDs();
+	test_pots();
 
 
 	return 0;
