@@ -7,6 +7,9 @@
 
 #define MIDI_CLOCK_RATE 11250
 #define DEBOUNCE 8
+#define POTMIN 0x00C0
+#define POTMAX 0x0FFF
+#define POTRANGE 0x0F3F 
 
 bool i_SWPUSHstate	= 0;
 bool i_SWPUSHon		= 0;
@@ -404,15 +407,33 @@ void runPOT(){
 	for(i = 0; i < 5; i++){
 		ADCA.CH0.INTFLAGS	|= 0x01;			//clear interrupt flag
 		ADCA.CH0.MUXCTRL	&= ~(0x07 << 3);	//clear pin select
-		ADCA.CH0.MUXCTRL	|= ((i+3) << 3);		//set pin select to current input
+		ADCA.CH0.MUXCTRL	|= ((i+3) << 3);	//set pin select to current input
 		ADCA.CH0.CTRL		|=	0x80;			//start conversion
 		
 		while(!(ADCA.CH0.INTFLAGS & 0x01)){}
 		
 		i_POT[i] = ADCA.CH0.RESL;
-		i_POT[i] |= ADCA.CH0.RESH << 8;		
+		i_POT[i] |= ADCA.CH0.RESH << 8;
+		
+		if (i_POT[i] < POTMIN)
+			i_POT[i] = 0;
+		else
+			i_POT[i] = i_POT[i] - POTMIN;
 	}
 	
+}
+
+uint16_t scalePOT(uint8_t pot, uint16_t outmin, uint16_t outmax){
+	//pot: 0-4 to select input pot
+	//outmin: minimum value to output
+	//outmax: maximum value to output
+	
+	double temp;
+	
+	temp = 1.0*i_POT[pot]/POTRANGE;
+	temp = temp*(outmax - outmin) + outmin;
+	
+	return (uint16_t) temp;
 }
 
 void initLED(){
@@ -599,26 +620,21 @@ void test_pots(){
 	initPOT();
 	
 	uint8_t selPOT = 0;
-	double temp;
 	
 	while(1){
-	runSW();
-	runPOT();
+		runSW();
+		runPOT();
 	
-	if(i_SWENCon){
-		selPOT++;
-		if (selPOT>4)
-			selPOT = 0;
-	}
 	
-	temp = 1.0*i_POT[selPOT]/0x0FFF;
-	temp = temp*99.0;
-	
-	o_LED7SEG = 100*(selPOT+1) + (int)temp;
+		o_LED7SEG = 100*(selPOT+1) + scalePOT(selPOT, 0, 7);
 			
+		if(i_SWENCon){
+			selPOT++;
+			if (selPOT>4)
+				selPOT = 0;
+		}
 	
-	
-	runLED();
+		runLED();
 	
 	}	
 }
