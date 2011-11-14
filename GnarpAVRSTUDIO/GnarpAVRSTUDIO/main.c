@@ -37,6 +37,9 @@ uint16_t o_LED7SEG	= 0x0000;
 
 uint16_t i_POT[5]	= {0,0,0,0,0};
 
+bool _i_ENCA0		= 0;
+bool i_ENCcw		= 0;
+bool i_ENCccw		= 0;
 
 	// Set baud rate
 /*	UBRRH = (uint8_t)(clockScale >> 8);
@@ -385,6 +388,33 @@ void testADC(){
 	
 }
 
+void initENC(){
+	PORTB.DIRCLR = 0x03;		//Encoder A and B input
+}
+
+void runENC(){
+	bool A1;	//current A
+	bool B1;	//current B
+	
+	A1 = !(PORTB.IN & 0x01);
+	B1 = !((PORTB.IN >> 1) & 0x01);
+	
+	if (!_i_ENCA0 & A1)		//movement
+	{
+		if (B1)
+			i_ENCcw = 1;	//CW		
+		else
+			i_ENCcw = 0;	//CCW
+			
+		i_ENCccw = !i_ENCccw;
+	}
+	else{
+		i_ENCcw = 0;
+		i_ENCccw = 0;
+	}		
+	_i_ENCA0 = A1;
+}
+
 void initPOT(){
 	PORTA.DIRCLR	= 0xF9;		//ADC3:7 and VREF input
 
@@ -639,9 +669,34 @@ void test_pots(){
 	}	
 }
 
+void test_encoder(){
+	initLED();
+	initSW();
+	initPOT();
+	initENC();
+	
+	o_LED7SEG = 100;
+	
+	while(1){
+		runSW();
+		runPOT();
+		runENC();
+		
+		if (i_ENCcw)
+			o_LED7SEG++;
+		else if (i_ENCccw)
+			o_LED7SEG += -1;
+			
+		o_LEDSTAT = i_SWENCstate;
+
+		
+		runLED();
+	}
+}
+
 int main(void) {
 
-	test_pots();
+	test_encoder();
 
 
 	return 0;
