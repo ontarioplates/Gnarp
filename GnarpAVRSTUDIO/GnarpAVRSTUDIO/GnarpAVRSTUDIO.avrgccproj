@@ -21,14 +21,14 @@
     <AssemblyName>GnarpAVRSTUDIO</AssemblyName>
     <Name>GnarpAVRSTUDIO</Name>
     <RootNamespace>GnarpAVRSTUDIO</RootNamespace>
-    <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
+    <avrtool>com.atmel.avrdbg.tool.avrdragon</avrtool>
     <com_atmel_avrdbg_tool_avrdragon>
       <ToolType>com.atmel.avrdbg.tool.avrdragon</ToolType>
       <ToolName>AVR Dragon</ToolName>
       <ToolNumber>00A20002303C</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1310</port>
+        <port>2404</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -54,21 +54,21 @@
       </ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1310</port>
+        <port>2361</port>
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>
     <com_atmel_avrdbg_tool_jtagicemkii>
-      <ToolType xmlns="">com.atmel.avrdbg.tool.jtagicemkii</ToolType>
-      <ToolName xmlns="">JTAGICE mkII</ToolName>
-      <ToolNumber xmlns="">00B000006113</ToolNumber>
-      <Channel xmlns="">
+      <ToolType>com.atmel.avrdbg.tool.jtagicemkii</ToolType>
+      <ToolName>JTAGICE mkII</ToolName>
+      <ToolNumber>00B000006113</ToolNumber>
+      <Channel>
         <host>127.0.0.1</host>
-        <port>2356</port>
+        <port>2361</port>
         <ssl>False</ssl>
       </Channel>
-      <ToolOptions xmlns="">
-        <InterfaceName>JTAG</InterfaceName>
+      <ToolOptions>
+        <InterfaceName>PDI</InterfaceName>
         <InterfaceProperties>
           <JtagDbgClock>1000000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
@@ -116,10 +116,10 @@
     </ToolchainSettings>
     <MemorySettings>
       <MemorySegments>
-  <InitialStack IsEnabled="0">
-    <Address>0x800</Address>
-  </InitialStack>
-</MemorySegments>
+        <InitialStack IsEnabled="0">
+          <Address>0x800</Address>
+        </InitialStack>
+      </MemorySegments>
     </MemorySettings>
     <GenerateHexFile>True</GenerateHexFile>
     <GenerateMapFile>True</GenerateMapFile>
