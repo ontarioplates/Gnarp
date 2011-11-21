@@ -41,44 +41,65 @@ bool _i_ENCA0		= 0;
 bool i_ENCcw		= 0;
 bool i_ENCccw		= 0;
 
-bool i_MIDIRX		= 0;
+uint8_t i_MIDIRX	= 0x00;
 
-ISR(USARTD1_RXC_vect)
-{
-	i_MIDIRX = 1;
+ISR(USARTD1_RXC_vect){
+	i_MIDIRX = USARTD1.DATA & 0xFF;
+//	USARTD1.STATUS &= ~0x80;
 }
 
 
 void initCLOCK(){
     //CLOCK AND PLL SETUP
-	unsigned char XOSCTEST = 0;
-	unsigned char PLLMULTFACTOR;
-	PLLMULTFACTOR = 0x02;		//Set the PLL Multiplication Factor to 2x.
-	CLK.PSCTRL = 0x01;			//Set Prescaler to 1.
-	CLK.RTCCTRL = 0x04;			//Set Real Time Clock Control to internal RCOSC but do not enable.
-	OSC.XOSCCTRL = 0x8B;
-	OSC.CTRL = 0x08;			//Once XOOSCTEST equals 1, it will exit the do loop and enable the external oscillator.
-	for (XOSCTEST = 0; XOSCTEST < 1; )
-		XOSCTEST = OSC.STATUS >> 3 &1;
-	OSC.PLLCTRL = 0xC0 + PLLMULTFACTOR;	//Set the PLL to use the external crystal and set multiplication factor.
-	OSC.CTRL = 0x18;			//Enable the PLL, disable the External Clock.
-	XOSCTEST = 0;
-	for (XOSCTEST = 0; XOSCTEST < 1; )
-		XOSCTEST = OSC.STATUS >> 4 &1;
-	CCP = 0xD8;					//Configuration Change Protection, write signature to change Clock to PLL.
-	CLK.CTRL = 0x04;			//Set the Clock to PLL
+	while (CLK.CTRL != 0x04){
+		CLK.PSCTRL = 0x01;			//Set Prescaler to 1.
+		CLK.RTCCTRL = 0x04;			//Set Real Time Clock Control to internal RCOSC but do not enable.
+		
+		OSC.XOSCCTRL = 0x8B;		//prepare for external clock (8-12 MHz)
+		OSC.CTRL = 0x08;			//enable external clock 
+		while (!(OSC.STATUS & 0x08)){}	//wait for External Oscillator to become stable and ready
+		
+		OSC.PLLCTRL = 0xC2;	//Set the PLL to use the external crystal and set multiplication factor to 2.
+		OSC.CTRL = 0x18;				//Enable the PLL, disable the External Clock.
+	
+		while (!(OSC.STATUS & 0x10)){}	//wait for PLL to become stable and ready
+
+		CCP = 0xD8;					//Configuration Change Protection, write signature to change Clock to PLL.
+		CLK.CTRL = 0x04;			//Set the Clock to PLL
+	}		
 }
 
 void initMIDI(){
 
-	cli();						//disable global interrupts
-	USARTD1.CTRLA = 0x27;		//enable RX interrupt as Medium Level, TX interrupt as Low Level, DRE as Hi Level
-	USARTD1.CTRLB = 0x18;		//set RXEN and TXEN in CTRLB Register to enable USART reciever and transmitter
-	USARTD1.CTRLC = 0x03;		//Asynchronous, Parity disabled, Single stop bit, 8 bit character size
-	USARTD1.BAUDCTRLA = 0x2F;	//BSEL = 47
-	USARTD1.BAUDCTRLB = 0x00;	//BSCALE = 0
-	PMIC.CTRL |= 0x07;			//enable all levels on interrupts
-	sei();						//enable global interrupts
+	cli();							//disable global interrupts
+	PORTD.DIRCLR		= 0x40;		//USARTRX as input
+	PORTD.DIRSET		= 0x80;		//USARTTX as output
+	PORTD.OUTSET		= 0x80;		//set TxD high for initialization
+	USARTD1.CTRLA		= 0x20;		//enable RX interrupt as Medium Level, TX interrupt as Low Level, DRE as Hi Level
+	USARTD1.CTRLC		= 0x03;		//Asynchronous, Parity disabled, Single stop bit, 8 bit character size
+	USARTD1.BAUDCTRLA	= 0x2F;		//BSEL = 47
+	USARTD1.BAUDCTRLB	= 0x00;		//BSCALE = 0
+	USARTD1.CTRLB		= 0x18;		//set RXEN and TXEN in CTRLB Register to enable USART receiver and transmitter
+	PMIC.CTRL			|= 0x02;	//enable all levels on interrupts
+	sei();							//enable global interrupts
+
+}
+
+void initMIDIvar(uint8_t bcA){
+	cli();							//disable global interrupts
+	PORTD.DIRCLR		= 0x40;		//USARTRX as input
+	PORTD.DIRSET		= 0x80;		//USARTTX as output
+	PORTD.OUTSET		= 0x80;		//set TxD high for initialization
+	USARTD1.CTRLA		= 0x20;		//enable RX interrupt as Medium Level, TX interrupt as Low Level, DRE as Hi Level
+	USARTD1.CTRLC		= 0x03;		//Asynchronous, Parity disabled, Single stop bit, 8 bit character size
+	USARTD1.BAUDCTRLA	= bcA;		//BSEL = 47
+	USARTD1.BAUDCTRLB	= 0x00;		//BSCALE = 0
+	USARTD1.CTRLB		= 0x18;		//set RXEN and TXEN in CTRLB Register to enable USART receiver and transmitter
+	PMIC.CTRL			|= 0x02;	//enable all levels on interrupts
+	sei();							//enable global interrupts
+	
+	
+	//WORKS at bcA = 3
 
 }
 
@@ -102,7 +123,7 @@ void runENC(){
 		else
 			i_ENCcw = 0;	//CCW
 			
-		i_ENCccw = !i_ENCccw;
+		i_ENCccw = !i_ENCcw;
 	}
 	else{
 		i_ENCcw = 0;
@@ -352,7 +373,7 @@ void test_pots(){
 		runPOT();
 	
 	
-		o_LED7SEG = 100*(selPOT+1) + scalePOT(selPOT, 0, 7);
+		o_LED7SEG = 0*(selPOT+1) + scalePOT(selPOT, 1, 990);
 			
 		if(i_SWENCon){
 			selPOT++;
@@ -390,31 +411,150 @@ void test_encoder(){
 	}
 }
 
-void test_midi(){
+void test_midiTX(){
 	initCLOCK();
 	initLED();
 	initMIDI();
+	initPOT();
+	initSW();
+	initENC();
 	
-	i_MIDIRX = 0;
+	uint8_t val = 0;
+	uint8_t send = 0;
 	
 	while(1){
-
-		if (i_MIDIRX){
-		//	i_MIDIRX = 0;
-			o_LEDSTAT = 1;
+		runSW();
+		runPOT();
+		runENC();
+		
+		o_LEDDP2 = i_SWENCstate;
+		o_LEDDP1 = 0;
+		o_LEDDP0 = 0;
+		o_LEDSTAT = 0;
+		
+		send = 0;
+		
+		if (i_ENCccw){
+			send = 1;
+			val = (val - 1) % 256;
 		}
-		else
-			o_LEDSTAT = 0;
+		
+		if (i_ENCcw){
+			send = 1;
+			val = (val + 1) % 256;
+		}
+		
+		if (send)
+			initMIDIvar(val);
+		
+		if (i_SWENCon){
+			send = 2;
+		}
 			
-		o_LEDDP0 = i_SWTOGstate;
+		if (send==1){
+			while (!(USARTD1.STATUS & 0x20)){}//Data Register Empty Flag
 			
+			o_LEDDP1 = 1;
+			USARTD1.DATA = 0xF8;		//sync
+		}
+		
+		if (send == 2){
+			while (!(USARTD1.STATUS & 0x20)){}//Data Register Empty Flag
+			
+			o_LEDDP1 = 1;
+			USARTD1.DATA = 0xB0;		//control change
+			
+			while (!(USARTD1.STATUS & 0x20)){}//Data Register Empty Flag
+			
+			o_LEDDP0 = 1;
+			USARTD1.DATA = 0x01;		//mod wheel
+			
+			while (!(USARTD1.STATUS & 0x20)){}//Data Register Empty Flag
+			
+			o_LEDSTAT = 1;
+			USARTD1.DATA = 0x37;		//value = 55
+		}
+		
+		o_LED7SEG = val;
+		runLED();	
+			
+		
+//		if (USARTD1.STATUS & 0x80)
+//			i_MIDIRX = USARTD1.DATA;
+		
+		
+//		runLED();
+	}
+}
+
+void test_midiTX2(){
+	initCLOCK();
+	initENC();
+	initLED();
+	initSW();
+	initPOT();
+	initMIDI();
+	
+	uint8_t val = 0;
+	
+	while(1){
+		runPOT();
+		runENC();
+		runSW();
+		
+		val = scalePOT(0,248,253);
+		
+		if (i_SWPUSHon){
+			while (!(USARTD1.STATUS & 0x20)){}//Data Register Empty Flag
+			USARTD1.DATA = val;		//sync
+		}
+		
+		o_LEDSTAT =	i_SWPUSHstate;
+		
+		o_LED7SEG = val;
+		
 		runLED();
 	}
-}	
+	
+}
+
+void test_midiRX(){
+	initCLOCK();
+	initENC();
+	initLED();
+	initSW();
+	initPOT();
+	initMIDI();
+	
+	uint8_t val = 0;
+	
+	while(1){
+		runPOT();
+		runENC();
+		runSW();
+		
+		o_LED7SEG = i_MIDIRX;
+		
+		runLED();
+	}		
+}
+
+void test_OSCOUT(){
+	initCLOCK();
+	
+	PORTC.DIRSET = 0xF8;
+	PORTCFG.CLKEVOUT = 0x01;  //Peripheral Clock output to port C pin7
+	
+	while(1){}
+	
+	
+}
 
 int main(void) {
 
-	test_midi();
+//	test_midiTX();
+	test_midiTX2();
+//	test_midiRX();
 
 	return 0;
 }
