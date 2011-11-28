@@ -1,9 +1,0 @@
-*.o
-*.hex
-*.out
-*.map
-*.swp
-*.gz
-*.lst
-doc/latex/
-doc/html/

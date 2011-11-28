@@ -39,21 +39,18 @@ ADDITIONAL_DEPENDENCIES:=
 OUTPUT_FILE_DEP:=
 
 # Every subdirectory with source files must be described here
-SUBDIRS :=  \
-../xnorMIDI \
-../xnorMIDI/bytequeue
+SUBDIRS := 
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../hardware.c \
-../main.c \
-../serial_midi.c \
-../xnorMIDI/bytequeue/bytequeue.c \
-../xnorMIDI/bytequeue/interrupt_setting.c \
+main.c \
 ../xnorMIDI/midi.c \
-../xnorMIDI/midi_device.c
-
+../xnorMIDI/midi_device.c \
+../xnorMIDI/bytequeue/bytequeue.c \
+../xnorMIDI/bytequeue/interrupt_settings.c \
+../serial_midi.c \
+../hardware.c
 
 PREPROCESSING_SRCS += 
 
@@ -62,43 +59,42 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-hardware.o \
 main.o \
-serial_midi.o \
-xnorMIDI/bytequeue/bytequeue.o \
-xnorMIDI/bytequeue/interrupt_setting.o \
-xnorMIDI/midi.o \
-xnorMIDI/midi_device.o
+../xnorMIDI/midi.o \
+../xnorMIDI/midi_device.o \
+../xnorMIDI/bytequeue/bytequeue.o \
+../xnorMIDI/bytequeue/interrupt_settings.o \
+../serial_midi.o \
+../hardware.o
 
 
 OBJS_AS_ARGS +=  \
-hardware.o \
 main.o \
-serial_midi.o \
-xnorMIDI/bytequeue/bytequeue.o \
-xnorMIDI/bytequeue/interrupt_setting.o \
-xnorMIDI/midi.o \
-xnorMIDI/midi_device.o
+midi.o \
+../xnorMIDI/midi_device.o \
+../xnorMIDI/bytequeue/bytequeue.o \
+../xnorMIDI/bytequeue/interrupt_settings.o \
+../serial_midi.o \
+../hardware.o
 
 
 C_DEPS +=  \
-hardware.d \
 main.d \
-serial_midi.d \
-xnorMIDI/bytequeue/bytequeue.d \
-xnorMIDI/bytequeue/interrupt_setting.d \
-xnorMIDI/midi.d \
-xnorMIDI/midi_device.d
-
+../xnorMIDI/midi.d \
+../xnorMIDI/midi_device.d \
+../xnorMIDI/bytequeue/bytequeue.d \
+../xnorMIDI/bytequeue/interrupt_settings.d \
+../serial_midi.d \
+../hardware.d
 
 C_DEPS_AS_ARGS +=  \
-hardware.d \
 main.d \
-serial_midi.d \
-xnorMIDI/bytequeue/bytequeue.d \
-xnorMIDI/bytequeue/interrupt_setting.d \
-xnorMIDI/midi.d \
-xnorMIDI/midi_device.d
+../xnorMIDI/midi.d \
+../xnorMIDI/midi_device.d \
+../xnorMIDI/bytequeue/bytequeue.d \
+../xnorMIDI/bytequeue/interrupt_settings.d \
+../serial_midi.d \
+../hardware.d
 
 
 OUTPUT_FILE_PATH +=GnarpAVRSTUDIO.elf
@@ -135,27 +131,7 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 
 
 
-
-
-
-
-
-
-
-
 ./%.o: .././%.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -Os -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atxmega16a4   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
-	@echo Finished building: $<
-
-xnorMIDI/bytequeue/%.o: ../xnorMIDI/bytequeue/%.c
-	@echo Building file: $<
-	@echo Invoking: AVR/GNU C Compiler
-	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -Os -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atxmega16a4   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
-	@echo Finished building: $<
-
-xnorMIDI/%.o: ../xnorMIDI/%.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler
 	$(QUOTE)$(AVR_APP_PATH)avr-gcc.exe$(QUOTE) -funsigned-char -funsigned-bitfields -Os -fpack-struct -fshort-enums -g2 -Wall -c -std=gnu99  -mmcu=atxmega16a4   -MD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
