@@ -38,15 +38,15 @@ static void initialize_clock(){
 
 static void initialize_MIDI(){
     cli();                     //disable global interrupts
+	PORTD.OUTSET = 0x80;       //set TxD high for initialization
     PORTD.DIRCLR = 0x40;       //USARTRX as input
     PORTD.DIRSET = 0x80;       //USARTTX as output
-    PORTD.OUTSET = 0x80;       //set TxD high for initialization
-    USARTD1.CTRLA = 0x20;      //enable RX interrupt as Medium Level, TX interrupt as Low Level, DRE as Hi Level
+    USARTD1.CTRLB = 0x18;      //set RXEN and TXEN in CTRLB Register to enable USART receiver and transmitter
+    USARTD1.CTRLA = 0x20;      //enable RX interrupt as Mid Level
     USARTD1.CTRLC = 0x03;      //Asynchronous, Parity disabled, Single stop bit, 8 bit character size
     USARTD1.BAUDCTRLA = 0x2F;  //BSEL = 47
     USARTD1.BAUDCTRLB = 0x00;  //BSCALE = 0
-    USARTD1.CTRLB = 0x18;      //set RXEN and TXEN in CTRLB Register to enable USART receiver and transmitter
-    PMIC.CTRL |= 0x02;         //enable all levels on interrupts
+    PMIC.CTRL |= 0x87;         //enable all levels on interrupts
     sei();                     //enable global interrupts
 }
 
