@@ -13,11 +13,14 @@
 uint16_t tick_count = 0;
 uint16_t LED_count = 0;
 
+volatile uint16_t note_out;
+volatile uint16_t velocity_out;
+
 ISR(TCC0_CCA_vect){
 	TCC0.CNT = 0x0000;	//reset counter
 	tick_count++;
-	if (get_pushbutton_switch_state() == 1)
-		midi_send_clock(serial_midi_device());
+	if (note_out)
+		midi_send_noteon(serial_midi_device(),MIDI_CHAN,(uint8_t)note_out,(uint8_t)velocity_out);
 }
 
 ISR(USARTD1_RXC_vect){
@@ -322,7 +325,7 @@ void test_xnor_out(){
 	uint16_t note = 100;
 	
 	startup_functions();
-	serial_midi_init();
+//	serial_midi_init();
 	
 	while(1){
 		preloop_functions();
@@ -364,7 +367,7 @@ void test_xnor_in(){
 	uint16_t note = 100;
 	
 	startup_functions();
-//	serial_midi_init();
+	serial_midi_init();
 	
 	while(1){
 		preloop_functions();
@@ -599,14 +602,18 @@ void test_tick_accuracy(){
 	volatile bool decimal_point2 = 0;
 	volatile bool status_LED = 0;
 	volatile uint16_t seven_segment_value = 0;
-	volatile uint16_t BPM = 120;
-	volatile uint8_t beat_count = 0;
-	volatile uint8_t measure_count = 0;
 	
-	volatile bool off_sent = 0;
+	volatile uint16_t BPM;
+
+	
+	volatile uint32_t beat_count = 0;
+	volatile uint32_t beat_count_max;
+	
+	volatile bool finished = 0;
 	
 	
 	startup_functions();
+	serial_midi_init();
 
 	
 	TCC0.CTRLA = 0x00;  //disable timer
@@ -615,64 +622,91 @@ void test_tick_accuracy(){
 	TCC0.CTRLD = 0x00;
 	TCC0.INTCTRLA = 0x00;
 	TCC0.INTCTRLB = 0x03;  //enable CCA interrupt Hi-Level
-	BPM_to_TMR(BPM);		//set initialize bpm timer registers
 
 	while(1){
-		preloop_functions();
-
-		if (get_encoder() == TURN_CW){
-			if (BPM < 400)
-				BPM++;
-				BPM_to_TMR(BPM);
-		}
-		else if (get_encoder() == TURN_CCW){
-			if (BPM > 30){
-				BPM += -1;
-				BPM_to_TMR(BPM);
-			}				
-		}
+		for(BPM = 30; BPM < 34; BPM++){
+			preloop_functions();
+			
+			if (!get_toggle_switch_state())
+				break;
 		
-		if (tick_count >= 24){
-			off_sent = 0;
-			tick_count = tick_count - 24;
-			beat_count++;
-				if (beat_count > 3){
-					beat_count = 0;
-					measure_count++;
-					if (measure_count > 99){
-						measure_count = 0;
-					}						
-				}
-		}
-		
-		decimal_point0 = 0;
-		decimal_point1 = 0;
-		if (tick_count < 12)
-			decimal_point0 = 1;
-		if (beat_count < 2)
-			decimal_point1 = 1;
-		
-		if (get_encoder_switch_edge() == EDGE_RISE){
-			beat_count = 0;
-			measure_count = 0;
-			tick_count = 0;
-		}			
-		
-		if (get_toggle_switch_state())
-			seven_segment_value = beat_count + 10*measure_count;
-		else
 			seven_segment_value = BPM;
+			velocity_out = BPM/127;		//prepare signifying MIDI outputs
+			note_out = BPM - velocity_out*127;
 		
-		postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
-	}
+			decimal_point0 = 0;
+			decimal_point1 = 0;
+			decimal_point2 = 0;
+			status_LED = 0;
+		
+			beat_count = 0;
+			
+			//4 beats or 4 seconds, whichever is more samples
+			if (BPM/20 > 4)
+				beat_count_max = BPM/15;
+			else
+				beat_count_max = 4;
+		
+			midi_send_clock(serial_midi_device());    //clock tick to separate different BPMs
+			midi_send_clock(serial_midi_device());
+			
+			tick_count = 0;
+		
+			BPM_to_TMR(BPM);  //start ticks
+		
+		
 	
+			while(beat_count < beat_count_max && get_toggle_switch_state()){
+				preloop_functions();
+				if (tick_count >= 24){
+					tick_count = tick_count - 24;
+					beat_count++;
+				}
+				if (tick_count < 12)
+					status_LED = 1;
+				else
+					status_LED = 0;
+				postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
+			}
+		
+			finished = 1;
+
+		}
+	
+		while(!get_toggle_switch_state() || finished){
+			note_out = 0;
+		
+			preloop_functions();
+			BPM_to_TMR(200);
+			if (tick_count >= 24)
+				tick_count = 0;
+		
+			if (tick_count < 12){
+				decimal_point0 = 1;
+				decimal_point1 = 1;
+				decimal_point2 = 1;
+				status_LED = 1;
+				seven_segment_value = 111;
+			}
+			else{
+				decimal_point0 = 0;
+				decimal_point1 = 0;
+				decimal_point2 = 0;
+				status_LED = 0;
+				seven_segment_value = 888;			
+			}	
+			postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
+		}
+	
+	
+	}	
 }
 
 int main(void) {
 
+//	test_xnor_out();
 //    test_BPM();
    test_tick_accuracy();
-//    test_seven_segment();
-
+   
 	return 0;
 }

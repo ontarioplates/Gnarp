@@ -48,8 +48,6 @@ static void initialize_MIDI(){
     USARTD1.BAUDCTRLB = 0x00;  //BSCALE = 0
     PMIC.CTRL |= 0x87;         //enable all levels on interrupts
     sei();                     //enable global interrupts
-	
-	serial_midi_init();
 }
 
 static void initialize_encoder(){
