@@ -509,6 +509,48 @@ void BPM_to_TMR(uint16_t BPM){
 	return;
 }
 
+void BPM_to_TMR2(uint16_t BPM){
+    const uint32_t numerator = 1440000000;                                 //clk = 24MHz, cyc/beat = 1.44Trillion/BPM
+    const uint32_t clock_divide[8] = {0, 1, 2, 4, 8, 64, 256, 1024};     //corresponds to division value for TCxx.CTRLA
+	
+	volatile uint8_t current_clock_divide_select = (TCC0.CTRLA & 0x0F);
+	volatile uint8_t new_clock_divide_select = 1;
+	volatile uint32_t adjusted_count = 0;
+	
+	volatile uint32_t cycle_per_beat = numerator/BPM;   //compare value for no divider
+	
+	volatile uint32_t compare_value = cycle_per_beat/clock_divide[new_clock_divide_select];
+	
+	while (compare_value > 0xFFFF){        //run loop until compare_value is a 16 bit number
+		new_clock_divide_select++;             //try the next highest divider
+		
+		if (new_clock_divide_select > 7)       //unless you've explored all of them
+			return;
+		
+		compare_value = cycle_per_beat/clock_divide[new_clock_divide_select];
+	}
+	
+	if (TCC0.CTRLA){
+		if (!(current_clock_divide_select == new_clock_divide_select)){           //stop and scale the timer count if the divider must change
+			TCC0.CTRLA = 0x00;
+			adjusted_count = TCC0.CNT * clock_divide[new_clock_divide_select];
+			adjusted_count = adjusted_count / clock_divide[current_clock_divide_select];
+			while (adjusted_count > compare_value)
+				adjusted_count = adjusted_count - compare_value;
+			TCC0.CNT = (uint16_t) adjusted_count;
+		}
+		else
+			TCC0.CTRLA = 0x00;  //otherwise, just stop the timer 
+	}			
+	
+	
+	TCC0.CCA = (uint16_t) compare_value;    //set the new compare value for beat
+	TCC0.CCD = (uint16_t) compare_value/24; //set the new compare value for midi-clock ticks
+	TCC0.CTRLA = new_clock_divide_select;   //set the new clock divider and start the clock
+
+	return;
+}
+
 void test_BPM(){
 	volatile bool decimal_point0 = 0;
 	volatile bool decimal_point1 = 0;
