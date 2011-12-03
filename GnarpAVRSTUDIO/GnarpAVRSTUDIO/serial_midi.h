@@ -10,7 +10,7 @@ extern "C" {
 
 //initialize serial midi and return the device pointer
 MidiDevice* serial_midi_init();
-//MidiDevice* serial_midi_device();
+MidiDevice* serial_midi_device();
 //void serial_midi_send(MidiDevice * device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2);
 
 #ifdef __cplusplus

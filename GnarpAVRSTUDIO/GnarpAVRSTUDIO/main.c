@@ -10,18 +10,89 @@
 
 #define MIDI_CHAN 0
 
-uint16_t tick_count = 0;
-uint16_t LED_count = 0;
+typedef enum {QUARTER, QUARTER_TRIPLET, EIGTH_DOTTED, EIGTH, EIGTH_TRIPLET, SIXTEENTH_DOTTED, SIXTEENTH, SIXTEENTH_TRIPLET}
+note_division;
 
-volatile uint16_t note_out;
-volatile uint16_t velocity_out;
+bool beat_overflow = 0;
+uint8_t current_pitch;
+uint8_t current_velocity;
+uint8_t next_pitch;
+uint8_t next_velocity;
+note_division next_division;
+uint16_t next_duration;
+
+void note_off(uint8_t pitch, uint8_t velocity){
+	if (get_toggle_switch_state())
+		midi_send_noteoff(serial_midi_device(),MIDI_CHAN,pitch,velocity);
+}
+
+void note_on(uint8_t pitch, uint8_t velocity, note_division division, uint16_t duration){
+	const uint32_t division_numerator[8]   = {1, 2, 3, 1, 1, 3, 1, 1};
+	const uint32_t division_denominator[8] = {1, 3, 4, 2, 3, 8, 4, 6};
+	volatile uint16_t current_time;
+	volatile uint32_t next_note_on_time;
+	volatile uint32_t next_cutoff_time;
+		
+//	Q: 1/1 2/3 3/2
+//	E: 1/2 1/3 3/4
+//	S: 1/4 1/6 3/8
+//  a= q (1) /e (1/2) /s (1/4)
+//  b= d (3/2) / x (1) / t (2/3)
+//  note length = a^-2 * 2/3^(b-1)   ... too complicated, just make a lookup table/array
+	
+	if (get_toggle_switch_state())	
+		midi_send_noteon(serial_midi_device(), MIDI_CHAN, pitch, velocity);
+	
+	current_time = TCC0.CNT;
+
+	next_note_on_time = TCC0.CCA * division_numerator[division];  //calculate the new value for Compare B (interrupt for new note)
+	next_note_on_time = next_note_on_time / division_denominator[division];
+	
+	next_cutoff_time = next_note_on_time * duration;
+	next_cutoff_time = next_cutoff_time / 0xFFFF;
+	
+	next_cutoff_time += current_time;
+	if (next_cutoff_time > TCC0.CCA)
+		next_cutoff_time = next_cutoff_time - TCC0.CCA;
+	
+	next_note_on_time += current_time;
+	if (next_note_on_time > TCC0.CCA)    //the counter will reset at CCA, so check for overflow
+		next_note_on_time = next_note_on_time - TCC0.CCA;
+		
+	TCC0.CCB = (uint16_t) next_note_on_time;    //set compare B to new value
+	TCC0.CCC = (uint16_t) next_cutoff_time;     //set compare C to new value
+	TCC0.CTRLB |= 0x20;   //enable CCB (note on)
+	TCC0.CTRLB |= 0x40;   //enable CCC (note off) 
+}
+
+
 
 ISR(TCC0_CCA_vect){
-	TCC0.CNT = 0x0000;	//reset counter
-	tick_count++;
-	if (note_out)
-		midi_send_noteon(serial_midi_device(),MIDI_CHAN,(uint8_t)note_out,(uint8_t)velocity_out);
+	TCC0.CNT = 0;      //reset beat clock
+	beat_overflow = 1; //signal new beat flag
+	
+/*	if (get_toggle_switch_state()){
+		midi_send_noteoff(serial_midi_device(),MIDI_CHAN,100,100);
+		midi_send_noteon(serial_midi_device(),MIDI_CHAN,100,100);
+	}*/	
 }
+
+ISR(TCC0_CCB_vect){
+	note_on(next_pitch,next_velocity,next_division,next_duration);
+	current_pitch = next_pitch;
+	current_velocity = next_velocity;
+}
+
+ISR(TCC0_CCC_vect){
+	note_off(current_pitch, current_velocity);
+	TCC0.CTRLB &= ~0x40;  //disable CCC (note off)
+}
+
+ISR(TCC0_CCD_vect){
+	//midi_send_clock(serial_midi_device());  //send clock tick
+	//calculate time for next clock tick
+}
+
 
 ISR(USARTD1_RXC_vect){
 	midi_device_input(serial_midi_device(),1,USARTD1.DATA);
@@ -419,7 +490,7 @@ void test_blank(){
 	
 }
 
-void test_timer(){
+/*void test_timer(){
 	bool decimal_point0 = 0;
 	bool decimal_point1 = 0;
 	bool decimal_point2 = 0;
@@ -466,7 +537,7 @@ void test_timer(){
 		postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
 	}
 	
-}
+}*/
 
 void BPM_to_TMR(uint16_t BPM){
     const uint32_t numerator = 60000000;                                 //clk = 12MHz, cyc/MIDItick = 30M/BPM
@@ -546,12 +617,116 @@ void BPM_to_TMR2(uint16_t BPM){
 	
 	TCC0.CCA = (uint16_t) compare_value;    //set the new compare value for beat
 	TCC0.CCD = (uint16_t) compare_value/24; //set the new compare value for midi-clock ticks
+	
+	TCC0.CTRLB |= 0x90;   //enable CCA (beat count) and CCD (tick count)
+	
 	TCC0.CTRLA = new_clock_divide_select;   //set the new clock divider and start the clock
 
 	return;
 }
 
-void test_BPM(){
+
+
+
+void test_notes(){
+	volatile bool decimal_point0 = 0;
+	volatile bool decimal_point1 = 0;
+	volatile bool decimal_point2 = 0;
+	volatile bool status_LED = 0;
+	volatile uint16_t seven_segment_value = 0;
+	volatile uint16_t BPM = 60;
+	volatile uint8_t beat_count = 0;
+	volatile bool play_notes = 0;
+	volatile uint32_t temp_duration;
+		
+	startup_functions();
+	serial_midi_init();
+	
+	TCC0.CTRLA = 0x00;  //disable timer
+	TCC0.CTRLB = 0x00;  //disable all compares
+	TCC0.CTRLC = 0x00;
+	TCC0.CTRLD = 0x00;
+	TCC0.INTFLAGS = 0x00;  //clear interrupt flags
+	TCC0.INTCTRLA = 0x00;
+	TCC0.INTCTRLB = 0x6B;  //enable CCA interrupt Hi-Level, CCB mid, CCC mid, CCD low
+    TCC0.CNT = 0;     //reset counter
+	BPM_to_TMR2(BPM);
+	
+	next_pitch = 50;
+	next_velocity = 100;
+	next_division = QUARTER;
+	next_duration = 0xEFFF;
+	
+	note_on(next_pitch,next_velocity,next_division,next_duration);
+	
+	while(1){
+		preloop_functions();
+
+		if (beat_overflow){
+			beat_overflow = 0;
+			beat_count++;
+			if (beat_count > 3)
+				beat_count = 0;
+		}
+		
+		if (TCC0.CNT < TCC0.CCA/4)
+			decimal_point0 = 1;
+		else
+			decimal_point0 = 0;
+
+		if (get_pushbutton_switch_state()){
+			if (get_encoder_switch_state())
+			{
+				if (get_encoder_switch_edge() == EDGE_RISE || get_pushbutton_switch_edge() == EDGE_RISE){
+					BPM += 20;
+					if (BPM>400)
+						BPM = 4;
+					BPM_to_TMR2(BPM);
+				}					
+				seven_segment_value = BPM;
+			}
+			else{
+				if (get_encoder() == TURN_CW && next_division < SIXTEENTH_TRIPLET)
+					next_division++;
+				if (get_encoder() == TURN_CCW && next_division > QUARTER)
+					next_division += -1;
+			
+			seven_segment_value = next_division;
+			}			
+		}
+		else if (get_encoder_switch_state()){
+			temp_duration = 100;
+			temp_duration = temp_duration * next_duration;
+			temp_duration = temp_duration / 0xFFFF;
+			
+			if (get_encoder_switch_edge() == EDGE_RISE){
+				temp_duration+=5;
+				if (temp_duration > 100)
+					temp_duration = temp_duration-100;
+				
+				next_duration = (temp_duration * 0xFFFF) / 100;
+			}			
+			
+			seven_segment_value = (uint16_t)temp_duration;
+		}
+		else
+			seven_segment_value = beat_count;
+			
+		if (get_toggle_switch_edge() == EDGE_RISE){
+			note_off(current_pitch,current_velocity);
+			beat_count = 0;
+			TCC0.CNT = 0;
+			note_on(next_pitch,next_velocity,next_division,next_duration);
+		}			
+					
+		
+		postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
+	}
+	
+}
+
+
+/*void test_BPM(){
 	volatile bool decimal_point0 = 0;
 	volatile bool decimal_point1 = 0;
 	volatile bool decimal_point2 = 0;
@@ -637,8 +812,8 @@ void test_BPM(){
 	}
 	
 }
-
-void test_tick_accuracy(){
+*/
+/*void test_tick_accuracy(){
 	volatile bool decimal_point0 = 0;
 	volatile bool decimal_point1 = 0;
 	volatile bool decimal_point2 = 0;
@@ -743,12 +918,10 @@ void test_tick_accuracy(){
 	
 	}	
 }
-
+*/
 int main(void) {
 
-//	test_xnor_out();
-//    test_BPM();
-   test_tick_accuracy();
+	test_notes();
    
 	return 0;
 }
