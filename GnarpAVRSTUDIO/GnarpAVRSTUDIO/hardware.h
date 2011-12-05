@@ -12,8 +12,12 @@ turn_state;
 typedef enum {EDGE_NONE, EDGE_RISE, EDGE_FALL}
 switch_edge;
 	
-void startup_functions();
-void preloop_functions();
+void initialize_hardware();
+void read_hardware();
+
+void set_LEDs_on(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2);
+void set_LEDs_off(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2);
+void set_seven_segment_LEDs(uint16_t seven_segment_value);
 void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value);
 
 turn_state get_encoder();

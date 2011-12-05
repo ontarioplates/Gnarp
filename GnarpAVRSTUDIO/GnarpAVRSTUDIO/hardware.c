@@ -7,9 +7,8 @@
 #include "stdlib.h"
 
 #define DEBOUNCE 8
-#define POTMIN 0x00C0
-#define POTMAX 0x0FFF
-#define POTRANGE 0x0F3F
+#define POTMIN 501
+#define POTMAX 3817
 
 static turn_state encoder_state = TURN_NONE;
 static switch_edge pushbutton_switch_edge = EDGE_NONE;
@@ -96,7 +95,7 @@ static void initialize_pots(){
 }
 
 static void read_pots(){
-    uint8_t i;
+    volatile uint8_t i;
     
     //cycle through each ADC input and read the values
     //and set the variables appropriately
@@ -124,10 +123,17 @@ uint16_t get_pot_value(uint8_t pot, uint16_t outmin, uint16_t outmax){
     //outmin: minimum value to output
     //outmax: maximum value to output
     
+	const uint16_t pot_range = POTMAX - POTMIN; 
     float temp;
     
-    temp = 1.0*pot_values[pot]/POTRANGE;
+    temp = 1.0*pot_values[pot]/pot_range;
     temp = temp*(outmax - outmin) + outmin;
+	
+	if (temp > outmax)
+		temp = outmax;
+		
+	if (temp < outmin)
+		temp = outmin;
     
     return (uint16_t) temp;
 }
@@ -151,10 +157,7 @@ static void initialize_LEDs(){
     PORTC.OUTSET = 0x08;    //STATLED high (blank statled)
 }
 
-static void set_LEDs(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value){
-    //booleans and such convert to LED out
-    bool decimal_points[3] = {decimal_point_0, decimal_point_1, decimal_point_2};
-    
+void set_seven_segment_LEDs(uint16_t seven_segment_value){
     uint8_t i;
     uint8_t digit;
     
@@ -168,19 +171,38 @@ static void set_LEDs(bool status_LED, bool decimal_point_0, bool decimal_point_1
         PORTC.OUTSET = digit << 4;              //set digit select #
         PORTD.OUTSET = 0x38;                    //disarm all 7 segments
         
-        seven_segment_value = seven_segment_value/10;           //shift 7seg number down to next digit
-        
-        if (decimal_points[i])                              //light appropriate decimal points  (CHANGE INDEX SCALING FOR NEXT REVISION)
-            PORTD.OUTSET = 1 << (i+2)%3;
-        else
-            PORTD.OUTCLR = 1 << (i+2)%3;
+        seven_segment_value = seven_segment_value/10;           //shift 7seg number down to next digit 
     }
-    
-    if (status_LED)                                //light STATLED if necessary
-        PORTC.OUTCLR = 0x08;
-    else
-        PORTC.OUTSET = 0x08;
-    
+}
+
+void set_LEDs_on(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2){
+    //booleans and such convert to LED out
+	if (status_LED)
+		PORTC.OUTCLR = 0x08;
+	
+	if (decimal_point_0)
+		PORTD.OUTSET = 0x04;
+		
+	if (decimal_point_1)
+		PORTD.OUTSET = 0x01;
+	
+	if (decimal_point_2)
+		PORTD.OUTSET = 0x02;
+}
+
+void set_LEDs_off(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2){
+    //booleans and such convert to LED out
+	if (status_LED)
+		PORTC.OUTSET = 0x08;
+	
+	if (decimal_point_0)
+		PORTD.OUTCLR = 0x04;
+		
+	if (decimal_point_1)
+		PORTD.OUTCLR = 0x01;
+	
+	if (decimal_point_2)
+		PORTD.OUTCLR = 0x02;
 }
 
 static void initialize_switches(){
@@ -295,7 +317,7 @@ switch_edge get_toggle_switch_edge(){
     return toggle_switch_edge;
 }
 
-void startup_functions(){
+void initialize_hardware(){
     initialize_clock();
     initialize_MIDI();
     initialize_pots();
@@ -304,12 +326,14 @@ void startup_functions(){
     initialize_LEDs();
 }
 
-void preloop_functions(){
+void read_hardware(){
     read_switches();
     read_pots();
     read_encoder();
 }
 
 void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value){
-    set_LEDs(status_LED, decimal_point_0, decimal_point_1, decimal_point_2, seven_segment_value);
+    
+	
+	//set_LEDs(status_LED, decimal_point_0, decimal_point_1, decimal_point_2, seven_segment_value);
 }
