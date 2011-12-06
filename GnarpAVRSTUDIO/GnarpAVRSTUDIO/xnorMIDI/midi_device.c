@@ -78,8 +78,8 @@ void midi_device_process(MidiDevice * device) {
       device->pre_input_process_callback(device);
 
    //pull stuff off the queue and process
-   byteQueueIndex_t len = bytequeue_length(&device->input_queue);
-   uint16_t i;
+   volatile byteQueueIndex_t len = bytequeue_length(&device->input_queue);
+   volatile uint16_t i;
    //TODO limit number of bytes processed?
    for(i = 0; i < len; i++) {
       uint8_t val = bytequeue_get(&device->input_queue, 0);

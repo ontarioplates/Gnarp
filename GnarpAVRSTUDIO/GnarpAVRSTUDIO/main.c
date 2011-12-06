@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-static MidiDevice midi_device;
+/*static MidiDevice midi_device;
 
 bool beat_overflow = 0;
 uint8_t next_velocity;
@@ -17,9 +17,10 @@ uint16_t next_duration;
 	
 const uint8_t pitch_array[7] = {50, 55, 53, 60, 59, 65, 40};
 uint8_t pitch_array_select = 0;
-
+*/
 ISR(USARTD1_RXC_vect){
-	midi_device_input(midi_device,1,USARTD1.DATA);
+	midi_device_input(serial_midi_device(),1,USARTD1.DATA);
+	midi_device_process(serial_midi_device());
 }
 
 void test_pots(){
@@ -36,15 +37,13 @@ void test_pots(){
 	while(1){
 		read_hardware();
 	
-		seven_segment_value = 100*(selPOT+1) + get_pot_value(selPOT, 1, 99);
+		set_seven_segment_LEDs(100*(selPOT+1) + get_pot_value(selPOT, 1, 99));
 			
 		if(get_encoder_switch_edge()==EDGE_RISE){
 			selPOT++;
 			if (selPOT>4)
 				selPOT = 0;
 		}
-	
-		postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
 	
 	}	
 }
@@ -352,7 +351,7 @@ void test_xnor_out(){
 	}
 	
 }
-
+*/
 void test_xnor_in(){
 	bool decimal_point0 = 0;
 	bool decimal_point1 = 0;
@@ -366,35 +365,10 @@ void test_xnor_in(){
 	
 	while(1){
 		read_hardware();
-		
-		if (get_encoder() == TURN_CCW){
-			if (note <= 64)
-				note = 152;
-			else
-				note += -1;
-		}
-		else if (get_encoder() == TURN_CW){
-			if (note >= 152)
-				note = 64;
-			else
-				note++;
-		}				
-					
-//		if (get_encoder_switch_edge() == EDGE_RISE)
-//		    midi_send_noteon(serial_midi_device(),MIDI_CHAN,note,120);
-//		else if (get_encoder_switch_edge() == EDGE_FALL)
-//			midi_send_noteoff(serial_midi_device(),MIDI_CHAN,note,120);
-		
-		status_LED = get_encoder_switch_state();
-		decimal_point0 = (get_encoder() == TURN_CW);
-		decimal_point1 = (get_encoder() == TURN_CCW);
-		seven_segment_value = note;
-		
-		postloop_functions(status_LED,decimal_point0,decimal_point1,decimal_point2,seven_segment_value);
 	}
 	
 }
-*/
+
 void test_blank(){
 	bool decimal_point0 = 0;
 	bool decimal_point1 = 0;
@@ -680,12 +654,7 @@ void test_notes2(){
 */
 int main(void) {
 
-	initialize_hardware();
-	serial_midi_init();
-	
-	while(1){
-		midi_device_process(serial_midi_device());
-	}		
+	test_xnor_in();
    
 	return 0;
 }

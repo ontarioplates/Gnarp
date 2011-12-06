@@ -7,8 +7,8 @@
 #include "stdlib.h"
 
 #define DEBOUNCE 8
-#define POTMIN 501
-#define POTMAX 3817
+#define POTMIN 0x00E0
+#define POTMAX 0x0FFF
 
 static turn_state encoder_state = TURN_NONE;
 static switch_edge pushbutton_switch_edge = EDGE_NONE;
@@ -86,7 +86,7 @@ static void initialize_pots(){
     ADCA.CTRLB = 0x00;
     ADCA.REFCTRL = 0x20;        //set PORTA reference voltage
     ADCA.EVCTRL = 0x00;
-    ADCA.PRESCALER = 0x00;
+    ADCA.PRESCALER = 0x01;     //set prescaler to clk/8 for accuracy
     ADCA.INTFLAGS = 0x00;
     ADCA.CTRLA |= 0x01;         //enable ADC
     ADCA.CH0.CTRL = 0x01;       //select external single-ended input
@@ -106,6 +106,7 @@ static void read_pots(){
         ADCA.CH0.CTRL |=    0x80;            //start conversion
         
         while(!(ADCA.CH0.INTFLAGS & 0x01)){} //wait for read to complete
+
         
         pot_values[i] = ADCA.CH0.RESL;
         pot_values[i] |= ADCA.CH0.RESH << 8;
