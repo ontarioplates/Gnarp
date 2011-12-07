@@ -652,9 +652,49 @@ void test_notes2(){
 	
 }
 */
+
+void test_pot_banks(){
+	initialize_hardware();
+	
+	uint16_t pot_out_max = 10;
+	uint16_t pot_out_min = 0;
+	uint16_t pot_out_value = 0;
+	
+	while(1){
+		read_hardware();
+		
+		if (get_encoder() == TURN_CW){
+			if (get_encoder_switch_state()){
+				if (pot_out_min < (pot_out_max - 1))
+					pot_out_min++;
+			}					
+			else if (pot_out_max < 999)
+				pot_out_max++;
+		}
+		else if (get_encoder() == TURN_CCW){
+			if (get_encoder_switch_state()){
+				if (pot_out_min > 0)
+					pot_out_min += -1;
+			}					
+			else if (pot_out_max > (pot_out_min + 1))
+				pot_out_max += -1;
+		}
+		
+		pot_out_value = get_pot_value(2, pot_out_min, pot_out_max);
+		
+		if (get_toggle_switch_state())
+			set_seven_segment_LEDs(pot_out_value);
+		else if (get_pushbutton_switch_state())
+			set_seven_segment_LEDs(pot_out_min);
+		else
+			set_seven_segment_LEDs(pot_out_max);
+		
+	}
+}
+
 int main(void) {
 
-	test_xnor_in();
+	test_pot_banks();
    
 	return 0;
 }

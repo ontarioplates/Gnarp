@@ -124,11 +124,11 @@ uint16_t get_pot_value(uint8_t pot, uint16_t outmin, uint16_t outmax){
     //outmin: minimum value to output
     //outmax: maximum value to output
     
-	const uint16_t pot_range = POTMAX - POTMIN; 
+	const uint16_t pot_range = POTMAX - POTMIN + 1; 
     float temp;
     
     temp = 1.0*pot_values[pot]/pot_range;
-    temp = temp*(outmax - outmin) + outmin;
+    temp = temp*(outmax - outmin + 1) + outmin;
 	
 	if (temp > outmax)
 		temp = outmax;
