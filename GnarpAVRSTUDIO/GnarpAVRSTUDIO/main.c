@@ -19,7 +19,9 @@ const uint8_t pitch_array[7] = {50, 55, 53, 60, 59, 65, 40};
 uint8_t pitch_array_select = 0;
 */
 ISR(USARTD1_RXC_vect){
-	midi_device_input(serial_midi_device(),1,USARTD1.DATA);
+//	static uint8_t new_byte[1];
+//	new_byte[0] = USARTD1.DATA;
+	midi_device_input(serial_midi_device(),1,&(USARTD1.DATA));
 	midi_device_process(serial_midi_device());
 }
 
@@ -353,18 +355,28 @@ void test_xnor_out(){
 }
 */
 void test_xnor_in(){
-	bool decimal_point0 = 0;
-	bool decimal_point1 = 0;
-	bool decimal_point2 = 0;
-	bool status_LED = 0;
-	uint16_t seven_segment_value = 0;
-	uint16_t note = 100;
-	
+	static uint8_t new_byte;
+
 	initialize_hardware();
 	serial_midi_init();
 	
 	while(1){
 		read_hardware();
+		
+		if (get_encoder_switch_edge()){
+			new_byte = 0x90;
+			midi_device_input(serial_midi_device(),1,&new_byte);
+			midi_device_process(serial_midi_device());
+			
+			new_byte = 0x3D;
+			midi_device_input(serial_midi_device(),1,&new_byte);
+			midi_device_process(serial_midi_device());
+			
+			new_byte = 0x64;
+			midi_device_input(serial_midi_device(),1,&new_byte);
+			midi_device_process(serial_midi_device());
+		}
+		
 	}
 	
 }
@@ -694,7 +706,7 @@ void test_pot_banks(){
 
 int main(void) {
 
-	test_pot_banks();
+	test_xnor_in();
    
 	return 0;
 }

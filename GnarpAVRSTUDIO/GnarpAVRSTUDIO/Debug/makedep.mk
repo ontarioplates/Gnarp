@@ -4,6 +4,8 @@
 
 hardware.c
 
+linkedlist.c
+
 main.c
 
 serial_midi.c

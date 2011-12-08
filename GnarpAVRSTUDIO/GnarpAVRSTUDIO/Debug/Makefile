@@ -47,6 +47,7 @@ SUBDIRS :=  \
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../hardware.c \
+../linkedlist.c \
 ../main.c \
 ../serial_midi.c \
 ../xnorMIDI/bytequeue/bytequeue.c \
@@ -63,6 +64,7 @@ ASM_SRCS +=
 
 OBJS +=  \
 hardware.o \
+linkedlist.o \
 main.o \
 serial_midi.o \
 xnorMIDI/bytequeue/bytequeue.o \
@@ -73,6 +75,7 @@ xnorMIDI/midi_device.o
 
 OBJS_AS_ARGS +=  \
 hardware.o \
+linkedlist.o \
 main.o \
 serial_midi.o \
 xnorMIDI/bytequeue/bytequeue.o \
@@ -83,6 +86,7 @@ xnorMIDI/midi_device.o
 
 C_DEPS +=  \
 hardware.d \
+linkedlist.d \
 main.d \
 serial_midi.d \
 xnorMIDI/bytequeue/bytequeue.d \
@@ -93,6 +97,7 @@ xnorMIDI/midi_device.d
 
 C_DEPS_AS_ARGS +=  \
 hardware.d \
+linkedlist.d \
 main.d \
 serial_midi.d \
 xnorMIDI/bytequeue/bytequeue.d \
@@ -128,6 +133,8 @@ ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_F
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR/GNU C Compiler
+
+
 
 
 
