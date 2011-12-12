@@ -46,6 +46,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../arpeggiator.c \
 ../hardware.c \
 ../linkedlist.c \
 ../main.c \
@@ -63,6 +64,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+arpeggiator.o \
 hardware.o \
 linkedlist.o \
 main.o \
@@ -74,6 +76,7 @@ xnorMIDI/midi_device.o
 
 
 OBJS_AS_ARGS +=  \
+arpeggiator.o \
 hardware.o \
 linkedlist.o \
 main.o \
@@ -85,6 +88,7 @@ xnorMIDI/midi_device.o
 
 
 C_DEPS +=  \
+arpeggiator.d \
 hardware.d \
 linkedlist.d \
 main.d \
@@ -96,6 +100,7 @@ xnorMIDI/midi_device.d
 
 
 C_DEPS_AS_ARGS +=  \
+arpeggiator.d \
 hardware.d \
 linkedlist.d \
 main.d \
@@ -133,6 +138,8 @@ ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_F
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR/GNU C Compiler
+
+
 
 
 

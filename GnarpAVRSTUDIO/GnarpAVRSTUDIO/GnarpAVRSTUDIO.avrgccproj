@@ -130,12 +130,12 @@
     <ExternalMakeFilePath>C:\Documents and Settings\David\My Documents\AVR\Gnarp\GnarpAVRSTUDIO\GnarpAVRSTUDIO\Debug\Makefile_manual</ExternalMakeFilePath>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="arpeggiator.c">
+    <Compile Include="arpeggiator.c">
       <SubType>compile</SubType>
-    </None>
-    <None Include="arpeggiator.h">
+    </Compile>
+    <Compile Include="arpeggiator.h">
       <SubType>compile</SubType>
-    </None>
+    </Compile>
     <Compile Include="hardware.c">
       <SubType>compile</SubType>
     </Compile>
@@ -143,6 +143,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="linkedlist.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="linkedlist.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
