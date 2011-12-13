@@ -1,13 +1,5 @@
 #include "main.h"
 
-#include "hardware.h"
-#include "serial_midi.h"
-
-#include <avr/interrupt.h>
-#include <math.h>
-#include <stdbool.h>
-#include <stdlib.h>
-
 /*static MidiDevice midi_device;
 
 bool beat_overflow = 0;
@@ -704,9 +696,144 @@ void test_pot_banks(){
 	}
 }
 
+void check_note_list_head_pitch_f(NoteList* note_list, uint8_t* pitch_list){
+	
+	volatile uint8_t list_count = note_list->count;
+	
+	if (list_count == 0)
+	    return;
+	
+
+	volatile uint8_t i = 0;
+	volatile Note* current_note;
+	
+	current_note = note_list->head_pitch;
+	
+	i=0;
+	while (current_note != NULL){
+		pitch_list[i] = current_note->pitch;
+		
+		current_note = current_note->next_note_by_pitch;
+		i++;
+	}
+	
+	i = 0;
+	
+	return;
+}
+
+void check_note_list_head_pitch_b(NoteList* note_list, uint8_t* pitch_list){
+	
+	volatile uint8_t list_count = note_list->count;
+	
+	if (list_count == 0)
+	    return;
+	
+
+	volatile uint8_t i = 0;
+	volatile Note* current_note;
+	
+	current_note = note_list->tail_pitch;
+	
+	i=0;
+	while (current_note != NULL){
+		pitch_list[i] = current_note->pitch;
+		
+		current_note = current_note->previous_note_by_pitch;
+		i++;
+	}
+	
+	i = 0;
+	
+	return;
+}
+
+void check_note_list_head_trigger_f(NoteList* note_list, uint8_t* pitch_list){
+	
+	volatile uint8_t list_count = note_list->count;
+	
+	if (list_count == 0)
+	    return;
+	
+
+	volatile uint8_t i = 0;
+	volatile Note* current_note;
+	
+	current_note = note_list->head_trigger;
+	
+	i=0;
+	while (current_note != NULL){
+		pitch_list[i] = current_note->pitch;
+		
+		current_note = current_note->next_note_by_trigger;
+		i++;
+	}
+	
+	i = 0;
+	
+	return;
+}
+
+void check_note_list_head_trigger_b(NoteList* note_list, uint8_t* pitch_list){
+	
+	volatile uint8_t list_count = note_list->count;
+	
+	if (list_count == 0)
+	    return;
+	
+
+	volatile uint8_t i = 0;
+	volatile Note* current_note;
+	
+	current_note = note_list->tail_trigger;
+	
+	i=0;
+	while (current_note != NULL){
+		pitch_list[i] = current_note->pitch;
+		
+		current_note = current_note->previous_note_by_trigger;
+		i++;
+	}
+	
+	i = 0;
+	
+	return;
+}
+
+void test_list(){
+	volatile uint8_t check_count;
+	volatile uint8_t i;
+	volatile uint8_t note_stream[MAX_LIST_NOTES];
+	volatile uint8_t check_pitch_f[MAX_LIST_NOTES];
+	volatile uint8_t check_pitch_b[MAX_LIST_NOTES];
+	volatile uint8_t check_trigger_f[MAX_LIST_NOTES];
+	volatile uint8_t check_trigger_b[MAX_LIST_NOTES];
+	
+	initialize_hardware();
+	initialize_note_list();
+	
+	for (i=0; i< MAX_LIST_NOTES; i++)
+	    note_stream[i] = rand() % 100 + 100;
+		
+	for (i=0; i<MAX_LIST_NOTES; i++){
+	    add_note_in_full_order(get_note_list(), note_stream[i], note_stream[i]);
+	}		
+	
+    check_note_list_head_pitch_f(get_note_list(), check_pitch_f);
+	check_note_list_head_pitch_b(get_note_list(), check_pitch_b);
+    check_note_list_head_trigger_f(get_note_list(), check_trigger_f);
+	check_note_list_head_trigger_b(get_note_list(), check_trigger_b);
+	
+	
+	
+	return;
+
+}
+
 int main(void) {
 
-	test_xnor_in();
+
+	test_list();
    
 	return 0;
 }

@@ -1,7 +1,7 @@
 #include "arpeggiator.h"
 
 static PlayList global_play_list;
-
+/*
 ISR(TCC0_CCA_vect){
 	TCC0.CNT = 0;      //reset beat clock
 }
@@ -101,18 +101,18 @@ uint8_t get_current_velocity(){
 uint8_t get_next_velocity(){
 	
 }
-
+*/
 PlayList* get_play_list(){
 	//return global play list pointer for use with all functions
 	
 	return &global_play_list;
 }
 
-Note get_note_from_play_list(PlayList* play_list){
+Note* get_note_from_play_list(PlayList* play_list){
 	//set play status
 	//return note to play
 	
-	if (play_list->count => MAX_PLAY_NOTES)
+	if (play_list->count >= MAX_PLAY_NOTES)
 	    play_list->count = 0;
 	
 	play_list->play_status = 1;
