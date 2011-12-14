@@ -5,7 +5,7 @@ static NoteList global_note_list;
 
 //Return pointer to the global note list
 NoteList* get_note_list(){
-	return &global_note_list;
+    return &global_note_list;
 }
 
 //Iterate through the bank of notes to find an available note to use
@@ -18,7 +18,7 @@ static Note* allocate_note(NoteList* note_list){
             note_list->note_bank[i].status = 1;
             return &(note_list->note_bank[i]);
         }
-	}
+    }
     return NULL;
 }
 
@@ -37,11 +37,11 @@ static void free_note(Note* note){
 //Reset all data in the note list
 //Reset all data in each note of the list 
 void initialize_note_list(){
-	uint8_t i;
-	
-	NoteList* note_list	= &global_note_list;
-	
-	note_list->count = 0;
+    uint8_t i;
+    
+    NoteList* note_list    = &global_note_list;
+    
+    note_list->count = 0;
     note_list->head_pitch = NULL;
     note_list->tail_pitch = NULL;
     note_list->head_trigger = NULL;
@@ -56,16 +56,16 @@ void initialize_note_list(){
 //Return the next note's pointer if not found
 //Return NULL if end of the list is reached
 static Note* find_note_by_pitch(NoteList* note_list, uint8_t pitch){
-	Note* target_note = note_list->head_pitch;
-	
-	while(target_note != NULL){
-		if (pitch <= target_note->pitch)
-		    break;
+    Note* target_note = note_list->head_pitch;
+    
+    while(target_note != NULL){
+        if (pitch <= target_note->pitch)
+            break;
 
-	    target_note = target_note->next_note_by_pitch;
-	}
-	
-	return target_note;
+        target_note = target_note->next_note_by_pitch;
+    }
+    
+    return target_note;
 }
 
 
@@ -73,57 +73,57 @@ static Note* find_note_by_pitch(NoteList* note_list, uint8_t pitch){
 //If it is found, adjust surrounding pointers
 //And remove and free the note
 void remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
-	Note* dead_note = find_note_by_pitch(note_list, pitch);
-	
-	//note not found (reached the end of the note list)
-	if (dead_note == NULL)
-	    return;
+    Note* dead_note = find_note_by_pitch(note_list, pitch);
     
-	//note not found (did not reach the end of the note list)
-	if (dead_note->pitch != pitch)
-	    return;
-		
-	//otherwise, the note was found and ready to be removed
-	note_list->count += -1;
-	
-	//check for empty list
-	if (note_list->count == 0){
-		initialize_note_list();
-		return;
-	}
-	
-	//adjust surrounding pointers
-	//set new heads and tails if necessary
-	
-	if (dead_note->previous_note_by_pitch)
-	    dead_note->previous_note_by_pitch->next_note_by_pitch = dead_note->next_note_by_pitch;
-	else
-	    note_list->head_pitch = dead_note->next_note_by_pitch;
-	
-	if (dead_note->next_note_by_pitch)
-		dead_note->next_note_by_pitch->previous_note_by_pitch = dead_note->previous_note_by_pitch;
-	else
-	    note_list->tail_pitch = dead_note->previous_note_by_pitch;
-		
-	if (dead_note->previous_note_by_trigger)
-	    dead_note->previous_note_by_trigger->next_note_by_trigger = dead_note->next_note_by_trigger;
-	else
-	    note_list->head_trigger = dead_note->next_note_by_trigger;
-	
-	if (dead_note->next_note_by_trigger)
-		dead_note->next_note_by_trigger->previous_note_by_trigger = dead_note->previous_note_by_trigger;
-	else
-	    note_list->tail_trigger = dead_note->previous_note_by_trigger;
-	
-	//clear all note data and set its status to available
-	free_note(dead_note);
+    //note not found (reached the end of the note list)
+    if (dead_note == NULL)
+        return;
+    
+    //note not found (did not reach the end of the note list)
+    if (dead_note->pitch != pitch)
+        return;
+        
+    //otherwise, the note was found and ready to be removed
+    note_list->count += -1;
+    
+    //check for empty list
+    if (note_list->count == 0){
+        initialize_note_list();
+        return;
+    }
+    
+    //adjust surrounding pointers
+    //set new heads and tails if necessary
+    
+    if (dead_note->previous_note_by_pitch)
+        dead_note->previous_note_by_pitch->next_note_by_pitch = dead_note->next_note_by_pitch;
+    else
+        note_list->head_pitch = dead_note->next_note_by_pitch;
+    
+    if (dead_note->next_note_by_pitch)
+        dead_note->next_note_by_pitch->previous_note_by_pitch = dead_note->previous_note_by_pitch;
+    else
+        note_list->tail_pitch = dead_note->previous_note_by_pitch;
+        
+    if (dead_note->previous_note_by_trigger)
+        dead_note->previous_note_by_trigger->next_note_by_trigger = dead_note->next_note_by_trigger;
+    else
+        note_list->head_trigger = dead_note->next_note_by_trigger;
+    
+    if (dead_note->next_note_by_trigger)
+        dead_note->next_note_by_trigger->previous_note_by_trigger = dead_note->previous_note_by_trigger;
+    else
+        note_list->tail_trigger = dead_note->previous_note_by_trigger;
+    
+    //clear all note data and set its status to available
+    free_note(dead_note);
 }
 
  //Change the velocity of an existing note
 static Note* update_note_velocity(Note* note, uint8_t velocity){
     note->velocity = velocity;
 }
-	
+    
 static void move_note_to_tail_trigger(NoteList* note_list, Note* note){
     //Move note out of existing trigger order
     //Place note at the end of the trigger order
