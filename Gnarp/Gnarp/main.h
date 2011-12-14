@@ -5,8 +5,6 @@
 extern "C" {
 #endif
 
-
-
 #include "hardware.h"
 #include "serial_midi.h"
 #include "linkedlist.h"
@@ -16,7 +14,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 #include <inttypes.h>
-
 
 #ifdef __cplusplus
 }
