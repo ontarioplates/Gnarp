@@ -11,7 +11,7 @@ turn_state;
 
 typedef enum {EDGE_NONE, EDGE_RISE, EDGE_FALL}
 switch_edge;
-	
+    
 void initialize_hardware();
 void read_hardware();
 

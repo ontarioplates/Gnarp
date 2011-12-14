@@ -145,6 +145,9 @@
     <Compile Include="note_list.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="note_list.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="play_list.c">
       <SubType>compile</SubType>
     </Compile>

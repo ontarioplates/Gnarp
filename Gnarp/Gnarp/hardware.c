@@ -37,7 +37,7 @@ static void initialize_clock(){
 
 static void initialize_MIDI(){
     cli();                     //disable global interrupts
-	PORTD.OUTSET = 0x80;       //set TxD high for initialization
+    PORTD.OUTSET = 0x80;       //set TxD high for initialization
     PORTD.DIRCLR = 0x40;       //USARTRX as input
     PORTD.DIRSET = 0x80;       //USARTTX as output
     USARTD1.CTRLB = 0x18;      //set RXEN and TXEN in CTRLB Register to enable USART receiver and transmitter
@@ -124,17 +124,17 @@ uint16_t get_pot_value(uint8_t pot, uint16_t outmin, uint16_t outmax){
     //outmin: minimum value to output
     //outmax: maximum value to output
     
-	const uint16_t pot_range = POTMAX - POTMIN + 1; 
+    const uint16_t pot_range = POTMAX - POTMIN + 1; 
     float temp;
     
     temp = 1.0*pot_values[pot]/pot_range;
     temp = temp*(outmax - outmin + 1) + outmin;
-	
-	if (temp > outmax)
-		temp = outmax;
-		
-	if (temp < outmin)
-		temp = outmin;
+    
+    if (temp > outmax)
+        temp = outmax;
+        
+    if (temp < outmin)
+        temp = outmin;
     
     return (uint16_t) temp;
 }
@@ -178,32 +178,32 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
 
 void set_LEDs_on(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2){
     //booleans and such convert to LED out
-	if (status_LED)
-		PORTC.OUTCLR = 0x08;
-	
-	if (decimal_point_0)
-		PORTD.OUTSET = 0x04;
-		
-	if (decimal_point_1)
-		PORTD.OUTSET = 0x01;
-	
-	if (decimal_point_2)
-		PORTD.OUTSET = 0x02;
+    if (status_LED)
+        PORTC.OUTCLR = 0x08;
+    
+    if (decimal_point_0)
+        PORTD.OUTSET = 0x04;
+        
+    if (decimal_point_1)
+        PORTD.OUTSET = 0x01;
+    
+    if (decimal_point_2)
+        PORTD.OUTSET = 0x02;
 }
 
 void set_LEDs_off(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2){
     //booleans and such convert to LED out
-	if (status_LED)
-		PORTC.OUTSET = 0x08;
-	
-	if (decimal_point_0)
-		PORTD.OUTCLR = 0x04;
-		
-	if (decimal_point_1)
-		PORTD.OUTCLR = 0x01;
-	
-	if (decimal_point_2)
-		PORTD.OUTCLR = 0x02;
+    if (status_LED)
+        PORTC.OUTSET = 0x08;
+    
+    if (decimal_point_0)
+        PORTD.OUTCLR = 0x04;
+        
+    if (decimal_point_1)
+        PORTD.OUTCLR = 0x01;
+    
+    if (decimal_point_2)
+        PORTD.OUTCLR = 0x02;
 }
 
 static void initialize_switches(){
@@ -335,6 +335,6 @@ void read_hardware(){
 
 void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value){
     
-	
-	//set_LEDs(status_LED, decimal_point_0, decimal_point_1, decimal_point_2, seven_segment_value);
+    
+    //set_LEDs(status_LED, decimal_point_0, decimal_point_1, decimal_point_2, seven_segment_value);
 }

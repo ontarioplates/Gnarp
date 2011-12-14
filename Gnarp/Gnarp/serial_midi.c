@@ -9,8 +9,8 @@ static MidiDevice midi_device;
 
 void serial_midi_send(MidiDevice* device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
    //we always send the first byte
-	while (!(USARTD1.STATUS & 0x20)){}; // Wait for empty transmit buffer
-	USARTD1.DATA = inByte0;
+    while (!(USARTD1.STATUS & 0x20)){}; // Wait for empty transmit buffer
+    USARTD1.DATA = inByte0;
    //if cnt == 2 or 3 we send the send byte
    if(cnt > 1) {
       while (!(USARTD1.STATUS & 0x20)){}; // Wait for empty transmit buffer
@@ -39,26 +39,26 @@ void serial_midi_init(){
 
 void generic_noteon_callback(MidiDevice * device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
     volatile uint8_t bytes[3] = {inByte0, inByte1, inByte2};
-		
-	volatile static uint8_t j = 0;
-	
-	if (j < 0xFF)
-		j++;
-	else
-		j = 0;
-	
+        
+    volatile static uint8_t j = 0;
+    
+    if (j < 0xFF)
+        j++;
+    else
+        j = 0;
+    
 
 }
 
 void generic_catchall_callback(MidiDevice * device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
     volatile uint8_t bytes[3] = {inByte0, inByte1, inByte2};
-		
-	volatile static uint8_t j = 0;
-	
-	if (j < 0xFF)
-		j++;
-	else
-		j = 0;
-	
+        
+    volatile static uint8_t j = 0;
+    
+    if (j < 0xFF)
+        j++;
+    else
+        j = 0;
+    
 
 }

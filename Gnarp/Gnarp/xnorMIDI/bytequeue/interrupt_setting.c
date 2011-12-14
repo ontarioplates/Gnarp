@@ -26,13 +26,13 @@
 
 
 interrupt_setting_t store_and_clear_interrupt(void) {
-	uint8_t sreg = SREG;
+    uint8_t sreg = SREG;
     cli();
     return sreg;
 }
 
 void restore_interrupt_setting(interrupt_setting_t setting) {
-	SREG = setting;
+    SREG = setting;
 }
 
 

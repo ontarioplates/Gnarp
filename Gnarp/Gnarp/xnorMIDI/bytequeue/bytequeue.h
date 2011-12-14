@@ -30,10 +30,10 @@ extern "C" {
 typedef uint8_t byteQueueIndex_t;
 
 typedef struct {
-	byteQueueIndex_t start;
-	byteQueueIndex_t end;
-	byteQueueIndex_t length;
-	uint8_t * data;
+    byteQueueIndex_t start;
+    byteQueueIndex_t end;
+    byteQueueIndex_t length;
+    uint8_t * data;
 } byteQueue_t;
 
 //you must have a queue, an array of data which the queue will use, and the length of that array
