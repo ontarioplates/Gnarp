@@ -1,15 +1,5 @@
 #include "hardware.h"
 
-#include <avr/interrupt.h>
-#include <avr/io.h>
-#include "stdbool.h"
-#include "stdint.h"
-#include "stdlib.h"
-
-#define DEBOUNCE 8
-#define POTMIN 0x00E0
-#define POTMAX 0x0FFF
-
 static turn_state encoder_state = TURN_NONE;
 static switch_edge pushbutton_switch_edge = EDGE_NONE;
 static switch_edge toggle_switch_edge = EDGE_NONE;

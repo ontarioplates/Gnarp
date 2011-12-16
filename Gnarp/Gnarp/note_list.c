@@ -41,7 +41,7 @@ void initialize_note_list(){
     
     NoteList* note_list = &global_note_list;
     
-    note_list->count = 0;
+    note_list->length = 0;
     note_list->head_pitch = NULL;
     note_list->tail_pitch = NULL;
     note_list->head_trigger = NULL;
@@ -83,10 +83,10 @@ void remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
         return;
         
     //otherwise, the note was found and ready to be removed
-    note_list->count += -1;
+    note_list->length += -1;
     
     //check for empty list
-    if (note_list->count == 0){
+    if (note_list->length == 0){
         initialize_note_list();
         return;
     }
@@ -134,14 +134,14 @@ static Note* add_note_at_previous_pitch(NoteList* note_list, Note* target_note, 
 	if (new_note == NULL)
 	    return NULL;
 	
-	note_list->count += 1;
+	note_list->length += 1;
 	
 	//set data of new note
 	new_note->pitch = pitch;
 	new_note->velocity = velocity;
 	
 	//new_note is the only member of the list
-	if (note_list->count == 1){
+	if (note_list->length == 1){
 		new_note->next_note_by_pitch = NULL;
 		new_note->previous_note_by_pitch = NULL;
 		note_list->head_pitch = new_note;
@@ -176,7 +176,7 @@ static Note* add_note_at_previous_pitch(NoteList* note_list, Note* target_note, 
 static void insert_note_at_tail_trigger(NoteList* note_list, Note* note){
 
 	//check if the note is the only member of the list
-    if (note_list->count == 1){
+    if (note_list->length == 1){
         note_list->tail_trigger = note;
         note_list->head_trigger = note;
         note->next_note_by_trigger = NULL;

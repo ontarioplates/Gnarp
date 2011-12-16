@@ -17,7 +17,7 @@ struct Note
 
 struct NoteList
 {
-    uint8_t         count;
+    uint8_t         length;
     struct Note     *head_pitch, *tail_pitch, *head_trigger, *tail_trigger;
     struct Note     note_bank[MAX_LIST_NOTES];
 };

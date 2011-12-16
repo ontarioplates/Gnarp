@@ -2,9 +2,15 @@
 #ifndef HWSETUP_H_
 #define HWSETUP_H_
 
+#include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdlib.h>
 
+#define DEBOUNCE 8
+#define POTMIN 0x00E0
+#define POTMAX 0x0FFF
 
 typedef enum {TURN_NONE, TURN_CW, TURN_CCW}
 turn_state;

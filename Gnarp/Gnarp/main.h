@@ -8,6 +8,7 @@ extern "C" {
 #include "hardware.h"
 #include "serial_midi.h"
 #include "note_list.h"
+#include "play_list.h"
 
 #include <avr/interrupt.h>
 #include <math.h>

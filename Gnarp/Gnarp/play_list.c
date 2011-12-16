@@ -1,5 +1,6 @@
 #include "play_list.h"
 
+//Play list to be used for all function
 static PlayList global_play_list;
 /*
 ISR(TCC0_CCA_vect){
@@ -102,34 +103,36 @@ uint8_t get_next_velocity(){
     
 }
 */
+
+//Return pointer to the global play list
 PlayList* get_play_list(){
-    //return global play list pointer for use with all functions
-    
     return &global_play_list;
 }
 
-Note* get_note_from_play_list(PlayList* play_list){
-    //set play status
-    //return note to play
-    
-    if (play_list->count >= MAX_PLAY_NOTES)
-        play_list->count = 0;
-    
-    play_list->play_status = 1;
-    
-    return play_list->notes[play_list->play_index];
-}
-
+//Reset all data in play list
 void initialize_play_list(PlayList* play_list){
-    //reset the play list note pointers, counters, and flags
     
     uint8_t i;
     for (i = 0; i < MAX_PLAY_NOTES; i++)
         play_list->notes[i] = NULL;
-    play_list->count = 0;
+    play_list->length = 0;
     play_list->play_index = 0;
     play_list->play_status = 0;
 }
+
+//Return the next note in the playlist to be started
+Note* get_next_note_to_start(PlayList* play_list){
+    if (play_list->next_index >= length)
+        play_list->next_index = 0;
+    
+    play_list->play_status = 1;
+	
+	
+    
+    return play_list->notes[play_list->current_index];
+}
+
+Note* get_current_note
 
 void initialize_arpeggiator(){
     //initialize note list in linkedlist.c
@@ -146,7 +149,7 @@ void build_play_list(PlayList* play_list, NoteList* note_list){
     uint8_t play_list_index = 0;
     Note* current_note;
     
-    uint8_t note_list_size = note_list->count;
+    uint8_t note_list_size = note_list->length;
     uint8_t random_list_depth;      //index for random pattern
     
     uint8_t i;
@@ -220,7 +223,7 @@ void build_play_list(PlayList* play_list, NoteList* note_list){
         }
     }
 
-    play_list->count = play_list_index;     //set play list count appropriately
+    play_list->length = play_list_index;     //set play list length appropriately
 
     return;
 }
@@ -235,7 +238,7 @@ void input_note_on(PlayList* play_list, uint8_t pitch, uint8_t velocity){
     
     bool first_note = 0;
     
-    if (get_note_list()->count == 0)        //check for empty note list
+    if (get_note_list()->length == 0)        //check for empty note list
         first_note = 1;
     
     add_note_in_full_order(get_note_list(),pitch,velocity);     //add note into note list
@@ -331,7 +334,7 @@ void createPattern(NoteList *note_list){
 
         //random
         case 4:
-            cnt = note_list->count;
+            cnt = note_list->length;
             for(; pIndex < RAND_BUFF; pIndex++){
                 r = rand() % cnt;
                 curNode = note_list->head_pitch;
@@ -485,14 +488,14 @@ void resetBeat(){
 void keyPress(){
     add_note_in_full_order(testList, MCU_USART_pitch, MCU_USART_velocity);   //add note to list
     createPattern(testList);                    //rebuild pattern
-    if (testList->count == 1)                   //if it's the first note, reset the beat
+    if (testList->length == 1)                   //if it's the first note, reset the beat
         resetBeat();
 }
 
 void keyRelease(){
     listRMV(testList, MCU_USART_pitch);                //remove note from list
     createPattern(testList);                    //rebuild pattern
-    if (testList->count < 1){                    //if list is empty, stop all timers
+    if (testList->length < 1){                    //if list is empty, stop all timers
         MCUplayTMR = -1;
         MCUgateTMR = -1;
     }
