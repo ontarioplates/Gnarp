@@ -46,10 +46,9 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
-../arpeggiator.c \
 ../hardware.c \
-../linkedlist.c \
 ../main.c \
+../note_list.c \
 ../serial_midi.c \
 ../xnorMIDI/bytequeue/bytequeue.c \
 ../xnorMIDI/bytequeue/interrupt_setting.c \
@@ -64,10 +63,9 @@ ASM_SRCS +=
 
 
 OBJS +=  \
-arpeggiator.o \
 hardware.o \
-linkedlist.o \
 main.o \
+note_list.o \
 serial_midi.o \
 xnorMIDI/bytequeue/bytequeue.o \
 xnorMIDI/bytequeue/interrupt_setting.o \
@@ -76,10 +74,9 @@ xnorMIDI/midi_device.o
 
 
 OBJS_AS_ARGS +=  \
-arpeggiator.o \
 hardware.o \
-linkedlist.o \
 main.o \
+note_list.o \
 serial_midi.o \
 xnorMIDI/bytequeue/bytequeue.o \
 xnorMIDI/bytequeue/interrupt_setting.o \
@@ -88,10 +85,9 @@ xnorMIDI/midi_device.o
 
 
 C_DEPS +=  \
-arpeggiator.d \
 hardware.d \
-linkedlist.d \
 main.d \
+note_list.d \
 serial_midi.d \
 xnorMIDI/bytequeue/bytequeue.d \
 xnorMIDI/bytequeue/interrupt_setting.d \
@@ -100,10 +96,9 @@ xnorMIDI/midi_device.d
 
 
 C_DEPS_AS_ARGS +=  \
-arpeggiator.d \
 hardware.d \
-linkedlist.d \
 main.d \
+note_list.d \
 serial_midi.d \
 xnorMIDI/bytequeue/bytequeue.d \
 xnorMIDI/bytequeue/interrupt_setting.d \
@@ -111,35 +106,33 @@ xnorMIDI/midi.d \
 xnorMIDI/midi_device.d
 
 
-OUTPUT_FILE_PATH +=GnarpAVRSTUDIO.elf
+OUTPUT_FILE_PATH +=Gnarp.elf
 
-OUTPUT_FILE_PATH_AS_ARGS +=GnarpAVRSTUDIO.elf
+OUTPUT_FILE_PATH_AS_ARGS +=Gnarp.elf
 
-HEX_FLASH_FILE_PATH +=GnarpAVRSTUDIO.hex
+HEX_FLASH_FILE_PATH +=Gnarp.hex
 
-HEX_FLASH_FILE_PATH_AS_ARGS +=GnarpAVRSTUDIO.hex
+HEX_FLASH_FILE_PATH_AS_ARGS +=Gnarp.hex
 
-HEX_EEPROM_FILE_PATH +=GnarpAVRSTUDIO.eep
+HEX_EEPROM_FILE_PATH +=Gnarp.eep
 
-HEX_EEPROM_FILE_PATH_AS_ARGS +=GnarpAVRSTUDIO.eep
+HEX_EEPROM_FILE_PATH_AS_ARGS +=Gnarp.eep
 
-LSS_FILE_PATH +=GnarpAVRSTUDIO.lss
+LSS_FILE_PATH +=Gnarp.lss
 
-LSS_FILE_PATH_AS_ARGS +=GnarpAVRSTUDIO.lss
+LSS_FILE_PATH_AS_ARGS +=Gnarp.lss
 
-MAP_FILE_PATH =GnarpAVRSTUDIO.map
+MAP_FILE_PATH =Gnarp.map
 
-MAP_FILE_PATH_AS_ARGS =GnarpAVRSTUDIO.map
+MAP_FILE_PATH_AS_ARGS =Gnarp.map
 
-LIB_AS_ARGS +=libGnarpAVRSTUDIO.a
+LIB_AS_ARGS +=libGnarp.a
 
 ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_FILE_PATH) size
 
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR/GNU C Compiler
-
-
 
 
 

@@ -13,7 +13,7 @@ main.d main.o: .././main.c .././main.h .././hardware.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdbool.h \
  .././serial_midi.h ../././xnorMIDI/midi.h ../././xnorMIDI/midi_device.h \
  ../././xnorMIDI/midi_function_types.h \
- ../././xnorMIDI/bytequeue/bytequeue.h .././linkedlist.h \
+ ../././xnorMIDI/bytequeue/bytequeue.h .././note_list.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/stdio.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdarg.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stddef.h \
@@ -59,7 +59,7 @@ c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1
 
 ../././xnorMIDI/bytequeue/bytequeue.h:
 
-.././linkedlist.h:
+.././note_list.h:
 
 c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/stdio.h:
 

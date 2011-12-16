@@ -64,11 +64,11 @@
       <ToolNumber>00B000006113</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>3228</port>
+        <port>1692</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
-        <InterfaceName>JTAG</InterfaceName>
+        <InterfaceName>PDI</InterfaceName>
         <InterfaceProperties>
           <JtagDbgClock>1000000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
@@ -148,12 +148,12 @@
     <Compile Include="note_list.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="play_list.c">
+    <None Include="play_list.c">
       <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="play_list.h">
+    </None>
+    <None Include="play_list.h">
       <SubType>compile</SubType>
-    </Compile>
+    </None>
     <Compile Include="serial_midi.c">
       <SubType>compile</SubType>
     </Compile>

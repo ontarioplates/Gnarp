@@ -808,24 +808,24 @@ void test_list(){
     volatile uint8_t check_pitch_b[MAX_LIST_NOTES];
     volatile uint8_t check_trigger_f[MAX_LIST_NOTES];
     volatile uint8_t check_trigger_b[MAX_LIST_NOTES];
+	
+	uint8_t input_number = MAX_LIST_NOTES;
     
-    initialize_hardware();
+//    initialize_hardware();
     initialize_note_list();
     
     for (i=0; i< MAX_LIST_NOTES; i++)
-        note_stream[i] = rand() % 100 + 100;
+        note_stream[i] = rand() % 5 + 100;
         
     for (i=0; i<MAX_LIST_NOTES; i++){
-        add_note_in_full_order(get_note_list(), note_stream[i], note_stream[i]);
+        insert_note(get_note_list(), note_stream[i], note_stream[i]);
     }        
     
     check_note_list_head_pitch_f(get_note_list(), check_pitch_f);
     check_note_list_head_pitch_b(get_note_list(), check_pitch_b);
     check_note_list_head_trigger_f(get_note_list(), check_trigger_f);
     check_note_list_head_trigger_b(get_note_list(), check_trigger_b);
-    
-    
-    
+ 
     return;
 
 }
