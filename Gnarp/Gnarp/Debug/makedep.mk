@@ -8,6 +8,8 @@ main.c
 
 note_list.c
 
+arpeggiator.c
+
 serial_midi.c
 
 xnorMIDI\bytequeue\bytequeue.c

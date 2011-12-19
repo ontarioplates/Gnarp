@@ -148,12 +148,12 @@
     <Compile Include="note_list.h">
       <SubType>compile</SubType>
     </Compile>
-    <None Include="play_list.c">
+    <Compile Include="arpeggiator.c">
       <SubType>compile</SubType>
-    </None>
-    <None Include="play_list.h">
+    </Compile>
+    <Compile Include="arpeggiator.h">
       <SubType>compile</SubType>
-    </None>
+    </Compile>
     <Compile Include="serial_midi.c">
       <SubType>compile</SubType>
     </Compile>

@@ -1,28 +1,69 @@
-#include "play_list.h"
+#include "arpeggiator.h"
 
 //Play list to be used for all function
-static PlayList global_play_list;
-/*
+static NotePlayer global_note_player;
+
+//Return pointer to the global note player
+NotePlayer* get_note_player(){
+    return &global_note_player;
+}
+
 ISR(TCC0_CCA_vect){
-    TCC0.CNT = 0;      //reset beat clock
+	//reset beat clock
+    TCC0.CNT = 0;
 }
 
 ISR(TCC0_CCB_vect){
-    TCC0.CTRLB &= ~0x20;  //disable CCB and CCC interrupts
+	//MAYBE DISABLE USARTRX INTERRUPT?
+	
+	//disable CCB (note on) and CCC (note off) interrupts
+    TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
+	
+	NotePlayer* note_player = get_note_player();
+	
+	//capture the time at interrupt start (aka the current compare B value)
+	uint32_t current_time = (uint32_t) TCC0.CCB;
+	uint32_t next_stop_time;
+	uint32_t next_start_time;
+	
+	//if a note is still playing, stop it
+	if (note_player->play_status)
+	    stop_current_note(note_player);
     
-    midi_send_noteon(serial_midi_device(),MIDI_CHAN, get_next_pitch(), get_next_velocity());
+	//start the next note
+	start_next_note(note_player);
     
-    configure_note_timing(get_pot_value(1,0,7), get_pot_value(0, 10, 0xFFFF));
+    //compute next compare values
+	next_start_time = current_time + note_player->start_time_increment;
+	next_stop_time = current_time + note_player->stop_time_increment;
+	
+	//check for overflow
+	if (next_start_time > TCC0.CCA)
+	    next_start_time = next_start_time - TCC0.CCA;
+    if (next_stop_time > TCC0.CCA)
+	    next_stop_time = next_stop_time - TCC0.CCA;
+	
+	//assign values to compare registers
+	TCC0.CCB = (uint16_t) next_start_time;
+	TCC0.CCC = (uint16_t) next_stop_time;
     
-    TCC0.CTRLB |= 0x20;   //enable CCB (note on) interrupt
-    TCC0.CTRLB |= 0x40;   //enable CCC (note off) interrupt
+	//enable CCB (note on) and CCC (note off) interrupts
+    TCC0.CTRLB |= 0x20;
+    TCC0.CTRLB |= 0x40;
 }
 
 ISR(TCC0_CCC_vect){
-    if sad
-    midi_send_noteoff(serial_midi_device(), MIDI_CHAN, get_current_pitch(), get_current_velocity());
-    TCC0.CTRLB &= ~0x40;  //disable CCC (note off)
+	//MAYBE DISABLE USARTRX INTERRUPT?
+	//disable CCB (note on) and CCC (note off) interrupts
+    TCC0.CTRLB &= ~0x20; 
+    TCC0.CTRLB &= ~0x40;
+	
+	//stop the current note
+	stop_current_note(get_note_player());
+	
+	//enable CCB (note on) interupt
+	TCC0.CTRLB |= 0x40;
 }
 
 ISR(TCC0_CCD_vect){
@@ -47,109 +88,77 @@ static void initialize_note_timer(){
     TCC0.CNT = 0;          //reset counter
 }
 
-static void configure_note_timing(note_division division, uint16_t duration){
-    const uint32_t division_numerator[8]   = {1, 2, 3, 1, 1, 3, 1, 1};
-    const uint32_t division_denominator[8] = {1, 3, 4, 2, 3, 8, 4, 6};
-    volatile uint16_t current_time;
-    volatile uint32_t next_note_on_time;
-    volatile uint32_t next_cutoff_time;
-        
-//    Q: 1/1 2/3 3/2
-//    E: 1/2 1/3 3/4
-//    S: 1/4 1/6 3/8
-//  a= q (1) /e (1/2) /s (1/4)
-//  b= d (3/2) / x (1) / t (2/3)
-//  note length = a^-2 * 2/3^(b-1)   ... too complicated, just make a lookup table/array
-    
 
-    
-    current_time = TCC0.CNT;    //log current time
-
-    next_note_on_time = TCC0.CCA * division_numerator[division];       //calculate the new length for Compare B (interrupt for new note)
-    next_note_on_time = next_note_on_time / division_denominator[division];
-    
-    next_cutoff_time = next_note_on_time * duration;                  //calculate the new length for Compare C (interrupt for note off)
-    next_cutoff_time = next_cutoff_time / 0xFFFF;
-    
-    if (next_cutoff_time > next_note_on_time)                         //ensure the note cuts off before the next note
-        next_cutoff_time = next_note_on_time - 10;
-    
-    next_cutoff_time += current_time;                                 //add current time to Compare C for final value, check for overflow
-    if (next_cutoff_time > TCC0.CCA)
-        next_cutoff_time = next_cutoff_time - TCC0.CCA;
-    
-    next_note_on_time += current_time;                                //add current time to Compare C for final value, check for overflow
-    if (next_note_on_time > TCC0.CCA)    //the counter will reset at CCA, so check for overflow
-        next_note_on_time = next_note_on_time - TCC0.CCA;
-        
-    TCC0.CCB = (uint16_t) next_note_on_time;    //set compare B to new value
-    TCC0.CCC = (uint16_t) next_cutoff_time;     //set compare C to new value
-
+static void calculate_start_time_increment(NotePlayer* note_player){
+	uint8_t i;
+	
+	//start with value for a quarter note
+	uint32_t new_start_time_increment = TCC0.CCA;
+	
+	//according to time division setting, divide by x^2
+	for (i = 0; i < note_player->time_division; i++)
+	    new_start_time_increment /= 2;
+		
+	switch(note_player->time_variation){
+		case NONE:      break;
+			
+		case DOTTED:    new_start_time_increment *= 3;
+		                new_start_time_increment /= 2;
+				        break;
+				
+		case TRIPLET:   new_start_time_increment *= 2;
+		                new_start_time_increment /= 3;
+					    break;
+	}	
+	
+    note_player->start_time_increment = new_start_time_increment;
 }
 
-uint8_t get_current_pitch(){
-    
+static void calculate_stop_time_increment(NotePlayer* note_player){
+	uint32_t new_stop_time_increment = (uint32_t) (note_player->start_time_increment) * note_player->note_duration;
+	new_stop_time_increment = new_stop_time_increment / MAX_NOTE_DURATION;
+	
+	note_player->stop_time_increment = (uint16_t) new_stop_time_increment;
 }
 
-uint8_t get_next_pitch(){
-    
-}
 
-uint8_t get_current_velocity(){
-    
-}
 
-uint8_t get_next_velocity(){
-    
-}
-*/
 
-//Return pointer to the global play list
-PlayList* get_play_list(){
-    return &global_play_list;
-}
+
+
+
 
 //Reset all data in play list
-void initialize_play_list(PlayList* play_list){
+void initialize_note_player(NotePlayer* note_player){
     
     uint8_t i;
     for (i = 0; i < MAX_PLAY_NOTES; i++)
-        play_list->notes[i] = NULL;
-    play_list->length = 0;
-    play_list->play_index = 0;
-    play_list->play_status = 0;
+        note_player->play_list[i] = NULL;
+    note_player->note_max = 0;
+    note_player->note_index = 0;
+    note_player->play_status = 0;
 }
 
-//Return the next note in the playlist to be started
-Note* get_next_note_to_start(PlayList* play_list){
-    if (play_list->next_index >= length)
-        play_list->next_index = 0;
-    
-    play_list->play_status = 1;
-	
-	
-    
-    return play_list->notes[play_list->current_index];
-}
 
-Note* get_current_note
+
+
 
 void initialize_arpeggiator(){
     //initialize note list in linkedlist.c
     //initialize play list
     
     initialize_note_list();
-    initialize_play_list(get_play_list());
+    initialize_play_list(get_note_player());
 }
 
-void build_play_list(PlayList* play_list, NoteList* note_list){
+void build_play_list(NotePlayer* note_player, NoteList* note_list){
     
     //builds the play list according to pattern selection (pot0)
     
     uint8_t play_list_index = 0;
     Note* current_note;
     
-    uint8_t note_list_size = note_list->length;
+    uint8_t note_list_size = note_list->note_max;
     uint8_t random_list_depth;      //index for random pattern
     
     uint8_t i;
@@ -160,25 +169,25 @@ void build_play_list(PlayList* play_list, NoteList* note_list){
         //Asc pitch
         case 0:
             for(current_note = note_list->head_pitch; current_note; current_note=current_note->next_note_by_pitch)
-                play_list->notes[play_list_index++] = current_note;
+                note_player->play_list[play_list_index++] = current_note;
             break;
 
         //Desc pitch
         case 1:
             for(current_note = note_list->tail_pitch; current_note; current_note=current_note->previous_note_by_pitch)
-                play_list->notes[play_list_index++] = current_note;
+                note_player->play_list[play_list_index++] = current_note;
             break;
 
         //Asc trigger
         case 2:
             for(current_note = note_list->head_trigger; current_note; current_note=current_note->next_note_by_trigger)
-                play_list->notes[play_list_index++] = current_note;
+                note_player->play_list[play_list_index++] = current_note;
             break;
 
         //Desc trigger
         case 3:
             for(current_note = note_list->tail_trigger; current_note; current_note=current_note->previous_note_by_trigger)
-                play_list->notes[play_list_index++] = current_note;
+                note_player->play_list[play_list_index++] = current_note;
             break;
 
         //random
@@ -188,7 +197,7 @@ void build_play_list(PlayList* play_list, NoteList* note_list){
                 current_note = note_list->head_pitch;
                 for(i = 0; i < random_list_depth; i++)
                     current_note = current_note->next_note_by_pitch;
-                play_list->notes[play_list_index++] = current_note;
+                note_player->play_list[play_list_index++] = current_note;
             }
             break;
     }
@@ -217,36 +226,77 @@ void build_play_list(PlayList* play_list, NoteList* note_list){
         if (mirrored_length){
             play_list_index += -1;
             for (k = 1; play_list_index + k < mirrored_length; k++){
-                play_list->notes[play_list_index + k] = play_list->notes[play_list_index - k + edge_scale];
+                note_player->play_list[play_list_index + k] = note_player->play_list[play_list_index - k + edge_scale];
             }
             play_list_index = mirrored_length;
         }
     }
 
-    play_list->length = play_list_index;     //set play list length appropriately
+    note_player->note_max = play_list_index;     //set play list note_max appropriately
 
     return;
 }
 
+//called whenever a new MIDI noteon message is recieved
+    
+//adds the new note to the note list (if it's not a duplicate)
+//rebuilds play list and starts playing if it's the first note in the list
+    
 
-void input_note_on(PlayList* play_list, uint8_t pitch, uint8_t velocity){
-    
-    //called whenever a new MIDI noteon message is recieved
-    
-    //adds the new note to the note list (if it's not a duplicate)
-    //rebuilds play list and starts playing if it's the first note in the list
-    
+void input_note_on(NotePlayer* note_player, uint8_t pitch, uint8_t velocity){
+    //MAYBE DISABLE USARTrx AND/OR TIMER INTERRUPTS
+	
+	insert_note(get_note_list(), pitch, velocity);
+
     bool first_note = 0;
     
-    if (get_note_list()->length == 0)        //check for empty note list
+    if (get_note_list()->note_max == 0)        //check for empty note list
         first_note = 1;
     
     add_note_in_full_order(get_note_list(),pitch,velocity);     //add note into note list
     
     if (first_note){         //if it's the first note in the note list, build the play list and start playing by setting the play interrupt flag
-        build_play_list(get_play_list(),get_note_list());
+        build_play_list(get_note_player(),get_note_list());
         TCC0.INTFLAGS &= 0x20;
     }        
+}
+
+void stop_current_note(NotePlayer* note_player){
+	//set midi message to stop the current note
+    midi_send_noteoff(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player]->pitch,note_player->play_list[note_player]->velocity);
+	
+	//clear play flag
+    note_player->play_status = 0;
+}
+
+void start_next_note(NotePlayer* note_player){
+	//increment repeat count
+	note_player->repeat_index += 1;
+	
+	//if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
+	if (note_player->repeat_index > note_player->repeat_max){
+		note_player->repeat_index = 0;
+		note_player->note_index += 1;
+	}
+	
+	//if the play list is at the end, reset the note index and increment the octave index
+	if (note_player->note_index > note_player->note_max){
+	    note_player->note_index = 0;
+		note_player->octave_index += 1;
+    }
+	
+	//if the last octave is reached, reset the octave index
+	if (note_player->octave_index > note_player->octave_max){
+		note_player->octave_index = 0;
+		
+		//ADD CODE TO CHECK FOR RANDOM SETTING
+	}
+
+    //send midi message to start the note
+    midi_send_noteon(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player]->pitch,note_player->play_list[note_player]->velocity);
+	
+	//set play flag
+	note_player->play_status = 1;
 }
 
 
@@ -304,7 +354,7 @@ void createPattern(NoteList *note_list){
         case 0:
             for(curNode = note_list->head_pitch; curNode; curNode=curNode->next_note_by_pitch){
                 playQ[pIndex].pitch = curNode->pitch;
-                play_list->notes[play_list_index++]->velocity = curNode->velocity;
+                note_player->play_list[play_list_index++]->velocity = curNode->velocity;
             }
             break;
 
@@ -312,7 +362,7 @@ void createPattern(NoteList *note_list){
         case 1:
             for(curNode = note_list->tail_pitch; curNode; curNode=curNode->previous_note_by_pitch){
                 playQ[pIndex].pitch = curNode->pitch;
-                play_list->notes[play_list_index++]->velocity = curNode->velocity;
+                note_player->play_list[play_list_index++]->velocity = curNode->velocity;
             }
             break;
 
@@ -320,7 +370,7 @@ void createPattern(NoteList *note_list){
         case 2:
             for(curNode = note_list->head_trigger; curNode; curNode=curNode->next_note_by_trigger){
                 playQ[pIndex].pitch = curNode->pitch;
-                play_list->notes[play_list_index++]->velocity = curNode->velocity;
+                note_player->play_list[play_list_index++]->velocity = curNode->velocity;
             }
             break;
 
@@ -328,13 +378,13 @@ void createPattern(NoteList *note_list){
         case 3:
             for(curNode = note_list->tail_trigger; curNode; curNode=curNode->previous_note_by_trigger){
                 playQ[pIndex].pitch = curNode->pitch;
-                play_list->notes[play_list_index++]->velocity = curNode->velocity;
+                note_player->play_list[play_list_index++]->velocity = curNode->velocity;
             }
             break;
 
         //random
         case 4:
-            cnt = note_list->length;
+            cnt = note_list->note_max;
             for(; pIndex < RAND_BUFF; pIndex++){
                 r = rand() % cnt;
                 curNode = note_list->head_pitch;
@@ -488,14 +538,14 @@ void resetBeat(){
 void keyPress(){
     add_note_in_full_order(testList, MCU_USART_pitch, MCU_USART_velocity);   //add note to list
     createPattern(testList);                    //rebuild pattern
-    if (testList->length == 1)                   //if it's the first note, reset the beat
+    if (testList->note_max == 1)                   //if it's the first note, reset the beat
         resetBeat();
 }
 
 void keyRelease(){
     listRMV(testList, MCU_USART_pitch);                //remove note from list
     createPattern(testList);                    //rebuild pattern
-    if (testList->length < 1){                    //if list is empty, stop all timers
+    if (testList->note_max < 1){                    //if list is empty, stop all timers
         MCUplayTMR = -1;
         MCUgateTMR = -1;
     }

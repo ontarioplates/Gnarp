@@ -1,9 +1,4 @@
 #include "serial_midi.h"
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include "stdlib.h"
-
-#define MIDI_CHAN 0
 
 static MidiDevice midi_device;
 

@@ -49,6 +49,7 @@ C_SRCS +=  \
 ../hardware.c \
 ../main.c \
 ../note_list.c \
+../arpeggiator.c \
 ../serial_midi.c \
 ../xnorMIDI/bytequeue/bytequeue.c \
 ../xnorMIDI/bytequeue/interrupt_setting.c \
@@ -66,6 +67,7 @@ OBJS +=  \
 hardware.o \
 main.o \
 note_list.o \
+arpeggiator.o \
 serial_midi.o \
 xnorMIDI/bytequeue/bytequeue.o \
 xnorMIDI/bytequeue/interrupt_setting.o \
@@ -77,6 +79,7 @@ OBJS_AS_ARGS +=  \
 hardware.o \
 main.o \
 note_list.o \
+arpeggiator.o \
 serial_midi.o \
 xnorMIDI/bytequeue/bytequeue.o \
 xnorMIDI/bytequeue/interrupt_setting.o \
@@ -88,6 +91,7 @@ C_DEPS +=  \
 hardware.d \
 main.d \
 note_list.d \
+arpeggiator.d \
 serial_midi.d \
 xnorMIDI/bytequeue/bytequeue.d \
 xnorMIDI/bytequeue/interrupt_setting.d \
@@ -99,6 +103,7 @@ C_DEPS_AS_ARGS +=  \
 hardware.d \
 main.d \
 note_list.d \
+arpeggiator.d \
 serial_midi.d \
 xnorMIDI/bytequeue/bytequeue.d \
 xnorMIDI/bytequeue/interrupt_setting.d \
@@ -133,6 +138,8 @@ ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_F
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR/GNU C Compiler
+
+
 
 
 
