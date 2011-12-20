@@ -129,53 +129,53 @@ static Note* update_note_velocity(Note* note, uint8_t velocity){
 //return NULL otherwise
 static Note* add_note_at_previous_pitch(NoteList* note_list, Note* target_note, uint8_t pitch, uint8_t velocity){
     Note* new_note = allocate_note(note_list);
-	
-	//return NULL if there are no more notes
-	if (new_note == NULL)
-	    return NULL;
-	
-	note_list->length += 1;
-	
-	//set data of new note
-	new_note->pitch = pitch;
-	new_note->velocity = velocity;
-	
-	//new_note is the only member of the list
-	if (note_list->length == 1){
-		new_note->next_note_by_pitch = NULL;
-		new_note->previous_note_by_pitch = NULL;
-		note_list->head_pitch = new_note;
-		note_list->tail_pitch = new_note;
-		return new_note;		
-	}
-	
-	//if new_note isn't the only note, but target_note is NULL, new_note is at the tail pitch
-	if (target_note == NULL){
-		new_note->previous_note_by_pitch = note_list->tail_pitch;
-		new_note->next_note_by_pitch = NULL;
-		note_list->tail_pitch->next_note_by_pitch = new_note;
-		note_list->tail_pitch = new_note;
-		return new_note;
-	}
-	
-	//otherwise, adjust pointers
-	new_note->next_note_by_pitch = target_note;
-	new_note->previous_note_by_pitch = target_note->previous_note_by_pitch;
-	target_note->previous_note_by_pitch = new_note;
+    
+    //return NULL if there are no more notes
+    if (new_note == NULL)
+        return NULL;
+    
+    note_list->length += 1;
+    
+    //set data of new note
+    new_note->pitch = pitch;
+    new_note->velocity = velocity;
+    
+    //new_note is the only member of the list
+    if (note_list->length == 1){
+        new_note->next_note_by_pitch = NULL;
+        new_note->previous_note_by_pitch = NULL;
+        note_list->head_pitch = new_note;
+        note_list->tail_pitch = new_note;
+        return new_note;        
+    }
+    
+    //if new_note isn't the only note, but target_note is NULL, new_note is at the tail pitch
+    if (target_note == NULL){
+        new_note->previous_note_by_pitch = note_list->tail_pitch;
+        new_note->next_note_by_pitch = NULL;
+        note_list->tail_pitch->next_note_by_pitch = new_note;
+        note_list->tail_pitch = new_note;
+        return new_note;
+    }
+    
+    //otherwise, adjust pointers
+    new_note->next_note_by_pitch = target_note;
+    new_note->previous_note_by_pitch = target_note->previous_note_by_pitch;
+    target_note->previous_note_by_pitch = new_note;
 
     //check for head
-	if (new_note->previous_note_by_pitch == NULL)
-	    note_list->head_pitch = new_note;
-	else
-	    new_note->previous_note_by_pitch->next_note_by_pitch = new_note;
-		
-	return new_note;
+    if (new_note->previous_note_by_pitch == NULL)
+        note_list->head_pitch = new_note;
+    else
+        new_note->previous_note_by_pitch->next_note_by_pitch = new_note;
+        
+    return new_note;
 }
 
 //insert note at the end of the trigger order
 static void insert_note_at_tail_trigger(NoteList* note_list, Note* note){
 
-	//check if the note is the only member of the list
+    //check if the note is the only member of the list
     if (note_list->length == 1){
         note_list->tail_trigger = note;
         note_list->head_trigger = note;
@@ -183,14 +183,14 @@ static void insert_note_at_tail_trigger(NoteList* note_list, Note* note){
         note->previous_note_by_trigger = NULL;
         return;
     }
-	
+    
     //otherwise, set note as tail normally
-	note->next_note_by_trigger = NULL;
+    note->next_note_by_trigger = NULL;
     note->previous_note_by_trigger = note_list->tail_trigger;
     note_list->tail_trigger->next_note_by_trigger = note;
     note_list->tail_trigger = note;
-	
-	return;
+    
+    return;
 }
 
 //Move note out of existing trigger order
@@ -198,53 +198,53 @@ static void insert_note_at_tail_trigger(NoteList* note_list, Note* note){
 //If the note is the only member of the note_list, assign it to the head    
 static void move_note_to_tail_trigger(NoteList* note_list, Note* note){
 
-	//check if the note is already at the tail (also catches the case of a single-member list)
+    //check if the note is already at the tail (also catches the case of a single-member list)
     if (note_list->tail_trigger == note)
         return;
-    		
-	//check for head
+            
+    //check for head
     if (note_list->head_trigger == note){
-		//update head and remove note
-	    note_list->head_trigger = note->next_note_by_trigger;
-		note_list->head_trigger->previous_note_by_trigger = NULL;
+        //update head and remove note
+        note_list->head_trigger = note->next_note_by_trigger;
+        note_list->head_trigger->previous_note_by_trigger = NULL;
     }
     else{
-	    //otherwise remove note normally
-	    note->previous_note_by_trigger->next_note_by_trigger = note->next_note_by_trigger;
-	    note->next_note_by_trigger->previous_note_by_trigger = note->previous_note_by_trigger;
-	}
+        //otherwise remove note normally
+        note->previous_note_by_trigger->next_note_by_trigger = note->next_note_by_trigger;
+        note->next_note_by_trigger->previous_note_by_trigger = note->previous_note_by_trigger;
+    }
 
     //user function to move the note to the tail
-	insert_note_at_tail_trigger(note_list,note);
-	
-	return;
+    insert_note_at_tail_trigger(note_list,note);
+    
+    return;
 }
 
 //insert new note in complete order
 //return 0 if unsuccessful (no free note banks)
 //return 1 if successful
 bool insert_note(NoteList* note_list, uint8_t pitch, uint8_t velocity){
-	
-	//search for pitch position
+    
+    //search for pitch position
     Note* target_note = find_note_by_pitch(note_list,pitch);
-	Note* new_note;
-	
-	//check if the note is already in the list
-	if (target_note->pitch == pitch){
-		//if the note is already in the list, update the velocity and change its trigger position
-		new_note = target_note;
-	    update_note_velocity(new_note, velocity);
-		move_note_to_tail_trigger(note_list, new_note);
-		return 1;
+    Note* new_note;
+    
+    //check if the note is already in the list
+    if (target_note->pitch == pitch){
+        //if the note is already in the list, update the velocity and change its trigger position
+        new_note = target_note;
+        update_note_velocity(new_note, velocity);
+        move_note_to_tail_trigger(note_list, new_note);
+        return 1;
     }
-	else{
-		//if the note is new, add it in the proper pitch position
-	    new_note = add_note_at_previous_pitch(note_list, target_note, pitch, velocity);
-		if (new_note == NULL)
-		    return 0;
-		else{
-		    insert_note_at_tail_trigger(note_list, new_note);
-			return 1;
-		}			
-	}
+    else{
+        //if the note is new, add it in the proper pitch position
+        new_note = add_note_at_previous_pitch(note_list, target_note, pitch, velocity);
+        if (new_note == NULL)
+            return 0;
+        else{
+            insert_note_at_tail_trigger(note_list, new_note);
+            return 1;
+        }            
+    }
 }

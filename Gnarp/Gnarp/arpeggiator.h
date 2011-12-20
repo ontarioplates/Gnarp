@@ -22,23 +22,23 @@ note_time_variation;
 
 struct NotePlayer
 {
-	bool    play_status;
-	
-	uint8_t note_index;
-	uint8_t repeat_index;
-	uint8_t octave_index;
-	
-	uint8_t note_max;
-	uint8_t repeat_max;
-	uint8_t octave_max;
-	
-	uint16_t start_time_increment;
-	uint16_t stop_time_increment;
-	
-	uint16_t beats_per_minute;
-	note_time_division time_division;
-	note_time_variation time_variation;
-	
+    bool    play_status;
+    
+    uint8_t note_index;
+    uint8_t repeat_index;
+    uint8_t octave_index;
+    
+    uint8_t note_max;
+    uint8_t repeat_max;
+    uint8_t octave_max;
+    
+    uint16_t start_time_increment;
+    uint16_t stop_time_increment;
+    
+    uint16_t beats_per_minute;
+    note_time_division time_division;
+    note_time_variation time_variation;
+    
     Note*   play_list[MAX_PLAY_NOTES];
 };
 

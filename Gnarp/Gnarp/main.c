@@ -709,10 +709,10 @@ void check_note_list_head_pitch_f(NoteList* note_list, uint8_t* pitch_list){
     
     current_note = note_list->head_pitch;
     
-	for (i=0; i<MAX_LIST_NOTES; i++){
-		pitch_list[i] = 0;
-	}
-	
+    for (i=0; i<MAX_LIST_NOTES; i++){
+        pitch_list[i] = 0;
+    }
+    
     i=0;
     while (current_note != NULL){
         pitch_list[i] = current_note->pitch;
@@ -739,10 +739,10 @@ void check_note_list_head_pitch_b(NoteList* note_list, uint8_t* pitch_list){
     
     current_note = note_list->tail_pitch;
     
-	for (i=0; i<MAX_LIST_NOTES; i++){
-		pitch_list[i] = 0;
-	}
-	
+    for (i=0; i<MAX_LIST_NOTES; i++){
+        pitch_list[i] = 0;
+    }
+    
     i=0;
     while (current_note != NULL){
         pitch_list[i] = current_note->pitch;
@@ -769,10 +769,10 @@ void check_note_list_head_trigger_f(NoteList* note_list, uint8_t* pitch_list){
     
     current_note = note_list->head_trigger;
     
-	for (i=0; i<MAX_LIST_NOTES; i++){
-    	pitch_list[i] = 0;
-	}
-	
+    for (i=0; i<MAX_LIST_NOTES; i++){
+        pitch_list[i] = 0;
+    }
+    
     i=0;
     while (current_note != NULL){
         pitch_list[i] = current_note->pitch;
@@ -799,10 +799,10 @@ void check_note_list_head_trigger_b(NoteList* note_list, uint8_t* pitch_list){
     
     current_note = note_list->tail_trigger;
     
-	for (i=0; i<MAX_LIST_NOTES; i++){
-		pitch_list[i] = 0;
-	}
-	
+    for (i=0; i<MAX_LIST_NOTES; i++){
+        pitch_list[i] = 0;
+    }
+    
     i=0;
     while (current_note != NULL){
         pitch_list[i] = current_note->pitch;
@@ -824,8 +824,8 @@ void test_list(){
     volatile uint8_t check_pitch_b[MAX_LIST_NOTES];
     volatile uint8_t check_trigger_f[MAX_LIST_NOTES];
     volatile uint8_t check_trigger_b[MAX_LIST_NOTES];
-	
-	uint8_t input_number = MAX_LIST_NOTES;
+    
+    uint8_t input_number = MAX_LIST_NOTES;
     
     initialize_hardware();
     initialize_note_list();
@@ -842,18 +842,18 @@ void test_list(){
  
     for (i=0; i<(MAX_LIST_NOTES-1); ){
         remove_note_by_pitch(get_note_list(), i+100);
-		check_note_list_head_pitch_b(get_note_list(), check_pitch_b);
-		check_note_list_head_trigger_b(get_note_list(), check_trigger_b);
+        check_note_list_head_pitch_b(get_note_list(), check_pitch_b);
+        check_note_list_head_trigger_b(get_note_list(), check_trigger_b);
         i++;
     }
-	
-	for (i=0; i< MAX_LIST_NOTES; i++)
+    
+    for (i=0; i< MAX_LIST_NOTES; i++)
         note_stream[i] = rand() % 10 + 200;
         
     for (i=0; i<MAX_LIST_NOTES; i++){
         insert_note(get_note_list(), note_stream[i], note_stream[i]);
     }
-	
+    
     check_note_list_head_pitch_f(get_note_list(), check_pitch_f);
     check_note_list_head_trigger_f(get_note_list(), check_trigger_f);                  
  
@@ -866,8 +866,8 @@ int main(void) {
 
 
     test_list();
-	
-	while(1){};
-		       
+    
+    while(1){};
+               
     return 0;
 }

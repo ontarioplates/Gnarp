@@ -9,61 +9,61 @@ NotePlayer* get_note_player(){
 }
 
 ISR(TCC0_CCA_vect){
-	//reset beat clock
+    //reset beat clock
     TCC0.CNT = 0;
 }
 
 ISR(TCC0_CCB_vect){
-	//MAYBE DISABLE USARTRX INTERRUPT?
-	
-	//disable CCB (note on) and CCC (note off) interrupts
+    //MAYBE DISABLE USARTRX INTERRUPT?
+    
+    //disable CCB (note on) and CCC (note off) interrupts
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
-	
-	NotePlayer* note_player = get_note_player();
-	
-	//capture the time at interrupt start (aka the current compare B value)
-	uint32_t current_time = (uint32_t) TCC0.CCB;
-	uint32_t next_stop_time;
-	uint32_t next_start_time;
-	
-	//if a note is still playing, stop it
-	if (note_player->play_status)
-	    stop_current_note(note_player);
     
-	//start the next note
-	start_next_note(note_player);
+    NotePlayer* note_player = get_note_player();
+    
+    //capture the time at interrupt start (aka the current compare B value)
+    uint32_t current_time = (uint32_t) TCC0.CCB;
+    uint32_t next_stop_time;
+    uint32_t next_start_time;
+    
+    //if a note is still playing, stop it
+    if (note_player->play_status)
+        stop_current_note(note_player);
+    
+    //start the next note
+    start_next_note(note_player);
     
     //compute next compare values
-	next_start_time = current_time + note_player->start_time_increment;
-	next_stop_time = current_time + note_player->stop_time_increment;
-	
-	//check for overflow
-	if (next_start_time > TCC0.CCA)
-	    next_start_time = next_start_time - TCC0.CCA;
-    if (next_stop_time > TCC0.CCA)
-	    next_stop_time = next_stop_time - TCC0.CCA;
-	
-	//assign values to compare registers
-	TCC0.CCB = (uint16_t) next_start_time;
-	TCC0.CCC = (uint16_t) next_stop_time;
+    next_start_time = current_time + note_player->start_time_increment;
+    next_stop_time = current_time + note_player->stop_time_increment;
     
-	//enable CCB (note on) and CCC (note off) interrupts
+    //check for overflow
+    if (next_start_time > TCC0.CCA)
+        next_start_time = next_start_time - TCC0.CCA;
+    if (next_stop_time > TCC0.CCA)
+        next_stop_time = next_stop_time - TCC0.CCA;
+    
+    //assign values to compare registers
+    TCC0.CCB = (uint16_t) next_start_time;
+    TCC0.CCC = (uint16_t) next_stop_time;
+    
+    //enable CCB (note on) and CCC (note off) interrupts
     TCC0.CTRLB |= 0x20;
     TCC0.CTRLB |= 0x40;
 }
 
 ISR(TCC0_CCC_vect){
-	//MAYBE DISABLE USARTRX INTERRUPT?
-	//disable CCB (note on) and CCC (note off) interrupts
+    //MAYBE DISABLE USARTRX INTERRUPT?
+    //disable CCB (note on) and CCC (note off) interrupts
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
-	
-	//stop the current note
-	stop_current_note(get_note_player());
-	
-	//enable CCB (note on) interupt
-	TCC0.CTRLB |= 0x40;
+    
+    //stop the current note
+    stop_current_note(get_note_player());
+    
+    //enable CCB (note on) interupt
+    TCC0.CTRLB |= 0x40;
 }
 
 ISR(TCC0_CCD_vect){
@@ -90,35 +90,35 @@ static void initialize_note_timer(){
 
 
 static void calculate_start_time_increment(NotePlayer* note_player){
-	uint8_t i;
-	
-	//start with value for a quarter note
-	uint32_t new_start_time_increment = TCC0.CCA;
-	
-	//according to time division setting, divide by x^2
-	for (i = 0; i < note_player->time_division; i++)
-	    new_start_time_increment /= 2;
-		
-	switch(note_player->time_variation){
-		case NONE:      break;
-			
-		case DOTTED:    new_start_time_increment *= 3;
-		                new_start_time_increment /= 2;
-				        break;
-				
-		case TRIPLET:   new_start_time_increment *= 2;
-		                new_start_time_increment /= 3;
-					    break;
-	}	
-	
+    uint8_t i;
+    
+    //start with value for a quarter note
+    uint32_t new_start_time_increment = TCC0.CCA;
+    
+    //according to time division setting, divide by x^2
+    for (i = 0; i < note_player->time_division; i++)
+        new_start_time_increment /= 2;
+        
+    switch(note_player->time_variation){
+        case NONE:      break;
+            
+        case DOTTED:    new_start_time_increment *= 3;
+                        new_start_time_increment /= 2;
+                        break;
+                
+        case TRIPLET:   new_start_time_increment *= 2;
+                        new_start_time_increment /= 3;
+                        break;
+    }    
+    
     note_player->start_time_increment = new_start_time_increment;
 }
 
 static void calculate_stop_time_increment(NotePlayer* note_player){
-	uint32_t new_stop_time_increment = (uint32_t) (note_player->start_time_increment) * note_player->note_duration;
-	new_stop_time_increment = new_stop_time_increment / MAX_NOTE_DURATION;
-	
-	note_player->stop_time_increment = (uint16_t) new_stop_time_increment;
+    uint32_t new_stop_time_increment = (uint32_t) (note_player->start_time_increment) * note_player->note_duration;
+    new_stop_time_increment = new_stop_time_increment / MAX_NOTE_DURATION;
+    
+    note_player->stop_time_increment = (uint16_t) new_stop_time_increment;
 }
 
 
@@ -245,8 +245,8 @@ void build_play_list(NotePlayer* note_player, NoteList* note_list){
 
 void input_note_on(NotePlayer* note_player, uint8_t pitch, uint8_t velocity){
     //MAYBE DISABLE USARTrx AND/OR TIMER INTERRUPTS
-	
-	insert_note(get_note_list(), pitch, velocity);
+    
+    insert_note(get_note_list(), pitch, velocity);
 
     bool first_note = 0;
     
@@ -262,41 +262,41 @@ void input_note_on(NotePlayer* note_player, uint8_t pitch, uint8_t velocity){
 }
 
 void stop_current_note(NotePlayer* note_player){
-	//set midi message to stop the current note
+    //set midi message to stop the current note
     midi_send_noteoff(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player]->pitch,note_player->play_list[note_player]->velocity);
-	
-	//clear play flag
+    
+    //clear play flag
     note_player->play_status = 0;
 }
 
 void start_next_note(NotePlayer* note_player){
-	//increment repeat count
-	note_player->repeat_index += 1;
-	
-	//if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
-	if (note_player->repeat_index > note_player->repeat_max){
-		note_player->repeat_index = 0;
-		note_player->note_index += 1;
-	}
-	
-	//if the play list is at the end, reset the note index and increment the octave index
-	if (note_player->note_index > note_player->note_max){
-	    note_player->note_index = 0;
-		note_player->octave_index += 1;
+    //increment repeat count
+    note_player->repeat_index += 1;
+    
+    //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
+    if (note_player->repeat_index > note_player->repeat_max){
+        note_player->repeat_index = 0;
+        note_player->note_index += 1;
     }
-	
-	//if the last octave is reached, reset the octave index
-	if (note_player->octave_index > note_player->octave_max){
-		note_player->octave_index = 0;
-		
-		//ADD CODE TO CHECK FOR RANDOM SETTING
-	}
+    
+    //if the play list is at the end, reset the note index and increment the octave index
+    if (note_player->note_index > note_player->note_max){
+        note_player->note_index = 0;
+        note_player->octave_index += 1;
+    }
+    
+    //if the last octave is reached, reset the octave index
+    if (note_player->octave_index > note_player->octave_max){
+        note_player->octave_index = 0;
+        
+        //ADD CODE TO CHECK FOR RANDOM SETTING
+    }
 
     //send midi message to start the note
     midi_send_noteon(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player]->pitch,note_player->play_list[note_player]->velocity);
-	
-	//set play flag
-	note_player->play_status = 1;
+    
+    //set play flag
+    note_player->play_status = 1;
 }
 
 
