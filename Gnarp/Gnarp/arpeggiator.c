@@ -31,6 +31,10 @@ ISR(TCC0_CCB_vect){
     if (note_player->play_status)
         stop_current_note(note_player);
     
+	//rebuild the playlist if necessary
+	if (note_player->rebuild_playlist)
+		build_play_list(note_player);
+	
     //start the next note
     start_next_note(note_player);
     
@@ -62,7 +66,7 @@ ISR(TCC0_CCC_vect){
     //stop the current note
     stop_current_note(get_note_player());
     
-    //enable CCB (note on) interupt
+    //enable CCB (note on) interrupt
     TCC0.CTRLB |= 0x40;
 }
 
@@ -121,13 +125,6 @@ static void calculate_stop_time_increment(NotePlayer* note_player){
     note_player->stop_time_increment = (uint16_t) new_stop_time_increment;
 }
 
-
-
-
-
-
-
-
 //Reset all data in play list
 void initialize_note_player(NotePlayer* note_player){
     
@@ -139,33 +136,31 @@ void initialize_note_player(NotePlayer* note_player){
     note_player->play_status = 0;
 }
 
-
-
-
-
 void initialize_arpeggiator(){
     //initialize note list in linkedlist.c
     //initialize play list
     
     initialize_note_list();
-    initialize_play_list(get_note_player());
+//    initialize_play_list(get_note_player());
 }
 
-void build_play_list(NotePlayer* note_player, NoteList* note_list){
+void build_play_list(NotePlayer* note_player){
     
     //builds the play list according to pattern selection (pot0)
+	
+	NoteList* note_list = note_player->note_list;
     
     uint8_t play_list_index = 0;
     Note* current_note;
     
-    uint8_t note_list_size = note_list->note_max;
+    uint8_t note_list_size = note_list->length;
     uint8_t random_list_depth;      //index for random pattern
     
     uint8_t i;
     uint8_t mirror = 0;
 
 
-    switch(get_pot_value(0, 0, 4)){
+    switch(0){
         //Asc pitch
         case 0:
             for(current_note = note_list->head_pitch; current_note; current_note=current_note->next_note_by_pitch)
@@ -202,18 +197,19 @@ void build_play_list(NotePlayer* note_player, NoteList* note_list){
             break;
     }
 
-
     //option to mirror the pattern
     if (mirror){
         uint8_t mirrored_length;
         uint8_t edge_scale;
         uint8_t k;
 
-        if (mirror == 2){                         //double edge
+        if (mirror == 2){
+			//double edge
             mirrored_length = play_list_index*2;
             edge_scale = 1;
         }
-        if (mirror == 1){                         //single edge
+        if (mirror == 1){
+			//single edge
             if (play_list_index < 3)
                 mirrored_length = 0;
             else{
@@ -221,8 +217,6 @@ void build_play_list(NotePlayer* note_player, NoteList* note_list){
                 edge_scale = 0;
             }
         }
-
-
         if (mirrored_length){
             play_list_index += -1;
             for (k = 1; play_list_index + k < mirrored_length; k++){
@@ -233,40 +227,99 @@ void build_play_list(NotePlayer* note_player, NoteList* note_list){
     }
 
     note_player->note_max = play_list_index;     //set play list note_max appropriately
-
+	
+	while (note_player->note_index > note_player->note_max)
+		note_player->note_index -= note_player->note_max;
+	
+	note_player->rebuild_playlist = 0;
+	
     return;
 }
 
 //called whenever a new MIDI noteon message is recieved
-    
 //adds the new note to the note list (if it's not a duplicate)
 //rebuilds play list and starts playing if it's the first note in the list
-    
-
 void input_note_on(NotePlayer* note_player, uint8_t pitch, uint8_t velocity){
     //MAYBE DISABLE USARTrx AND/OR TIMER INTERRUPTS
+	
+	//try to insert the note
+    bool insert_success = insert_note(note_player->note_list, pitch, velocity);
+	
+	//if the note list is full, quit the routine
+	if (!insert_success)
+		return;
+	
+	//if this is the first note, build the playlist and start playing immediately
+	if (note_player->note_list->length == 1){
+		//capture the current time
+		uint32_t current_time = TCC0.CNT;
+		
+		build_play_list(note_player);
+		
+		//play the first (only) note
+		start_first_note(note_player);
     
-    insert_note(get_note_list(), pitch, velocity);
+		//compute next compare values
+		uint32_t next_start_time = current_time + note_player->start_time_increment;
+		uint32_t next_stop_time = current_time + note_player->stop_time_increment;
+    
+		//check for overflow
+		if (next_start_time > TCC0.CCA)
+			next_start_time = next_start_time - TCC0.CCA;
+		if (next_stop_time > TCC0.CCA)
+			next_stop_time = next_stop_time - TCC0.CCA;
+    
+		//assign values to compare registers
+		TCC0.CCB = (uint16_t) next_start_time;
+		TCC0.CCC = (uint16_t) next_stop_time;
+    
+		//enable CCB (note on) and CCC (note off) interrupts
+		TCC0.CTRLB |= 0x20;
+		TCC0.CTRLB |= 0x40;
+		
+		return;
+	}
+	
+	//otherwise set the playlist to be rebuilt on the next note on
+	note_player->rebuild_playlist = 1;
+}
 
-    bool first_note = 0;
-    
-    if (get_note_list()->note_max == 0)        //check for empty note list
-        first_note = 1;
-    
-    add_note_in_full_order(get_note_list(),pitch,velocity);     //add note into note list
-    
-    if (first_note){         //if it's the first note in the note list, build the play list and start playing by setting the play interrupt flag
-        build_play_list(get_note_player(),get_note_list());
-        TCC0.INTFLAGS &= 0x20;
-    }        
+void input_note_off(NotePlayer* note_player, uint8_t pitch){
+	//MAYBE DISABLE USARTrx AND/OR TIMER INTERRUPTS
+
+	
+	bool remove_success = remove_note_by_pitch(note_player->note_list,pitch);
+	
+	if (!remove_success)
+		return;
+		
+	if (note_player->note_list->length == 0){
+		//disable CCB (note on) and CCC (note off) interrupts
+		TCC0.CTRLB &= ~0x20; 
+		TCC0.CTRLB &= ~0x40;
+		
+		//stop playing
+		stop_current_note(note_player);
+		
+		//reset the note player
+		initialize_note_player(note_player);
+	}
 }
 
 void stop_current_note(NotePlayer* note_player){
     //set midi message to stop the current note
-    midi_send_noteoff(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player]->pitch,note_player->play_list[note_player]->velocity);
+    midi_send_noteoff(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player->note_index]->pitch,note_player->play_list[note_player->note_index]->velocity);
     
     //clear play flag
     note_player->play_status = 0;
+}
+
+void start_first_note(NotePlayer* note_player){
+	note_player->repeat_index = 0;
+	note_player->octave_index = 0;
+	note_player->note_index = 0;
+	note_player->play_status = 1;
+    midi_send_noteon(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player->note_index]->pitch,note_player->play_list[note_player->note_index]->velocity);
 }
 
 void start_next_note(NotePlayer* note_player){
@@ -293,7 +346,7 @@ void start_next_note(NotePlayer* note_player){
     }
 
     //send midi message to start the note
-    midi_send_noteon(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player]->pitch,note_player->play_list[note_player]->velocity);
+    midi_send_noteon(serial_midi_device(),MIDI_CHAN,note_player->play_list[note_player->note_index]->pitch,note_player->play_list[note_player->note_index]->velocity);
     
     //set play flag
     note_player->play_status = 1;

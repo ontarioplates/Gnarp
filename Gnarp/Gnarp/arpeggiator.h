@@ -13,6 +13,7 @@
 
 #define MAX_PLAY_NOTES 48
 #define MAX_NOTE_DURATION 0xFFFF
+#define RAND_BUFF 10
 
 typedef enum {QUARTER, EIGHTH, SIXTEENTH}
 note_time_division;
@@ -23,6 +24,7 @@ note_time_variation;
 struct NotePlayer
 {
     bool    play_status;
+	bool	rebuild_playlist;
     
     uint8_t note_index;
     uint8_t repeat_index;
@@ -36,12 +38,14 @@ struct NotePlayer
     uint16_t stop_time_increment;
     
     uint16_t beats_per_minute;
+	uint16_t note_duration;
     note_time_division time_division;
     note_time_variation time_variation;
     
     Note*   play_list[MAX_PLAY_NOTES];
+	NoteList* note_list;
 };
 
-
+typedef struct NotePlayer NotePlayer;
 
 #endif /* ARPEGGIATOR_H_ */

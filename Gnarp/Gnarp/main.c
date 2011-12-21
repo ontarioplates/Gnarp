@@ -698,9 +698,9 @@ void test_pot_banks(){
 
 void check_note_list_head_pitch_f(NoteList* note_list, uint8_t* pitch_list){
     
-    volatile uint8_t list_count = note_list->count;
+    volatile uint8_t list_length = note_list->length;
     
-    if (list_count == 0)
+    if (list_length == 0)
         return;
     
 
@@ -728,9 +728,9 @@ void check_note_list_head_pitch_f(NoteList* note_list, uint8_t* pitch_list){
 
 void check_note_list_head_pitch_b(NoteList* note_list, uint8_t* pitch_list){
     
-    volatile uint8_t list_count = note_list->count;
+    volatile uint8_t list_length = note_list->length;
     
-    if (list_count == 0)
+    if (list_length == 0)
         return;
     
 
@@ -758,9 +758,9 @@ void check_note_list_head_pitch_b(NoteList* note_list, uint8_t* pitch_list){
 
 void check_note_list_head_trigger_f(NoteList* note_list, uint8_t* pitch_list){
     
-    volatile uint8_t list_count = note_list->count;
+    volatile uint8_t list_length = note_list->length;
     
-    if (list_count == 0)
+    if (list_length == 0)
         return;
     
 
@@ -788,9 +788,9 @@ void check_note_list_head_trigger_f(NoteList* note_list, uint8_t* pitch_list){
 
 void check_note_list_head_trigger_b(NoteList* note_list, uint8_t* pitch_list){
     
-    volatile uint8_t list_count = note_list->count;
+    volatile uint8_t list_length = note_list->length;
     
-    if (list_count == 0)
+    if (list_length == 0)
         return;
     
 
@@ -817,13 +817,13 @@ void check_note_list_head_trigger_b(NoteList* note_list, uint8_t* pitch_list){
 }
 
 void test_list(){
-    volatile uint8_t check_count;
+    volatile uint8_t check_length;
     volatile uint8_t i;
-    volatile uint8_t note_stream[MAX_LIST_NOTES];
-    volatile uint8_t check_pitch_f[MAX_LIST_NOTES];
-    volatile uint8_t check_pitch_b[MAX_LIST_NOTES];
-    volatile uint8_t check_trigger_f[MAX_LIST_NOTES];
-    volatile uint8_t check_trigger_b[MAX_LIST_NOTES];
+    uint8_t note_stream[MAX_LIST_NOTES];
+    uint8_t check_pitch_f[MAX_LIST_NOTES];
+    uint8_t check_pitch_b[MAX_LIST_NOTES];
+    uint8_t check_trigger_f[MAX_LIST_NOTES];
+    uint8_t check_trigger_b[MAX_LIST_NOTES];
     
     uint8_t input_number = MAX_LIST_NOTES;
     

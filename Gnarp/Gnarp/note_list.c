@@ -71,16 +71,16 @@ static Note* find_note_by_pitch(NoteList* note_list, uint8_t pitch){
 //Search for note by pitch in the note list
 //If it is found, adjust surrounding pointers
 //And remove and free the note
-void remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
+bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
     Note* dead_note = find_note_by_pitch(note_list, pitch);
     
     //note not found (reached the end of the note list)
     if (dead_note == NULL)
-        return;
+        return 0;
     
     //note not found (did not reach the end of the note list)
     if (dead_note->pitch != pitch)
-        return;
+        return 0;
         
     //otherwise, the note was found and ready to be removed
     note_list->length += -1;
@@ -88,7 +88,7 @@ void remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
     //check for empty list
     if (note_list->length == 0){
         initialize_note_list();
-        return;
+        return 1;
     }
     
     //adjust surrounding pointers
@@ -116,6 +116,8 @@ void remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
     
     //clear all note data and set its status to available
     free_note(dead_note);
+	
+	return 1;
 }
 
 //Change the velocity of an existing note
