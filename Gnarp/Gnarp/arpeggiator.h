@@ -21,10 +21,11 @@ note_time_division;
 typedef enum {NONE, DOTTED, TRIPLET}
 note_time_variation;
 
-struct NotePlayer
+struct Sequencer
 {
+    bool    run_status;
     bool    play_status;
-	bool	rebuild_playlist;
+    bool    rebuild_play_list;
     
     uint8_t note_index;
     uint8_t repeat_index;
@@ -37,15 +38,21 @@ struct NotePlayer
     uint16_t start_time_increment;
     uint16_t stop_time_increment;
     
-    uint16_t beats_per_minute;
-	uint16_t note_duration;
-    note_time_division time_division;
-    note_time_variation time_variation;
+    uint8_t pattern;
+    uint16_t duration;
+    uint8_t division;
     
     Note*   play_list[MAX_PLAY_NOTES];
-	NoteList* note_list;
+    NoteList* note_list;
 };
 
-typedef struct NotePlayer NotePlayer;
+typedef struct Sequencer Sequencer;
+
+Sequencer* get_sequencer();
+void set_rebuild_play_list(Sequencer* sequencer, bool new_flag);
+void adjust_sequencer_to_bpm(Sequencer* sequencer);
+void initialize_sequencer();
+void continue_sequencer(Sequencer* sequencer, bool restart);
+void stop_sequencer(Sequencer* sequencer, bool full_stop);
 
 #endif /* ARPEGGIATOR_H_ */

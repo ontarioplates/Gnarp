@@ -101,30 +101,30 @@ static void read_pots(){
         pot_values[i] = ADCA.CH0.RESL;
         pot_values[i] |= ADCA.CH0.RESH << 8;
         
-        if (pot_values[i] < POTMIN)
+        if (pot_values[i] < POT_MIN)
             pot_values[i] = 0;
         else
-            pot_values[i] = pot_values[i] - POTMIN;
+            pot_values[i] = pot_values[i] - POT_MIN;
     }
     
 }
 
-uint16_t get_pot_value(uint8_t pot, uint16_t outmin, uint16_t outmax){
-    //pot: 0-4 to select input pot
-    //outmin: minimum value to output
-    //outmax: maximum value to output
+uint16_t get_pot_value(uint8_t pot_select, uint16_t output_min, uint16_t output_max){
+    //pot_select: 0-4 to select input pot
+    //output_min: minimum value to output
+    //output_max: maximum value to output
     
-    const uint16_t pot_range = POTMAX - POTMIN + 1; 
+    const uint16_t pot_range = POT_MAX - POT_MIN + 1; 
     float temp;
     
-    temp = 1.0*pot_values[pot]/pot_range;
-    temp = temp*(outmax - outmin + 1) + outmin;
+    temp = 1.0*pot_values[pot_select]/pot_range;
+    temp = temp*(output_max - output_min + 1) + output_min;
     
-    if (temp > outmax)
-        temp = outmax;
+    if (temp > output_max)
+        temp = output_max;
         
-    if (temp < outmin)
-        temp = outmin;
+    if (temp < output_min)
+        temp = output_min;
     
     return (uint16_t) temp;
 }

@@ -22,17 +22,18 @@
 //implementations of the typedef and these functions
 
 #include "interrupt_setting.h"
-#include <avr/interrupt.h>
+//#include <avr/interrupt.h>
 
 
 interrupt_setting_t store_and_clear_interrupt(void) {
-    uint8_t sreg = SREG;
-    cli();
+//   uint8_t sreg = SREG;
+    uint8_t sreg = 0;
+//    cli();
     return sreg;
 }
 
 void restore_interrupt_setting(interrupt_setting_t setting) {
-    SREG = setting;
+//   SREG = setting;
 }
 
 

@@ -9,8 +9,8 @@
 #include <stdlib.h>
 
 #define DEBOUNCE 8
-#define POTMIN 0x00E0
-#define POTMAX 0x0FFF
+#define POT_MIN 0x00E0
+#define POT_MAX 0x0FFF
 
 typedef enum {TURN_NONE, TURN_CW, TURN_CCW}
 turn_state;

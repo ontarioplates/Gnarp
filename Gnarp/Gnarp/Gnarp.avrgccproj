@@ -21,14 +21,14 @@
     <AssemblyName>GnarpAVRSTUDIO</AssemblyName>
     <Name>GnarpAVRSTUDIO</Name>
     <RootNamespace>GnarpAVRSTUDIO</RootNamespace>
-    <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
+    <avrtool>com.atmel.avrdbg.tool.avrdragon</avrtool>
     <com_atmel_avrdbg_tool_avrdragon>
       <ToolType>com.atmel.avrdbg.tool.avrdragon</ToolType>
       <ToolName>AVR Dragon</ToolName>
       <ToolNumber>00A20002303C</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1094</port>
+        <port>1661</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
@@ -54,7 +54,7 @@
       </ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1105</port>
+        <port>1661</port>
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>
@@ -130,6 +130,12 @@
     <ExternalMakeFilePath>C:\Documents and Settings\David\My Documents\AVR\Gnarp\GnarpAVRSTUDIO\GnarpAVRSTUDIO\Debug\Makefile_manual</ExternalMakeFilePath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="beat_clock.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="beat_clock.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="hardware.c">
       <SubType>compile</SubType>
     </Compile>

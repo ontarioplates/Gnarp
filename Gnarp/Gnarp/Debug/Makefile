@@ -46,6 +46,7 @@ SUBDIRS :=  \
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../beat_clock.c \
 ../hardware.c \
 ../main.c \
 ../note_list.c \
@@ -64,6 +65,7 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+beat_clock.o \
 hardware.o \
 main.o \
 note_list.o \
@@ -76,6 +78,7 @@ xnorMIDI/midi_device.o
 
 
 OBJS_AS_ARGS +=  \
+beat_clock.o \
 hardware.o \
 main.o \
 note_list.o \
@@ -88,6 +91,7 @@ xnorMIDI/midi_device.o
 
 
 C_DEPS +=  \
+beat_clock.d \
 hardware.d \
 main.d \
 note_list.d \
@@ -100,6 +104,7 @@ xnorMIDI/midi_device.d
 
 
 C_DEPS_AS_ARGS +=  \
+beat_clock.d \
 hardware.d \
 main.d \
 note_list.d \
@@ -138,6 +143,8 @@ ADDITIONAL_DEPENDENCIES:= $(HEX_FLASH_FILE_PATH) $(LSS_FILE_PATH) $(HEX_EEPROM_F
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR/GNU C Compiler
+
+
 
 
 

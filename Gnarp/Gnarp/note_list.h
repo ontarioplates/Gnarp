@@ -27,6 +27,7 @@ typedef struct Note Note;
 typedef struct NoteList NoteList;
 
 NoteList* get_note_list();
+uint8_t get_note_list_length(NoteList* note_list);
 void initialize_note_list();
 bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch);
 bool insert_note(NoteList* note_list, uint8_t pitch, uint8_t velocity);

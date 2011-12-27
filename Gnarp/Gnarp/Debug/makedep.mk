@@ -2,6 +2,8 @@
 # Automatically-generated file. Do not edit or delete the file
 ################################################################################
 
+beat_clock.c
+
 hardware.c
 
 main.c

@@ -8,6 +8,11 @@ NoteList* get_note_list(){
     return &global_note_list;
 }
 
+uint8_t get_note_list_length(NoteList* note_list){
+    return note_list->length;
+}
+
+
 //Iterate through the bank of notes to find an available note to use
 //Return NULL if all notes are taken
 //Return note pointer if there is one available
@@ -116,8 +121,8 @@ bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
     
     //clear all note data and set its status to available
     free_note(dead_note);
-	
-	return 1;
+    
+    return 1;
 }
 
 //Change the velocity of an existing note
