@@ -23,7 +23,7 @@ static void calculate_start_time_increment(Sequencer* sequencer){
     switch(sequencer->division){
         case 0:    break;
         
-        case 1:    new_start_time_increment *= 3;
+        case 1: new_start_time_increment *= 3;
                 new_start_time_increment /= 4;
                 break;
                 
@@ -433,16 +433,3 @@ void adjust_sequencer_to_bpm(Sequencer* sequencer){
     if (sequencer->run_status)
         continue_sequencer(sequencer, 1);
 }
-
-//interrupt to start the next note
-ISR(TCC0_CCB_vect){
-    //continue to the next note without restarting
-    continue_sequencer(get_sequencer(), 0);
-}
-
-//interrupt to stop the current note
-ISR(TCC0_CCC_vect){
-    //stop the sequencer note without a full stop
-    stop_sequencer(get_sequencer(), 0);
-}
-

@@ -9,11 +9,24 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+static Sequencer sequencer;
+static MidiDevice midi_device;
+
 ISR(USARTD1_RXC_vect){
-//    static uint8_t new_byte[1];
-//    new_byte[0] = USARTD1.DATA;
-    midi_device_input(get_midi_device(),1,&(USARTD1.DATA));
-    midi_device_process(get_midi_device());
+    midi_device_input(&midi_device,1,&(USARTD1.DATA));
+    midi_device_process(&midi_device);
+}
+
+//interrupt to start the next note
+ISR(TCC0_CCB_vect){
+    //continue to the next note without restarting
+    continue_sequencer(&sequencer, 0);
+}
+
+//interrupt to stop the current note
+ISR(TCC0_CCC_vect){
+    //stop the sequencer note without a full stop
+    stop_sequencer(&sequencer, 0);
 }
 
 
@@ -37,9 +50,6 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 
 int main(void) {
     const initial_BPM = 120;
-    Sequencer sequencer;
-	MidiDevice midi_device;
-
     uint8_t pitch = 100;
     
     initialize_hardware();
