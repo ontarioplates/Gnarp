@@ -5,18 +5,15 @@
 extern "C" {
 #endif 
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-#include <inttypes.h>
 
 #include "stdlib.h"
-#include "./xnorMIDI/midi.h"
+#include "./xnorMIDI/midi_device.h"
 #include "arpeggiator.h"
 
 #define MIDI_CHAN 0
 
-void serial_midi_init();
-MidiDevice* serial_midi_device();
+void initialize_serial_midi(MidiDevice* midi_device, Sequencer* sequencer);
+MidiDevice* get_midi_device();
 
 #ifdef __cplusplus
 }

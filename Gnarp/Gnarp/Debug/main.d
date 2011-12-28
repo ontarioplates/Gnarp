@@ -14,13 +14,10 @@ main.d main.o: .././main.c .././main.h .././hardware.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdbool.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/stdlib.h \
  c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stddef.h \
- .././serial_midi.h ../././xnorMIDI/midi.h ../././xnorMIDI/midi_device.h \
+ .././serial_midi.h ../././xnorMIDI/midi_device.h \
  ../././xnorMIDI/midi_function_types.h \
  ../././xnorMIDI/bytequeue/bytequeue.h .././arpeggiator.h \
- .././note_list.h \
- c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/stdio.h \
- c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdarg.h \
- c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/math.h
+ .././note_list.h
 
 .././main.h:
 
@@ -58,8 +55,6 @@ c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1
 
 .././serial_midi.h:
 
-../././xnorMIDI/midi.h:
-
 ../././xnorMIDI/midi_device.h:
 
 ../././xnorMIDI/midi_function_types.h:
@@ -69,9 +64,3 @@ c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1
 .././arpeggiator.h:
 
 .././note_list.h:
-
-c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/stdio.h:
-
-c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/include/stdarg.h:
-
-c:\program\ files\atmel\avr\ studio\ 5.0\avr\ toolchain\bin\../lib/gcc/avr/4.5.1/../../../../avr/include/math.h:

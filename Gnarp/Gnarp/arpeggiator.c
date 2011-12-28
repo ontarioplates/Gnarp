@@ -1,13 +1,11 @@
 #include "arpeggiator.h"
 
-//Play list to be used for all functions
-static Sequencer global_sequencer;
+#include "serial_midi.h"
+#include "./xnorMIDI/midi.h"
+#include "hardware.h"
 
-//Return pointer to the global sequencer
-Sequencer* get_sequencer(){
-    return &global_sequencer;
-}
-
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 static void calculate_start_time_increment(Sequencer* sequencer){
     //0 - qtr note (no division)
@@ -62,9 +60,8 @@ static void calculate_stop_time_increment(Sequencer* sequencer){
 }
 
 //Reset all data in the sequencer
-void initialize_sequencer(){  
+void initialize_sequencer(Sequencer* sequencer){  
     uint8_t i;
-    Sequencer* sequencer = &global_sequencer;
     
     //disable CCB (note on) and CCC (note off) interrupts
     TCC0.CTRLB &= ~0x20; 
@@ -76,6 +73,9 @@ void initialize_sequencer(){
     TCC0.INTCTRLB &= ~0x0C;
     TCC0.INTCTRLB |= 0x08;
     
+	//initialize the note list
+	initialize_note_list(&(sequencer->note_list));
+	
     //empty the play list
     for (i = 0; i < MAX_PLAY_NOTES; i++)
         sequencer->play_list[i] = NULL;
@@ -95,7 +95,6 @@ void initialize_sequencer(){
     sequencer->play_status = 0;
     
     //link the note list to the player and flag to rebuild the play list
-    sequencer->note_list = get_note_list();
     sequencer->rebuild_play_list = 1;
     
     //calculate the time increments
@@ -204,7 +203,7 @@ static void build_play_list(Sequencer* sequencer){
     
     //builds the play list according to pattern selection
     
-    NoteList* note_list = sequencer->note_list;
+    NoteList* note_list = &(sequencer->note_list);
     uint8_t pattern = sequencer->pattern;
     
     uint8_t play_list_index = 0;
@@ -309,7 +308,8 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     volatile uint32_t next_start_time;
     volatile uint32_t next_stop_time;
     
-    if (sequencer->note_list->length == 0)
+	//if there are no notes in the list, don't do anything
+    if (sequencer->note_list.length == 0)
         return;
     
     
@@ -328,7 +328,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     
     //turn off the current note if it is still playing
     if (sequencer->play_status){
-        midi_send_noteoff(serial_midi_device(),MIDI_CHAN,sequencer->play_list[sequencer->note_index]->pitch,sequencer->play_list[sequencer->note_index]->velocity);
+        midi_send_noteoff(get_midi_device(),MIDI_CHAN,sequencer->play_list[sequencer->note_index]->pitch,sequencer->play_list[sequencer->note_index]->velocity);
         sequencer->play_status = 0;
     }
         
@@ -362,7 +362,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     }
     
     //send midi message to start the note
-    midi_send_noteon(serial_midi_device(),MIDI_CHAN,sequencer->play_list[sequencer->note_index]->pitch,sequencer->play_list[sequencer->note_index]->velocity);
+    midi_send_noteon(get_midi_device(),MIDI_CHAN,sequencer->play_list[sequencer->note_index]->pitch,sequencer->play_list[sequencer->note_index]->velocity);
     
     set_LEDs_on(0,0,0,1);
     
@@ -387,7 +387,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     
     //stop the current note if it's playing
     if (sequencer->play_status){
-        midi_send_noteoff(serial_midi_device(),MIDI_CHAN,sequencer->play_list[sequencer->note_index]->pitch,sequencer->play_list[sequencer->note_index]->velocity);
+        midi_send_noteoff(get_midi_device(),MIDI_CHAN,sequencer->play_list[sequencer->note_index]->pitch,sequencer->play_list[sequencer->note_index]->velocity);
         set_LEDs_off(0,0,0,1);
         sequencer->play_status = 0;
     }
@@ -401,13 +401,38 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     
 }
 
+void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity){
+    //try to add the note to the note list.
+    //if successful, flag to rebuild the play list
+    //if it's the first note, restart the sequencer
+    
+    if (insert_note(&(sequencer->note_list), pitch, velocity)){
+		sequencer->rebuild_play_list = 1;
+        
+		if (sequencer->note_list.length == 1)
+            continue_sequencer(sequencer, 1);
+    }
+}
+
+void remove_note_from_arpeggiator(Sequencer* sequencer, uint8_t pitch){
+    //try to remove the note from the list
+    //if successful, set the rebuild flag
+    //if the note list is now empty, fully stop the sequencer
+    
+    if (remove_note_by_pitch(&(sequencer->note_list), pitch)){
+        sequencer->rebuild_play_list = 1;
+        
+        if (sequencer->note_list.length == 0)
+            stop_sequencer(sequencer, 1);
+    }	
+	
+}
+
 void adjust_sequencer_to_bpm(Sequencer* sequencer){
     //if the sequencer is running while the bpm changes, restart the sequencer
     if (sequencer->run_status)
         continue_sequencer(sequencer, 1);
 }
-
-
 
 //interrupt to start the next note
 ISR(TCC0_CCB_vect){

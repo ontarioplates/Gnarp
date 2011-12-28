@@ -1,18 +1,5 @@
 #include "note_list.h"
 
-//Note list to be used for all function
-static NoteList global_note_list;
-
-//Return pointer to the global note list
-NoteList* get_note_list(){
-    return &global_note_list;
-}
-
-uint8_t get_note_list_length(NoteList* note_list){
-    return note_list->length;
-}
-
-
 //Iterate through the bank of notes to find an available note to use
 //Return NULL if all notes are taken
 //Return note pointer if there is one available
@@ -41,11 +28,9 @@ static void free_note(Note* note){
 
 //Reset all data in the note list
 //Reset all data in each note of the list 
-void initialize_note_list(){
+void initialize_note_list(NoteList* note_list){
     uint8_t i;
-    
-    NoteList* note_list = &global_note_list;
-    
+
     note_list->length = 0;
     note_list->head_pitch = NULL;
     note_list->tail_pitch = NULL;
@@ -92,7 +77,7 @@ bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
     
     //check for empty list
     if (note_list->length == 0){
-        initialize_note_list();
+        initialize_note_list(note_list);
         return 1;
     }
     

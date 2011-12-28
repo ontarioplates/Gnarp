@@ -1,5 +1,10 @@
 #include "beat_clock.h"
 
+#include "arpeggiator.h"
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
+
 ISR(TCC0_CCA_vect){
     //reset beat clock
     TCC0.CNT = 0;
@@ -11,35 +16,6 @@ ISR(TCC0_CCD_vect){
 }
 
 static uint16_t BPM;
-
-void initialize_beat_clock(uint16_t new_BPM){
-    BPM = new_BPM;
-    configure_beat_clock_timer();
-    
-    //configure CCA and CCD as mid-level interrupts
-    TCC0.INTCTRLB &= ~0xC0;
-    TCC0.INTCTRLB |= 0x80;
-    TCC0.INTCTRLB &= ~0x03;
-    TCC0.INTCTRLB |= 0x02;
-    
-    //enable CCA and CCD interrupts
-    TCC0.CTRLB |= 0x80;
-    TCC0.CTRLB |= 0x10;
-}
-
-uint16_t get_BPM(){
-    return BPM;
-}
-
-void increment_BPM(){
-    BPM += 1;
-    configure_beat_clock_timer();
-}
-
-void decrement_BPM(){
-    BPM -= 1;
-    configure_beat_clock_timer();
-}
 
 void configure_beat_clock_timer(){
     //system clock = 24MHz; cyc/beat = 1.44Trillion/BPM
@@ -98,9 +74,6 @@ void configure_beat_clock_timer(){
     //set the new compare value for midi-clock ticks
     TCC0.CCD = (uint16_t) compare_value/24;
     
-    //alert the sequencer to the change
-    adjust_sequencer_to_bpm(get_sequencer());
-    
     //enable CCA (beat count) and CCD (midi tick) interrupt
     TCC0.CTRLB |= 0x10;
     TCC0.CTRLB |= 0x80;
@@ -110,4 +83,35 @@ void configure_beat_clock_timer(){
 
     return;
 }
+
+void initialize_beat_clock(uint16_t new_BPM){
+    BPM = new_BPM;
+    configure_beat_clock_timer();
+    
+    //configure CCA and CCD as mid-level interrupts
+    TCC0.INTCTRLB &= ~0xC0;
+    TCC0.INTCTRLB |= 0x80;
+    TCC0.INTCTRLB &= ~0x03;
+    TCC0.INTCTRLB |= 0x02;
+    
+    //enable CCA and CCD interrupts
+    TCC0.CTRLB |= 0x80;
+    TCC0.CTRLB |= 0x10;
+}
+
+uint16_t get_BPM(){
+    return BPM;
+}
+
+void increment_BPM(){
+    BPM += 1;
+    configure_beat_clock_timer();
+}
+
+void decrement_BPM(){
+    BPM -= 1;
+    configure_beat_clock_timer();
+}
+
+
 

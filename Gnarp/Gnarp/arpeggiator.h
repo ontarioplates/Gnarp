@@ -1,15 +1,11 @@
-#include <avr/interrupt.h>
-#include <avr/io.h>
+#ifndef ARPEGGIATOR_H_
+#define ARPEGGIATOR_H_
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "hardware.h"
 #include "note_list.h"
-#include "serial_midi.h"
-
-#ifndef ARPEGGIATOR_H_
-#define ARPEGGIATOR_H_
 
 #define MAX_PLAY_NOTES 48
 #define MAX_NOTE_DURATION 0xFFFF
@@ -43,15 +39,16 @@ struct Sequencer
     uint8_t division;
     
     Note*   play_list[MAX_PLAY_NOTES];
-    NoteList* note_list;
+    NoteList note_list;
 };
 
 typedef struct Sequencer Sequencer;
 
-Sequencer* get_sequencer();
-void set_rebuild_play_list(Sequencer* sequencer, bool new_flag);
 void adjust_sequencer_to_bpm(Sequencer* sequencer);
-void initialize_sequencer();
+void initialize_sequencer(Sequencer* sequencer);
+void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity);
+void remove_note_from_arpeggiator(Sequencer*, uint8_t pitch);
+
 void continue_sequencer(Sequencer* sequencer, bool restart);
 void stop_sequencer(Sequencer* sequencer, bool full_stop);
 
