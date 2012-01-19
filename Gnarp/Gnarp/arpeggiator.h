@@ -8,7 +8,8 @@
 #include "note_list.h"
 
 #define MAX_PLAY_NOTES 48
-#define MAX_NOTE_DURATION 0xFFFF
+#define MAX_NOTE_DURATION 0xFF
+#define MIDI_OCTAVE 12
 #define RAND_BUFF 10
 
 typedef enum {QUARTER, EIGHTH, SIXTEENTH}
@@ -35,7 +36,7 @@ struct Sequencer
     uint16_t stop_time_increment;
     
     uint8_t pattern;
-    uint16_t duration;
+    uint8_t duration;
     uint8_t division;
     
     Note*   play_list[MAX_PLAY_NOTES];

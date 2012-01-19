@@ -49,7 +49,7 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 }
 
 int main(void) {
-    const initial_BPM = 120;
+    const initial_BPM = 60;
     uint8_t pitch = 100;
     
     initialize_hardware();
