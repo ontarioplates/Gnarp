@@ -15,3 +15,5 @@ MAr1 Board Changes/Issues
 13. Fix footprint for pushbutton switch
 14. Connect LED 7 segments and DPs in correct order to MCU (0: 1's, 1: 10's, 2: 100's)
 15. Swap MIDI Out pins 4/5
+16. ALPS SRBV181004 rotary switch to maybe replace ALPHA.  cheaper
+17. Pinouts for 1/8" jack are wrong.  TS and T are switched
