@@ -1,3 +1,5 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #include "hardware.h"
 
 static turn_state encoder_state = TURN_NONE;

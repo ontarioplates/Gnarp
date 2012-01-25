@@ -1,11 +1,13 @@
-#include "arpeggiator.h"
+// Copyright (c) 2012, David Tuzman, All Right Reserved
 
-#include "serial_midi.h"
-#include "./xnorMIDI/midi.h"
-#include "hardware.h"
+#include "arpeggiator.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include "./xnorMIDI/midi.h"
+
+#include "serial_midi.h"
+#include "hardware.h"
 
 static void calculate_start_time_increment(Sequencer* sequencer){
     //0 - qtr note (no division)

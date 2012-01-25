@@ -1,3 +1,5 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #ifndef ARPEGGIATOR_H_
 #define ARPEGGIATOR_H_
 

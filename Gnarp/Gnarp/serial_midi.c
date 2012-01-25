@@ -1,3 +1,5 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #include "serial_midi.h"
 
 #include <avr/io.h>

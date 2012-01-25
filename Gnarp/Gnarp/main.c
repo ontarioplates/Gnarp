@@ -1,13 +1,16 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #include "main.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <stdint.h>
+
+#include <avr/interrupt.h>
 
 #include "hardware.h"
 #include "serial_midi.h"
 #include "arpeggiator.h"
-
-#include <avr/interrupt.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
 
 static Sequencer sequencer;
 static MidiDevice midi_device;

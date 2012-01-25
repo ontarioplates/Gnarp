@@ -1,3 +1,5 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #ifndef BEAT_CLOCK_H_
 #define BEAT_CLOCK_H_
 

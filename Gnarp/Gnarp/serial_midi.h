@@ -1,3 +1,5 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #ifndef SERIAL_MIDI_H
 #define SERIAL_MIDI_H
 
@@ -5,9 +7,10 @@
 extern "C" {
 #endif 
 
+#include <stdlib.h>
 
-#include "stdlib.h"
 #include "./xnorMIDI/midi_device.h"
+
 #include "arpeggiator.h"
 
 #define MIDI_CHAN 0

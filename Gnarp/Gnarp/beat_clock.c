@@ -1,9 +1,11 @@
-#include "beat_clock.h"
+// Copyright (c) 2012, David Tuzman, All Right Reserved
 
-#include "arpeggiator.h"
+#include "beat_clock.h"
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
+
+#include "arpeggiator.h"
 
 ISR(TCC0_CCA_vect){
     //reset beat clock

@@ -1,3 +1,5 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
+
 #include "note_list.h"
 
 //Iterate through the bank of notes to find an available note to use

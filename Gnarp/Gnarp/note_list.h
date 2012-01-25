@@ -1,3 +1,4 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
 
 #ifndef NOTE_LIST_H_
 #define NOTE_LIST_H_

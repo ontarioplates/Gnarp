@@ -1,12 +1,14 @@
+// Copyright (c) 2012, David Tuzman, All Right Reserved
 
-#ifndef HWSETUP_H_
-#define HWSETUP_H_
+#ifndef HARDWARE_H_
+#define HARDWARE_H_
 
-#include <avr/interrupt.h>
-#include <avr/io.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#include <avr/interrupt.h>
+#include <avr/io.h>
 
 #define DEBOUNCE 8
 #define POT_MIN 0x00E0
@@ -36,4 +38,4 @@ switch_edge get_pushbutton_switch_edge();
 switch_edge get_toggle_switch_edge();
 
 
-#endif /* HWSETUP_H_ */
+#endif /* HARDWARE_H_ */
