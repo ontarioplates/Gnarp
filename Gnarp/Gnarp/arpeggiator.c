@@ -104,103 +104,6 @@ void initialize_sequencer(Sequencer* sequencer){
     calculate_stop_time_increment(sequencer);
 }
 
-void set_rebuild_play_list(Sequencer* sequencer, bool new_flag){
-    sequencer->rebuild_play_list = new_flag;
-}
-
-static void reset_play_list_indeces(Sequencer* sequencer){
-    sequencer->octave_index = 0;
-    sequencer->note_index = 0;
-    sequencer->repeat_index = 0;
-}
-
-static void increment_play_list_indeces(Sequencer* sequencer){
-    //increment repeat count
-    sequencer->repeat_index += 1;
-    
-    //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
-    if (sequencer->repeat_index > sequencer->repeat_max){
-        sequencer->repeat_index = 0;
-        sequencer->note_index += 1;
-    }
-    
-    //if the play list is at the end, reset the note index and increment the octave index
-    if (sequencer->note_index > sequencer->note_max){
-        sequencer->note_index = 0;
-        sequencer->octave_index += 1;
-    }
-    
-    //if the last octave is reached, reset the octave index
-    if (sequencer->octave_index > sequencer->octave_max){
-        sequencer->octave_index = 0;
-    }    
-}
-
-
-static void set_sequencer_parameters(Sequencer* sequencer){
-    //correlate pots to control each parameter of the arpeggiator
-    const uint8_t octave_pot_sel= 0;
-    const uint8_t octave_pot_min = 0;
-    const uint8_t octave_pot_max = 3;
-    
-    const uint8_t repeat_pot_sel= 1;
-    const uint8_t repeat_pot_min = 0;
-    const uint8_t repeat_pot_max = 4;
-    
-    const uint8_t division_pot_sel= 2;
-    const uint8_t division_pot_min = 0;
-    const uint8_t division_pot_max = 6;
-    
-    const uint8_t duration_pot_sel= 3;
-    const uint8_t duration_pot_min = 11;
-    const uint8_t duration_pot_max = 255;
-    
-    const uint8_t pattern_pot_sel= 4;
-    const uint8_t pattern_pot_min = 0;
-    const uint8_t pattern_pot_max = 6;
-    
-    //read the new values from the pots
-    uint8_t octave_max_new = get_pot_value(octave_pot_sel, octave_pot_min, octave_pot_max);
-    uint8_t repeat_max_new = get_pot_value(repeat_pot_sel, repeat_pot_min, repeat_pot_max);
-    uint8_t division_new = get_pot_value(division_pot_sel,division_pot_min,division_pot_max);
-    uint8_t duration_new = get_pot_value(duration_pot_sel, duration_pot_min, duration_pot_max);
-    uint8_t pattern_new = get_pot_value(pattern_pot_sel, pattern_pot_min, pattern_pot_max);
-    
-    bool update_start_time_increment = 0;
-    bool update_stop_time_increment = 0;
-    
-    //flag to calculate new interrupt times if necessary
-    if (sequencer->repeat_max != repeat_max_new){
-        update_start_time_increment = 1;
-        update_stop_time_increment = 1;
-    }
-    
-    if (sequencer->division != division_new){
-        update_start_time_increment = 1;
-        update_stop_time_increment = 1;
-    }
-    
-    if (sequencer->duration != duration_new){
-        update_stop_time_increment = 1;
-    }
-    
-    if (sequencer->pattern != pattern_new){
-        sequencer->rebuild_play_list = 1;
-    }
-    
-    //load the new parameters into the arpeggiator
-    sequencer->octave_max = octave_max_new;
-    sequencer->repeat_max = repeat_max_new;
-    sequencer->division = division_new;
-    sequencer->duration = duration_new;
-    sequencer->pattern = pattern_new;
-    
-    if (update_start_time_increment)
-        calculate_start_time_increment(sequencer);
-    if (update_stop_time_increment)
-        calculate_stop_time_increment(sequencer);
-}
-
 static void build_play_list(Sequencer* sequencer){
     
     //builds the play list according to pattern selection
@@ -212,12 +115,16 @@ static void build_play_list(Sequencer* sequencer){
     Note* current_note;
     
     uint8_t note_list_size = note_list->length;
+	
+    uint8_t random_order[note_list_size];
+	uint8_t j;
+	uint8_t temp;
     uint8_t random_list_depth;      //index for random pattern
     
     uint8_t i;
     uint8_t mirror = 0;
 
-    pattern = 0;
+//    pattern = 0;
 
     switch(pattern){
         //Asc pitch
@@ -246,13 +153,21 @@ static void build_play_list(Sequencer* sequencer){
 
         //random
         case 4:
-            for(; play_list_index < RAND_BUFF; play_list_index++){
-                random_list_depth = rand() % note_list_size;
-                current_note = note_list->head_pitch;
-                for(i = 0; i < random_list_depth; i++)
-                    current_note = current_note->next_note_by_pitch;
-                sequencer->play_list[play_list_index++] = current_note;
-            }
+			for (i = 0; i<note_list_size; i++)
+			    random_order[i] = i;
+			for (i = 0; i<note_list_size; i++){
+				j = rand() % note_list_size;
+				temp = random_order[i];
+				random_order[i] = random_order[j];
+				random_order[j] = temp;
+			}			
+			for (i=0; i<note_list_size; i++){
+				current_note = note_list->head_pitch;
+				for (j = 0; j < random_order[i]; j++)
+				    current_note = current_note->next_note_by_pitch;
+				sequencer->play_list[play_list_index++] = current_note;
+			}
+
             break;
     }
 
@@ -296,6 +211,108 @@ static void build_play_list(Sequencer* sequencer){
     return;
 }
 
+
+void set_rebuild_play_list(Sequencer* sequencer, bool new_flag){
+    sequencer->rebuild_play_list = new_flag;
+}
+
+static void reset_play_list_indeces(Sequencer* sequencer){
+    sequencer->octave_index = 0;
+    sequencer->note_index = 0;
+    sequencer->repeat_index = 0;
+}
+
+static void increment_play_list_indeces(Sequencer* sequencer){
+    //increment repeat count
+    sequencer->repeat_index += 1;
+    
+    //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
+    if (sequencer->repeat_index > sequencer->repeat_max){
+        sequencer->repeat_index = 0;
+        sequencer->note_index += 1;
+    }
+    
+    //if the play list is at the end, reset the note index and increment the octave index
+    if (sequencer->note_index > sequencer->note_max){
+        sequencer->note_index = 0;
+        sequencer->octave_index += 1;		
+    }
+    
+    //if the last octave is reached, reset the octave index
+    if (sequencer->octave_index > sequencer->octave_max){
+        sequencer->octave_index = 0;
+		
+		//build a new random playlist if necessary
+		if (sequencer->pattern == 4)
+		    build_play_list(sequencer);
+    }    
+}
+
+
+static void set_sequencer_parameters(Sequencer* sequencer){
+    //correlate pots to control each parameter of the arpeggiator
+    const uint8_t octave_pot_sel= 0;
+    const uint8_t octave_pot_min = 0;
+    const uint8_t octave_pot_max = 3;
+    
+    const uint8_t repeat_pot_sel= 1;
+    const uint8_t repeat_pot_min = 0;
+    const uint8_t repeat_pot_max = 4;
+    
+    const uint8_t division_pot_sel= 2;
+    const uint8_t division_pot_min = 0;
+    const uint8_t division_pot_max = 6;
+    
+    const uint8_t duration_pot_sel= 3;
+    const uint8_t duration_pot_min = 11;
+    const uint8_t duration_pot_max = 255;
+    
+    const uint8_t pattern_pot_sel= 4;
+    const uint8_t pattern_pot_min = 0;
+    const uint8_t pattern_pot_max = 4;
+    
+    //read the new values from the pots
+    uint8_t octave_max_new = get_pot_value(octave_pot_sel, octave_pot_min, octave_pot_max);
+    uint8_t repeat_max_new = get_pot_value(repeat_pot_sel, repeat_pot_min, repeat_pot_max);
+    uint8_t division_new = get_pot_value(division_pot_sel,division_pot_min,division_pot_max);
+    uint8_t duration_new = get_pot_value(duration_pot_sel, duration_pot_min, duration_pot_max);
+    uint8_t pattern_new = get_pot_value(pattern_pot_sel, pattern_pot_min, pattern_pot_max);
+    
+    bool update_start_time_increment = 0;
+    bool update_stop_time_increment = 0;
+    
+    //flag to calculate new interrupt times if necessary
+    if (sequencer->repeat_max != repeat_max_new){
+        update_start_time_increment = 1;
+        update_stop_time_increment = 1;
+    }
+    
+    if (sequencer->division != division_new){
+        update_start_time_increment = 1;
+        update_stop_time_increment = 1;
+    }
+    
+    if (sequencer->duration != duration_new){
+        update_stop_time_increment = 1;
+    }
+    
+    if (sequencer->pattern != pattern_new){
+        sequencer->rebuild_play_list = 1;
+    }
+    
+    //load the new parameters into the arpeggiator
+    sequencer->octave_max = octave_max_new;
+    sequencer->repeat_max = repeat_max_new;
+    sequencer->division = division_new;
+    sequencer->duration = duration_new;
+    sequencer->pattern = pattern_new;
+    
+    if (update_start_time_increment)
+        calculate_start_time_increment(sequencer);
+    if (update_stop_time_increment)
+        calculate_stop_time_increment(sequencer);
+}
+
 void continue_sequencer(Sequencer* sequencer, bool restart){
 	uint16_t final_pitch;
 	uint16_t final_velocity;
@@ -315,7 +332,6 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
 	//if there are no notes in the list, don't do anything
     if (sequencer->note_list.length == 0)
         return;
-    
     
     current_time = (uint32_t) TCC0.CNT;
     /*
@@ -445,7 +461,11 @@ void remove_note_from_arpeggiator(Sequencer* sequencer, uint8_t pitch){
     //try to remove the note from the list
     //if successful, set the rebuild flag
     //if the note list is now empty, fully stop the sequencer
-    
+	
+	//if note is playing, stop it
+	if (sequencer->play_list[sequencer->note_index]->pitch == pitch)
+	    midi_send_noteoff(get_midi_device(), MIDI_CHAN, pitch, 0);
+		
     if (remove_note_by_pitch(&(sequencer->note_list), pitch)){
         sequencer->rebuild_play_list = 1;
         

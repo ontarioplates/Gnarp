@@ -28,7 +28,10 @@ void serial_midi_send(MidiDevice* midi_device, uint8_t cnt, uint8_t inByte0, uin
 }
 
 void noteon_to_arpeggiator(MidiDevice * midi_device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
-    add_note_to_arpeggiator(stored_sequencer, inByte1, inByte2);
+	if (inByte2 == 0)
+	    remove_note_from_arpeggiator(stored_sequencer, inByte1);
+	else
+        add_note_to_arpeggiator(stored_sequencer, inByte1, inByte2);
 }
 
 void noteoff_to_arpeggiator(MidiDevice * midi_device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
