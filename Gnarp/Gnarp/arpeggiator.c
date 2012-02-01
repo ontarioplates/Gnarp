@@ -9,6 +9,20 @@
 #include "serial_midi.h"
 #include "hardware.h"
 
+static uint8_t final_pitch(Sequencer* sequencer){
+	uint16_t final_pitch;
+	final_pitch = sequencer->play_list[sequencer->note_index]->pitch + MIDI_OCTAVE*(sequencer->octave_index);
+	while (final_pitch > 255)
+	        final_pitch -= 12;
+	return (uint8_t) final_pitch;
+}
+
+static uint8_t final_velocity(Sequencer* sequencer){
+	uint16_t final_velocity;
+	final_velocity = sequencer->play_list[sequencer->note_index]->velocity;
+	return (uint8_t) final_velocity;
+}
+
 static void calculate_start_time_increment(Sequencer* sequencer){
     //0 - qtr note (no division)
     //1 - dotted 8th (3/4)
@@ -314,9 +328,6 @@ static void set_sequencer_parameters(Sequencer* sequencer){
 }
 
 void continue_sequencer(Sequencer* sequencer, bool restart){
-	uint16_t final_pitch;
-	uint16_t final_velocity;
-
     //disable noteon and noteoff interrupts
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
@@ -334,29 +345,11 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
         return;
     
     current_time = (uint32_t) TCC0.CNT;
-    /*
-    //if this is a continuation, log the count time
-    //otherwise restart the counter
-    if (!restart)
-        current_time = (uint32_t) TCC0.CNT;
-    else{
-        current_time = 0;
-        TCC0.CNT = 0;
-    }
-    */
-	
-	
-    
     
     //turn off the current note if it is still playing
     if (sequencer->play_status){
-		//calculate the pitch and velocity to play
-    	final_pitch = sequencer->play_list[sequencer->note_index]->pitch + MIDI_OCTAVE*(sequencer->octave_index);
-    	final_velocity = sequencer->play_list[sequencer->note_index]->velocity;
-    	while (final_pitch > 255)
-	        final_pitch -= 12;
-			
-        midi_send_noteoff(get_midi_device(),MIDI_CHAN,final_pitch,final_velocity);
+        midi_send_noteoff(get_midi_device(),MIDI_CHAN,final_pitch(sequencer),final_velocity(sequencer));
+		set_LEDs_off(0,0,0,1);
         sequencer->play_status = 0;
     }
         
@@ -388,16 +381,9 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     else{
         reset_play_list_indeces(sequencer);
     }
-    
-	//calculate the pitch and velocity to play
-	final_pitch = sequencer->play_list[sequencer->note_index]->pitch + MIDI_OCTAVE*(sequencer->octave_index);
-	final_velocity = sequencer->play_list[sequencer->note_index]->velocity;
-	while (final_pitch > 255)
-	    final_pitch -= 12;
 	
     //send midi message to start the note
-    midi_send_noteon(get_midi_device(),MIDI_CHAN,final_pitch,final_velocity);
-    
+    midi_send_noteon(get_midi_device(),MIDI_CHAN,final_pitch(sequencer),final_velocity(sequencer));
     set_LEDs_on(0,0,0,1);
     
     //set play flag
@@ -412,9 +398,6 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
 }
 
 void stop_sequencer(Sequencer* sequencer, bool full_stop){
-	uint16_t final_pitch;
-	uint16_t final_velocity;
-	
     //disable CCB (note on) and CCC (note off) interrupts
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
@@ -424,13 +407,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     
     //stop the current note if it's playing
     if (sequencer->play_status){
-		//calculate the pitch and velocity to play
-	    final_pitch = sequencer->play_list[sequencer->note_index]->pitch + MIDI_OCTAVE*(sequencer->octave_index);
-	    final_velocity = sequencer->play_list[sequencer->note_index]->velocity;
-	    while (final_pitch > 255)
-	        final_pitch -= 12;
-		
-        midi_send_noteoff(get_midi_device(),MIDI_CHAN,final_pitch,final_velocity);
+        midi_send_noteoff(get_midi_device(),MIDI_CHAN,final_pitch(sequencer),final_velocity(sequencer));
 		set_LEDs_off(0,0,0,1);
         sequencer->play_status = 0;
     }
@@ -441,7 +418,6 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
         sequencer->run_status = 0;
     else    
         TCC0.CTRLB |= 0x20;
-    
 }
 
 void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity){
@@ -464,7 +440,7 @@ void remove_note_from_arpeggiator(Sequencer* sequencer, uint8_t pitch){
 	
 	//if note is playing, stop it
 	if (sequencer->play_list[sequencer->note_index]->pitch == pitch)
-	    midi_send_noteoff(get_midi_device(), MIDI_CHAN, pitch, 0);
+	    stop_sequencer(sequencer,0);
 		
     if (remove_note_by_pitch(&(sequencer->note_list), pitch)){
         sequencer->rebuild_play_list = 1;
