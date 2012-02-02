@@ -47,7 +47,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>Globals</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 </div>
@@ -91,40 +91,45 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00010"></a><a class="code" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">00010</a> <span class="preprocessor">#define MAX_LIST_NOTES 16</span>
 <a name="l00011"></a>00011 <span class="preprocessor"></span>
 <a name="l00012"></a>00012 
-<a name="l00018"></a><a class="code" href="struct_note.html">00018</a> <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>
-<a name="l00019"></a>00019 {
-<a name="l00024"></a><a class="code" href="struct_note.html#ad1f0bff7112206922c9d5a87adad6f2b">00024</a>     <span class="keywordtype">bool</span>        <a class="code" href="struct_note.html#ad1f0bff7112206922c9d5a87adad6f2b" title="Flag if the note is valid.">status</a>;
-<a name="l00025"></a>00025         
-<a name="l00026"></a><a class="code" href="struct_note.html#af5570d380fc44f29d029f82dbdd518f8">00026</a>     uint8_t     <a class="code" href="struct_note.html#af5570d380fc44f29d029f82dbdd518f8" title="Original MIDI pitch of the note (0-255)">pitch</a>;      
-<a name="l00027"></a><a class="code" href="struct_note.html#a6999f2bfd12f276d7db37ffd11b02a28">00027</a>     uint8_t     <a class="code" href="struct_note.html#a6999f2bfd12f276d7db37ffd11b02a28" title="Original MIDI velocity of the note (0-255)">velocity</a>;   
-<a name="l00029"></a><a class="code" href="struct_note.html#a9fb27e6db14d0be10e85c95bb8edea70">00029</a>     <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>* <a class="code" href="struct_note.html#a9fb27e6db14d0be10e85c95bb8edea70" title="Pointer to the next highest pitched note.">next_note_by_pitch</a>;        
-<a name="l00030"></a><a class="code" href="struct_note.html#a86fcc7b105aee6003337cd968fba16f4">00030</a>         <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>* <a class="code" href="struct_note.html#a86fcc7b105aee6003337cd968fba16f4" title="Pointer to the next lowest pitched note.">previous_note_by_pitch</a>;    
-<a name="l00031"></a><a class="code" href="struct_note.html#a102120f2095cbf19bd81d0ee6acbb47e">00031</a>     <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>* <a class="code" href="struct_note.html#a102120f2095cbf19bd81d0ee6acbb47e" title="Pointer to the subsequently triggered note.">next_note_by_trigger</a>;      
-<a name="l00032"></a><a class="code" href="struct_note.html#a86bda37aeff6ed0036c25613a7ead30e">00032</a>     <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>* <a class="code" href="struct_note.html#a86bda37aeff6ed0036c25613a7ead30e" title="Pointer to the previously triggered note.">previous_note_by_trigger</a>;  
-<a name="l00033"></a>00033 };
-<a name="l00034"></a>00034 
-<a name="l00035"></a><a class="code" href="struct_note_list.html">00035</a> <span class="keyword">struct </span><a class="code" href="struct_note_list.html">NoteList</a>
-<a name="l00036"></a>00036 {
-<a name="l00037"></a><a class="code" href="struct_note_list.html#ab2b3adeb2a67e656ff030b56727fd0ac">00037</a>     uint8_t         <a class="code" href="struct_note_list.html#ab2b3adeb2a67e656ff030b56727fd0ac">length</a>;
-<a name="l00038"></a><a class="code" href="struct_note_list.html#a883e4b7d2ad016970dbc1724dd777279">00038</a>     <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>     *<a class="code" href="struct_note_list.html#aeaf138b8a25d861007fd0b1885def2bd">head_pitch</a>, *<a class="code" href="struct_note_list.html#af9e2fc1ee26d40cbac0538e00ade1601">tail_pitch</a>, *<a class="code" href="struct_note_list.html#a62ff54d0a32401de6414d781669dda55">head_trigger</a>, *<a class="code" href="struct_note_list.html#a883e4b7d2ad016970dbc1724dd777279">tail_trigger</a>;
-<a name="l00039"></a><a class="code" href="struct_note_list.html#a29fdb40310127a836121d04ccf2a1dcb">00039</a>     <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>     <a class="code" href="struct_note_list.html#a29fdb40310127a836121d04ccf2a1dcb">note_bank</a>[<a class="code" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">MAX_LIST_NOTES</a>];
-<a name="l00040"></a>00040 };
-<a name="l00041"></a>00041 
-<a name="l00042"></a><a class="code" href="note__list_8h.html#a820e8754f76d4d189d5347d302964a1d">00042</a> <span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a> <a class="code" href="struct_note.html" title="Represents a single incoming MIDI note.">Note</a>;
-<a name="l00043"></a><a class="code" href="note__list_8h.html#a3211e586b9dc428c6f5299c5bc250b06">00043</a> <span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_note_list.html">NoteList</a> <a class="code" href="struct_note_list.html">NoteList</a>;
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 <span class="keywordtype">void</span> <a class="code" href="note__list_8c.html#a795d3be035010a5f0e3c72e887c558c9">initialize_note_list</a>(<a class="code" href="struct_note_list.html">NoteList</a>* note_list);
-<a name="l00046"></a>00046 <span class="keywordtype">bool</span> <a class="code" href="note__list_8c.html#a22a67f7778ae5d25d7fde85150b6b7da">remove_note_by_pitch</a>(<a class="code" href="struct_note_list.html">NoteList</a>* note_list, uint8_t pitch);
-<a name="l00047"></a>00047 <span class="keywordtype">bool</span> <a class="code" href="note__list_8c.html#af7cc19316d44ab93e6066ddaec01dac8">insert_note</a>(<a class="code" href="struct_note_list.html">NoteList</a>* note_list, uint8_t pitch, uint8_t velocity);
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 <span class="preprocessor">#endif </span><span class="comment">/* NOTE_LIST_H_ */</span>
+<a name="l00013"></a><a class="code" href="note__list_8h.html#a46873a8a9e16775c04be39cd51747463">00013</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_Note <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>;
+<a name="l00014"></a><a class="code" href="note__list_8h.html#ac11d7c8225f42ab55c0411746d33a534">00014</a> <span class="keyword">typedef</span> <span class="keyword">struct </span>_NoteList <a class="code" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>;
+<a name="l00015"></a>00015 
+<a name="l00021"></a><a class="code" href="struct_note.html">00021</a> <span class="keyword">struct </span><a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>
+<a name="l00022"></a>00022 {
+<a name="l00027"></a><a class="code" href="struct_note.html#ae75d8888ecdc05ec04186250a7be7e5a">00027</a>     <span class="keywordtype">bool</span>    <a class="code" href="struct_note.html#ae75d8888ecdc05ec04186250a7be7e5a" title="Flag if the note is being used.">status</a>;
+<a name="l00028"></a>00028         
+<a name="l00029"></a><a class="code" href="struct_note.html#aa059731d69680f5d2d9421ebf02c2c98">00029</a>     uint8_t <a class="code" href="struct_note.html#aa059731d69680f5d2d9421ebf02c2c98" title="Original MIDI pitch of the note (0-255)">pitch</a>;      
+<a name="l00030"></a><a class="code" href="struct_note.html#a5c55ad001b195d67eb9f44ad415d86d8">00030</a>     uint8_t <a class="code" href="struct_note.html#a5c55ad001b195d67eb9f44ad415d86d8" title="Original MIDI velocity of the note (0-255)">velocity</a>;   
+<a name="l00032"></a><a class="code" href="struct_note.html#acbc647c312039cad8e42188300f68f95">00032</a>     <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note.html#acbc647c312039cad8e42188300f68f95" title="Pointer to the next highest pitched note.">next_note_by_pitch</a>;        
+<a name="l00033"></a><a class="code" href="struct_note.html#a3d3daf1921e160c8377f09a81a842120">00033</a>         <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note.html#a3d3daf1921e160c8377f09a81a842120" title="Pointer to the next lowest pitched note.">previous_note_by_pitch</a>;    
+<a name="l00034"></a><a class="code" href="struct_note.html#a27de4233943ea203cbd3f741d73f2349">00034</a>     <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note.html#a27de4233943ea203cbd3f741d73f2349" title="Pointer to the subsequently triggered note.">next_note_by_trigger</a>;      
+<a name="l00035"></a><a class="code" href="struct_note.html#ab00987010d8242c86470e84c268bc495">00035</a>     <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note.html#ab00987010d8242c86470e84c268bc495" title="Pointer to the previously triggered note.">previous_note_by_trigger</a>;  
+<a name="l00036"></a>00036 };
+<a name="l00037"></a>00037 
+<a name="l00048"></a><a class="code" href="struct_note_list.html">00048</a> <span class="keyword">struct </span><a class="code" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>
+<a name="l00049"></a>00049 {
+<a name="l00050"></a><a class="code" href="struct_note_list.html#a158697e35b5cd7fa29e825c090eb801f">00050</a>     uint8_t <a class="code" href="struct_note_list.html#a158697e35b5cd7fa29e825c090eb801f" title="Number of Notes in the notelist.">length</a>; 
+<a name="l00052"></a><a class="code" href="struct_note_list.html#a9d8c399d4431e2610e9146a117eebf47">00052</a>         <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>    <a class="code" href="struct_note_list.html#a9d8c399d4431e2610e9146a117eebf47" title="The statically allocated array of Notes to store all the incoming info.">note_bank</a>[<a class="code" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">MAX_LIST_NOTES</a>]; 
+<a name="l00054"></a><a class="code" href="struct_note_list.html#a3257c81b7b3692eebc30577c4b67f88b">00054</a>     <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note_list.html#a3257c81b7b3692eebc30577c4b67f88b" title="The Note with the lowest pitch.">head_pitch</a>;    
+<a name="l00055"></a><a class="code" href="struct_note_list.html#ac3174d98a3409cb25b50565575ba9f69">00055</a>         <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note_list.html#ac3174d98a3409cb25b50565575ba9f69" title="The Note with the highest pitch.">tail_pitch</a>;    
+<a name="l00056"></a><a class="code" href="struct_note_list.html#a82d35c7892265004a1c1838889328cd9">00056</a>         <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note_list.html#a82d35c7892265004a1c1838889328cd9" title="The least-recently triggered Note.">head_trigger</a>;  
+<a name="l00057"></a><a class="code" href="struct_note_list.html#af29eed4ad00177a04557a1f84e321b55">00057</a>         <a class="code" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>*   <a class="code" href="struct_note_list.html#af29eed4ad00177a04557a1f84e321b55" title="The most-recently triggered Note.">tail_trigger</a>;  
+<a name="l00058"></a>00058 };
+<a name="l00059"></a>00059 
+<a name="l00065"></a>00065 <span class="keywordtype">void</span> <a class="code" href="note__list_8h.html#a795d3be035010a5f0e3c72e887c558c9" title="Reset all pointers and values in a NoteList.">initialize_note_list</a>(<a class="code" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>* note_list);
+<a name="l00066"></a>00066 
+<a name="l00077"></a>00077 <span class="keywordtype">bool</span> <a class="code" href="note__list_8h.html#a22a67f7778ae5d25d7fde85150b6b7da" title="Remove a given note from a NoteList.">remove_note_by_pitch</a>(<a class="code" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>* note_list, uint8_t pitch);
+<a name="l00078"></a>00078 
+<a name="l00092"></a>00092 <span class="keywordtype">bool</span> <a class="code" href="note__list_8h.html#af7cc19316d44ab93e6066ddaec01dac8" title="Insert a given note in proper order into a NoteList.">insert_note</a>(<a class="code" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>* note_list, uint8_t pitch, uint8_t velocity);
+<a name="l00093"></a>00093 
+<a name="l00094"></a>00094 <span class="preprocessor">#endif </span><span class="comment">/* NOTE_LIST_H_ */</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -136,7 +141,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 1 2012 17:23:28 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Feb 2 2012 14:59:23 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

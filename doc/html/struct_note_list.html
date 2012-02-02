@@ -47,7 +47,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -69,107 +69,136 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
-      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
-      <li><a href="functions.html"><span>Data&#160;Fields</span></a></li>
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
+      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
 </div>
 <div class="header">
   <div class="summary">
-<a href="#pub-attribs">Data Fields</a>  </div>
+<a href="#pub-attribs">Public Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">NoteList Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <!-- doxytag: class="NoteList" -->
+<p>This structure is a linked list of incoming MIDI notes.  
+ <a href="struct_note_list.html#details">More...</a></p>
+
 <p><code>#include &lt;<a class="el" href="note__list_8h_source.html">note_list.h</a>&gt;</code></p>
+
+<p><a href="struct_note_list-members.html">List of all members.</a></p>
 <table class="memberdecls">
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Data Fields</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#ab2b3adeb2a67e656ff030b56727fd0ac">length</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#aeaf138b8a25d861007fd0b1885def2bd">head_pitch</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#af9e2fc1ee26d40cbac0538e00ade1601">tail_pitch</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a62ff54d0a32401de6414d781669dda55">head_trigger</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a883e4b7d2ad016970dbc1724dd777279">tail_trigger</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="struct_note.html">Note</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a29fdb40310127a836121d04ccf2a1dcb">note_bank</a> [<a class="el" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">MAX_LIST_NOTES</a>]</td></tr>
+Public Attributes</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a158697e35b5cd7fa29e825c090eb801f">length</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of Notes in the notelist.  <a href="#a158697e35b5cd7fa29e825c090eb801f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_note.html">Note</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a9d8c399d4431e2610e9146a117eebf47">note_bank</a> [<a class="el" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">MAX_LIST_NOTES</a>]</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The statically allocated array of Notes to store all the incoming info.  <a href="#a9d8c399d4431e2610e9146a117eebf47"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a3257c81b7b3692eebc30577c4b67f88b">head_pitch</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> with the lowest pitch.  <a href="#a3257c81b7b3692eebc30577c4b67f88b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#ac3174d98a3409cb25b50565575ba9f69">tail_pitch</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> with the highest pitch.  <a href="#ac3174d98a3409cb25b50565575ba9f69"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#a82d35c7892265004a1c1838889328cd9">head_trigger</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The least-recently triggered <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>.  <a href="#a82d35c7892265004a1c1838889328cd9"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_note.html">Note</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_note_list.html#af29eed4ad00177a04557a1f84e321b55">tail_trigger</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The most-recently triggered <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>.  <a href="#af29eed4ad00177a04557a1f84e321b55"></a><br/></td></tr>
 </table>
-<hr/><h2>Field Documentation</h2>
-<a class="anchor" id="aeaf138b8a25d861007fd0b1885def2bd"></a><!-- doxytag: member="NoteList::head_pitch" ref="aeaf138b8a25d861007fd0b1885def2bd" args="" -->
+<hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
+<div class="textblock"><p>This structure is a linked list of incoming MIDI notes. </p>
+<p>This structure is an organized history of all the notes currently being played at the MIDI input jack.<br/>
+ The list can be traversed forwards or backwards in order of pitch or the order which the notes were triggered.<br/>
+ MAX_LIST_NOTES determines the maximum number of notes that can be stored in the list. Once this maximum is reached, newly inserted notes will not be tracked. </p>
+<dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> </dd></dl>
+</div><hr/><h2>Member Data Documentation</h2>
+<a class="anchor" id="a3257c81b7b3692eebc30577c4b67f88b"></a><!-- doxytag: member="NoteList::head_pitch" ref="a3257c81b7b3692eebc30577c4b67f88b" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="struct_note.html">Note</a>* <a class="el" href="struct_note_list.html#aeaf138b8a25d861007fd0b1885def2bd">head_pitch</a></td>
+          <td class="memname"><a class="el" href="struct_note.html">Note</a>* <a class="el" href="struct_note_list.html#a3257c81b7b3692eebc30577c4b67f88b">NoteList::head_pitch</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>The <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> with the lowest pitch. </p>
+
 </div>
 </div>
-<a class="anchor" id="a62ff54d0a32401de6414d781669dda55"></a><!-- doxytag: member="NoteList::head_trigger" ref="a62ff54d0a32401de6414d781669dda55" args="" -->
+<a class="anchor" id="a82d35c7892265004a1c1838889328cd9"></a><!-- doxytag: member="NoteList::head_trigger" ref="a82d35c7892265004a1c1838889328cd9" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="struct_note.html">Note</a> * <a class="el" href="struct_note_list.html#a62ff54d0a32401de6414d781669dda55">head_trigger</a></td>
+          <td class="memname"><a class="el" href="struct_note.html">Note</a>* <a class="el" href="struct_note_list.html#a82d35c7892265004a1c1838889328cd9">NoteList::head_trigger</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>The least-recently triggered <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>. </p>
+
 </div>
 </div>
-<a class="anchor" id="ab2b3adeb2a67e656ff030b56727fd0ac"></a><!-- doxytag: member="NoteList::length" ref="ab2b3adeb2a67e656ff030b56727fd0ac" args="" -->
+<a class="anchor" id="a158697e35b5cd7fa29e825c090eb801f"></a><!-- doxytag: member="NoteList::length" ref="a158697e35b5cd7fa29e825c090eb801f" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">uint8_t <a class="el" href="struct_note_list.html#ab2b3adeb2a67e656ff030b56727fd0ac">length</a></td>
+          <td class="memname">uint8_t <a class="el" href="struct_note_list.html#a158697e35b5cd7fa29e825c090eb801f">NoteList::length</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>Number of Notes in the notelist. </p>
+
 </div>
 </div>
-<a class="anchor" id="a29fdb40310127a836121d04ccf2a1dcb"></a><!-- doxytag: member="NoteList::note_bank" ref="a29fdb40310127a836121d04ccf2a1dcb" args="[MAX_LIST_NOTES]" -->
+<a class="anchor" id="a9d8c399d4431e2610e9146a117eebf47"></a><!-- doxytag: member="NoteList::note_bank" ref="a9d8c399d4431e2610e9146a117eebf47" args="[MAX_LIST_NOTES]" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="struct_note.html">Note</a> <a class="el" href="struct_note_list.html#a29fdb40310127a836121d04ccf2a1dcb">note_bank</a>[<a class="el" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">MAX_LIST_NOTES</a>]</td>
+          <td class="memname"><a class="el" href="struct_note.html">Note</a> <a class="el" href="struct_note_list.html#a9d8c399d4431e2610e9146a117eebf47">NoteList::note_bank</a>[<a class="el" href="note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309">MAX_LIST_NOTES</a>]</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>The statically allocated array of Notes to store all the incoming info. </p>
+
 </div>
 </div>
-<a class="anchor" id="af9e2fc1ee26d40cbac0538e00ade1601"></a><!-- doxytag: member="NoteList::tail_pitch" ref="af9e2fc1ee26d40cbac0538e00ade1601" args="" -->
+<a class="anchor" id="ac3174d98a3409cb25b50565575ba9f69"></a><!-- doxytag: member="NoteList::tail_pitch" ref="ac3174d98a3409cb25b50565575ba9f69" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="struct_note.html">Note</a> * <a class="el" href="struct_note_list.html#af9e2fc1ee26d40cbac0538e00ade1601">tail_pitch</a></td>
+          <td class="memname"><a class="el" href="struct_note.html">Note</a>* <a class="el" href="struct_note_list.html#ac3174d98a3409cb25b50565575ba9f69">NoteList::tail_pitch</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
+<p>The <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> with the highest pitch. </p>
+
 </div>
 </div>
-<a class="anchor" id="a883e4b7d2ad016970dbc1724dd777279"></a><!-- doxytag: member="NoteList::tail_trigger" ref="a883e4b7d2ad016970dbc1724dd777279" args="" -->
+<a class="anchor" id="af29eed4ad00177a04557a1f84e321b55"></a><!-- doxytag: member="NoteList::tail_trigger" ref="af29eed4ad00177a04557a1f84e321b55" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct <a class="el" href="struct_note.html">Note</a> * <a class="el" href="struct_note_list.html#a883e4b7d2ad016970dbc1724dd777279">tail_trigger</a></td>
+          <td class="memname"><a class="el" href="struct_note.html">Note</a>* <a class="el" href="struct_note_list.html#af29eed4ad00177a04557a1f84e321b55">NoteList::tail_trigger</a></td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>The most-recently triggered <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a>. </p>
 
 </div>
 </div>
@@ -182,7 +211,7 @@ Data Fields</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -194,7 +223,7 @@ Data Fields</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 1 2012 17:23:29 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Feb 2 2012 14:59:23 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

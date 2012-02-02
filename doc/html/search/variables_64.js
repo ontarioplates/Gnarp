@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['division',['division',['../struct_sequencer.html#a25455e97331a03552fc56fc875f126d7',1,'Sequencer']]],
-  ['duration',['duration',['../struct_sequencer.html#ae7b193beba4cc63eed61b211bae9e802',1,'Sequencer']]]
+  ['division',['division',['../struct_sequencer.html#a83bb55f36551dddc467be0a11ad6d9c6',1,'Sequencer']]],
+  ['duration',['duration',['../struct_sequencer.html#afd63b56482437187625e1b77677f772d',1,'Sequencer']]]
 ];

@@ -47,7 +47,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -70,7 +70,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
-      <li><a href="globals.html"><span>Globals</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 </div>
@@ -86,8 +86,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="note__list_8c.html#a795d3be035010a5f0e3c72e887c558c9">initialize_note_list</a> (<a class="el" href="struct_note_list.html">NoteList</a> *note_list)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset all pointers and values in a <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>.  <a href="#a795d3be035010a5f0e3c72e887c558c9"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="note__list_8c.html#a22a67f7778ae5d25d7fde85150b6b7da">remove_note_by_pitch</a> (<a class="el" href="struct_note_list.html">NoteList</a> *note_list, uint8_t pitch)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove a given note from a <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>.  <a href="#a22a67f7778ae5d25d7fde85150b6b7da"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="note__list_8c.html#af7cc19316d44ab93e6066ddaec01dac8">insert_note</a> (<a class="el" href="struct_note_list.html">NoteList</a> *note_list, uint8_t pitch, uint8_t velocity)</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert a given note in proper order into a <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>.  <a href="#af7cc19316d44ab93e6066ddaec01dac8"></a><br/></td></tr>
 </table>
 <hr/><h2>Function Documentation</h2>
 <a class="anchor" id="a795d3be035010a5f0e3c72e887c558c9"></a><!-- doxytag: member="note_list.c::initialize_note_list" ref="a795d3be035010a5f0e3c72e887c558c9" args="(NoteList *note_list)" -->
@@ -104,6 +107,14 @@ Functions</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Reset all pointers and values in a <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">note_list</td><td>pointer to the <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a> to initialize </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -138,6 +149,18 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Insert a given note in proper order into a <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>. </p>
+<p>If the <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> is not a duplicate, it is inserted into the <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a> in proper pitch order and at the end of the trigger order. If the <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> is a duplicate, its velocity is updated and moved to the end of the trigger order. If the #note_bank is filled, no new <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> will be inserted.</p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">note_list</td><td>pointer to the <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a> to use </td></tr>
+    <tr><td class="paramname">pitch</td><td>8-bit pitch value of the new <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> </td></tr>
+    <tr><td class="paramname">velocity</td><td>8-bit velocity value of the new <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>1 if the new <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> was inserted (including duplicates); 0 otherwise </dd></dl>
+
 </div>
 </div>
 <a class="anchor" id="a22a67f7778ae5d25d7fde85150b6b7da"></a><!-- doxytag: member="note_list.c::remove_note_by_pitch" ref="a22a67f7778ae5d25d7fde85150b6b7da" args="(NoteList *note_list, uint8_t pitch)" -->
@@ -165,6 +188,17 @@ Functions</h2></td></tr>
 </div>
 <div class="memdoc">
 
+<p>Remove a given note from a <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a>. </p>
+<p>This function searches for the <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a> for a <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> with the given pitch. If the <a class="el" href="struct_note.html" title="This structure represents a single incoming MIDI note.">Note</a> is found, its note_bank position is freed and the surrounding Notes' pointers are adjusted.</p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">note_list</td><td>pointer to the <a class="el" href="struct_note_list.html" title="This structure is a linked list of incoming MIDI notes.">NoteList</a> to use </td></tr>
+    <tr><td class="paramname">pitch</td><td>8-bit pitch value to search for </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>1 if the pitch was found and removed; 0 otherwise </dd></dl>
+
 </div>
 </div>
 </div><!-- contents -->
@@ -173,7 +207,7 @@ Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -185,7 +219,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Feb 1 2012 17:23:28 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Feb 2 2012 14:49:41 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

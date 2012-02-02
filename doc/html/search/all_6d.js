@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['main',['main',['../main_8c.html#a840291bc02cba5474a4cb46a9b9566fe',1,'main.c']]],
-  ['main_2ec',['main.c',['../main_8c.html',1,'']]],
   ['main_2eh',['main.h',['../main_8h.html',1,'']]],
   ['max_5flist_5fnotes',['MAX_LIST_NOTES',['../note__list_8h.html#aeed96cd1e1ead4eec3b292d9cb99a309',1,'note_list.h']]],
   ['max_5fnote_5fduration',['MAX_NOTE_DURATION',['../arpeggiator_8h.html#a3c600c154b30faf6c6c6d93affbc5b0a',1,'arpeggiator.h']]],
