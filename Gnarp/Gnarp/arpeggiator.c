@@ -263,34 +263,13 @@ static void increment_play_list_indeces(Sequencer* sequencer){
 }
 
 
-static void set_sequencer_parameters(Sequencer* sequencer){
-    //correlate pots to control each parameter of the arpeggiator
-    const uint8_t octave_pot_sel= 0;
-    const uint8_t octave_pot_min = 0;
-    const uint8_t octave_pot_max = 3;
-    
-    const uint8_t repeat_pot_sel= 1;
-    const uint8_t repeat_pot_min = 0;
-    const uint8_t repeat_pot_max = 4;
-    
-    const uint8_t division_pot_sel= 2;
-    const uint8_t division_pot_min = 0;
-    const uint8_t division_pot_max = 6;
-    
-    const uint8_t duration_pot_sel= 3;
-    const uint8_t duration_pot_min = 11;
-    const uint8_t duration_pot_max = 255;
-    
-    const uint8_t pattern_pot_sel= 4;
-    const uint8_t pattern_pot_min = 0;
-    const uint8_t pattern_pot_max = 4;
-    
+static void set_sequencer_parameters(Sequencer* sequencer, bool restart){
     //read the new values from the pots
-    uint8_t octave_max_new = get_pot_value(octave_pot_sel, octave_pot_min, octave_pot_max);
-    uint8_t repeat_max_new = get_pot_value(repeat_pot_sel, repeat_pot_min, repeat_pot_max);
-    uint8_t division_new = get_pot_value(division_pot_sel,division_pot_min,division_pot_max);
-    uint8_t duration_new = get_pot_value(duration_pot_sel, duration_pot_min, duration_pot_max);
-    uint8_t pattern_new = get_pot_value(pattern_pot_sel, pattern_pot_min, pattern_pot_max);
+    volatile uint8_t octave_max_new = get_pot_value(POT_SEL_OCTAVE, POT_MIN_OCTAVE, POT_MAX_OCTAVE);
+    volatile uint8_t repeat_max_new = get_pot_value(POT_SEL_REPEAT, POT_MIN_REPEAT, POT_MAX_REPEAT);
+    volatile uint8_t division_new = get_pot_value(POT_SEL_DIVISION, POT_MIN_DIVISION, POT_MAX_DIVISION);
+    volatile uint8_t duration_new = get_pot_value(POT_SEL_DURATION, POT_MIN_DURATION, POT_MAX_DURATION);
+    volatile uint8_t pattern_new = get_pot_value(POT_SEL_PATTERN, POT_MIN_PATTERN, POT_MAX_PATTERN);
     
     bool update_start_time_increment = 0;
     bool update_stop_time_increment = 0;
@@ -321,9 +300,9 @@ static void set_sequencer_parameters(Sequencer* sequencer){
     sequencer->duration = duration_new;
     sequencer->pattern = pattern_new;
     
-    if (update_start_time_increment)
+    if (update_start_time_increment || restart)
         calculate_start_time_increment(sequencer);
-    if (update_stop_time_increment)
+    if (update_stop_time_increment || restart)
         calculate_stop_time_increment(sequencer);
 }
 
@@ -354,7 +333,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     }
         
     //load the new hardware settings from the user
-    set_sequencer_parameters(sequencer);
+    set_sequencer_parameters(sequencer, restart);
     
     //compute next compare values
     next_start_time = current_time + sequencer->start_time_increment;

@@ -10,8 +10,8 @@
 #define MAX_LIST_NOTES 16
 
 
-typedef struct _Note Note;
-typedef struct _NoteList NoteList;
+typedef struct Note Note;
+typedef struct NoteList NoteList;
 
 /** 
  * @brief This structure represents a single incoming MIDI note
@@ -49,7 +49,7 @@ struct NoteList
 {
     uint8_t length; /**< Number of Notes in the notelist*/
 	
-	Note    note_bank[MAX_LIST_NOTES]; /**< The statically allocated array of Notes to store all the incoming info*/
+	Note   note_bank[MAX_LIST_NOTES]; /**< The statically allocated array of Notes to store all the incoming info*/
 	
     Note*   head_pitch;    /**< The Note with the lowest pitch*/
 	Note*   tail_pitch;    /**< The Note with the highest pitch*/

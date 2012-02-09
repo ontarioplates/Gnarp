@@ -59,6 +59,10 @@ int main(void) {
 	initialize_serial_midi(&midi_device, &sequencer);
     initialize_beat_clock(initial_BPM);
     set_seven_segment_LEDs(get_BPM());
+	
+	add_note_to_arpeggiator(&sequencer, 60, 100);
+	add_note_to_arpeggiator(&sequencer, 67, 100);
+	add_note_to_arpeggiator(&sequencer, 69, 100);
 
     while(1){
         read_hardware();
@@ -68,9 +72,9 @@ int main(void) {
         else if (get_encoder() == TURN_CCW)
             decrement_BPM();    
         
-        set_seven_segment_LEDs(get_BPM());
-
-        if (get_pushbutton_switch_edge() == EDGE_RISE)
+        set_seven_segment_LEDs(sequencer.repeat_max);
+		
+/*        if (get_pushbutton_switch_edge() == EDGE_RISE)
 		    continue_sequencer(&sequencer, 1);
 
 		if (get_toggle_switch_edge() == EDGE_FALL){
@@ -78,7 +82,7 @@ int main(void) {
 		}			
 		else if (get_encoder_switch_edge() == EDGE_RISE){
 			continue_sequencer(&sequencer, 1);
-		}				    
+		}				 */   
     }
 	
   /*  

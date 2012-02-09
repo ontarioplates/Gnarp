@@ -14,6 +14,26 @@
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
 
+//correlate pots to control each parameter of the arpeggiator	
+#define POT_SEL_OCTAVE 3
+#define POT_SEL_REPEAT 4
+#define POT_SEL_DIVISION 2
+#define POT_SEL_DURATION 0
+#define POT_SEL_PATTERN 1
+
+#define POT_MIN_OCTAVE 0
+#define POT_MIN_REPEAT 0
+#define POT_MIN_DIVISION 0
+#define POT_MIN_DURATION 11
+#define POT_MIN_PATTERN 0
+
+#define POT_MAX_OCTAVE 3
+#define POT_MAX_REPEAT 7
+#define POT_MAX_DIVISION 6
+#define POT_MAX_DURATION 255
+#define POT_MAX_PATTERN 4
+
+
 typedef enum {QUARTER, EIGHTH, SIXTEENTH}
 note_time_division;
 

@@ -10,6 +10,8 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+#define POT_FILTER_COEFF 4.0
+#define NUM_POTS 5
 #define DEBOUNCE 8
 #define POT_MIN 0x00E0
 #define POT_MAX 0x0FFF
@@ -19,6 +21,22 @@ turn_state;
 
 typedef enum {EDGE_NONE, EDGE_RISE, EDGE_FALL}
 switch_edge;
+
+typedef struct Hardware_Manager Hardware_Manager;
+
+struct Hardware_Manager{
+    turn_state encoder_state;
+	
+    switch_edge pushbutton_switch_edge;
+    switch_edge toggle_switch_edge;
+    switch_edge encoder_switch_edge;
+	
+    bool pushbutton_switch_state;
+    bool toggle_switch_state;
+    bool encoder_switch_state;
+	
+    uint16_t pot_values[5];
+};
     
 void initialize_hardware();
 void read_hardware();
