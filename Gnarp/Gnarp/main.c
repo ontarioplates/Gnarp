@@ -14,6 +14,7 @@
 
 static Sequencer sequencer;
 static MidiDevice midi_device;
+static Hardware_Manager* manager_ptr;
 
 ISR(USARTD1_RXC_vect){
     midi_device_input(&midi_device,1,&(USARTD1.DATA));
@@ -54,7 +55,7 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 int main(void) {
     const uint16_t initial_BPM = 60;
 	
-    initialize_hardware();
+    manager_ptr = initialize_hardware();
     initialize_sequencer(&sequencer);
 	initialize_serial_midi(&midi_device, &sequencer);
     initialize_beat_clock(initial_BPM);

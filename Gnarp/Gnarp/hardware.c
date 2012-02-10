@@ -14,7 +14,7 @@ void initialize_hardware_manager(){
     manager.encoder_switch_state = 0;
 	
 	for (uint8_t i = 0; i < NUM_POTS; i++)
-        manager.pot_values[i] = 0; 
+        manager.pot_values[i] = 0;
 }	
     
 static void initialize_clock(){
@@ -81,7 +81,7 @@ turn_state get_encoder(){
 static void initialize_pots(){
     PORTA.DIRCLR = 0xF9;        //ADC3:7 and VREF input
     ADCA.CTRLA = 0x00;          //disable ADC
-    ADCA.CTRLB = 0x00;
+    ADCA.CTRLB = 0x10;          //ADC to signed mode
     ADCA.REFCTRL = 0x20;        //set PORTA reference voltage
     ADCA.EVCTRL = 0x00;
     ADCA.PRESCALER = 0x01;     //set prescaler to clk/8 for accuracy
@@ -94,7 +94,7 @@ static void initialize_pots(){
 
 static void read_pots(){
     volatile uint8_t i;
-	volatile uint16_t new_reading;
+	volatile int16_t new_reading;
     
     //cycle through each ADC input and read the values
     //and set the variables appropriately
@@ -110,13 +110,13 @@ static void read_pots(){
         new_reading = ADCA.CH0.RESL;
         new_reading |= ADCA.CH0.RESH << 8;
 		
-		//LPF on new value to reduce noise
-		manager.pot_values[i] = manager.pot_values[i] + (new_reading - manager.pot_values[i])/POT_FILTER_COEFF + POT_FILTER_COEFF;
-        
-        if (manager.pot_values[i] < POT_MIN)
-            manager.pot_values[i] = 0;
+		if (new_reading < POT_MIN)
+            new_reading = POT_MIN;
         else
-            manager.pot_values[i] = manager.pot_values[i] - POT_MIN;
+            new_reading = new_reading - POT_MIN;
+		
+		//LPF on new value to reduce noise
+		manager.pot_values[i] = manager.pot_values[i] + (new_reading - (int16_t) manager.pot_values[i])/POT_FILTER_COEFF;
     }
     
 }
@@ -324,7 +324,7 @@ switch_edge get_toggle_switch_edge(){
     return manager.toggle_switch_edge;
 }
 
-void initialize_hardware(){
+Hardware_Manager* initialize_hardware(){
 	initialize_hardware_manager();
     initialize_clock();
     initialize_MIDI();
@@ -332,6 +332,7 @@ void initialize_hardware(){
     initialize_switches();
     initialize_encoder();
     initialize_LEDs();
+	return &manager;
 }
 
 void read_hardware(){

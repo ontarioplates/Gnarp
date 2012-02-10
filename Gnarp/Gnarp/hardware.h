@@ -10,11 +10,11 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define POT_FILTER_COEFF 4.0
+#define POT_FILTER_COEFF 20.0
 #define NUM_POTS 5
 #define DEBOUNCE 8
-#define POT_MIN 0x00E0
-#define POT_MAX 0x0FFF
+#define POT_MIN 0
+#define POT_MAX 2047
 
 typedef enum {TURN_NONE, TURN_CW, TURN_CCW}
 turn_state;
@@ -38,7 +38,7 @@ struct Hardware_Manager{
     uint16_t pot_values[5];
 };
     
-void initialize_hardware();
+Hardware_Manager* initialize_hardware();
 void read_hardware();
 
 void set_LEDs_on(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2);
