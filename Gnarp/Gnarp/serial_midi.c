@@ -47,10 +47,26 @@ void initialize_serial_midi(MidiDevice* midi_device, Sequencer* sequencer){
    midi_register_noteoff_callback(midi_device, noteoff_to_arpeggiator);
    
    //all midi messages that are not expected will be sent through to midi out
-   midi_register_fallthrough_callback(midi_device, serial_midi_send);
+//   midi_register_fallthrough_callback(midi_device, serial_midi_send);
    
    //store the device and sequencer pointers
    stored_sequencer = sequencer;
    stored_midi_device = midi_device;
 }
 
+void serial_midi_config_active(MidiDevice* midi_device){
+    //disable catchall THRU
+	midi_register_catchall_callback(midi_device, NULL);
+	
+	//enable THRU for non-arpeggiator messages
+	midi_register_fallthrough_callback(midi_device, serial_midi_send);
+}
+
+void serial_midi_config_bypass(MidiDevice* midi_device){
+	//enable catchall THRU
+	midi_register_catchall_callback(midi_device, serial_midi_send);
+	
+	//disable THRU for only non-arpeggiator messages
+	midi_register_fallthrough_callback(midi_device, NULL);
+	
+}

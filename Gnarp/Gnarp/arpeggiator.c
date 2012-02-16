@@ -109,8 +109,7 @@ void initialize_sequencer(Sequencer* sequencer){
     sequencer->duration = 0;
     sequencer->division = 0;
     sequencer->play_status = 0;
-    
-    //link the note list to the player and flag to rebuild the play list
+    sequencer->enable = 0;
     sequencer->rebuild_play_list = 1;
     
     //calculate the time increments
@@ -123,7 +122,6 @@ static void build_play_list(Sequencer* sequencer){
     //builds the play list according to pattern selection
     
     NoteList* note_list = &(sequencer->note_list);
-    uint8_t pattern = sequencer->pattern;
     
     uint8_t play_list_index = 0;
     Note* current_note;
@@ -140,7 +138,7 @@ static void build_play_list(Sequencer* sequencer){
 
 //    pattern = 0;
 
-    switch(pattern){
+    switch(sequencer->pattern){
         //Asc pitch
         case 0:
             for(current_note = note_list->head_pitch; current_note; current_note=current_note->next_note_by_pitch)
@@ -307,6 +305,9 @@ static void set_sequencer_parameters(Sequencer* sequencer, bool restart){
 }
 
 void continue_sequencer(Sequencer* sequencer, bool restart){
+	if (!(sequencer->enable))
+	    return;
+	
     //disable noteon and noteoff interrupts
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
@@ -363,7 +364,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
 	
     //send midi message to start the note
     midi_send_noteon(get_midi_device(),MIDI_CHAN,final_pitch(sequencer),final_velocity(sequencer));
-    set_LEDs_on(0,0,0,1);
+    set_LEDs_on(1,0,0,0);
     
     //set play flag
     sequencer->play_status = 1;
@@ -377,6 +378,9 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
 }
 
 void stop_sequencer(Sequencer* sequencer, bool full_stop){
+	if (!(sequencer->enable))
+	    return;
+	
     //disable CCB (note on) and CCC (note off) interrupts
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
@@ -387,7 +391,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     //stop the current note if it's playing
     if (sequencer->play_status){
         midi_send_noteoff(get_midi_device(),MIDI_CHAN,final_pitch(sequencer),final_velocity(sequencer));
-		set_LEDs_off(0,0,0,1);
+		set_LEDs_off(1,0,0,0);
         sequencer->play_status = 0;
     }
     
@@ -405,10 +409,11 @@ void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t veloci
     //if it's the first note, restart the sequencer
     
     if (insert_note(&(sequencer->note_list), pitch, velocity)){
-		sequencer->rebuild_play_list = 1;
-        
-		if (sequencer->note_list.length == 1)
+		sequencer->rebuild_play_list = 1;   
+
+        if (sequencer->note_list.length == 1)
             continue_sequencer(sequencer, 1);
+					
     }
 }
 
@@ -430,8 +435,33 @@ void remove_note_from_arpeggiator(Sequencer* sequencer, uint8_t pitch){
 	
 }
 
-void adjust_sequencer_to_bpm(Sequencer* sequencer){
+void bpm_change_postprocess(Sequencer* sequencer){
     //if the sequencer is running while the bpm changes, restart the sequencer
     if (sequencer->run_status)
-        continue_sequencer(sequencer, 1);
+        continue_sequencer(sequencer, 0);
+}
+
+void disable_sequencer(Sequencer* sequencer){
+	stop_sequencer(sequencer, 1);
+	sequencer->enable = 0;
+	
+	//start all currently held notes (enter THRU)
+	for (Note* i = sequencer->note_list.head_trigger; i != NULL; i = i->next_note_by_trigger){
+	    midi_send_noteon(get_midi_device(), MIDI_CHAN, i->pitch, i->velocity);
+	}
+	
+	serial_midi_config_bypass(get_midi_device());
+	
+}
+
+void enable_sequencer(Sequencer* sequencer){
+	serial_midi_config_active(get_midi_device());
+	
+	//stop all currently held notes (exit THRU)
+	for (Note* i = sequencer->note_list.head_trigger; i != NULL; i = i->next_note_by_trigger){
+	    midi_send_noteoff(get_midi_device(), MIDI_CHAN, i->pitch, i->velocity);
+	}
+	
+    sequencer->enable = 1;
+	continue_sequencer(sequencer, 1);	
 }

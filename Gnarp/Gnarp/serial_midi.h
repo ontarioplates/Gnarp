@@ -17,6 +17,8 @@ extern "C" {
 
 void initialize_serial_midi(MidiDevice* midi_device, Sequencer* sequencer);
 MidiDevice* get_midi_device();
+void serial_midi_config_active(MidiDevice* midi_device);
+void serial_midi_config_bypass(MidiDevice* midi_device);
 
 #ifdef __cplusplus
 }

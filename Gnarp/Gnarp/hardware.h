@@ -16,6 +16,8 @@
 #define POT_MIN 0
 #define POT_MAX 2047
 
+#define ALL_EIGHT_POSITION_SWITCHES true
+
 typedef enum {TURN_NONE, TURN_CW, TURN_CCW}
 turn_state;
 

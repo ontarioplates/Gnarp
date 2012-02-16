@@ -53,19 +53,24 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 }
 
 int main(void) {
-    const uint16_t initial_BPM = 60;
+    const uint16_t initial_BPM = 120;
 	
     manager_ptr = initialize_hardware();
+	
     initialize_sequencer(&sequencer);
+	
 	initialize_serial_midi(&midi_device, &sequencer);
+	
     initialize_beat_clock(initial_BPM);
+	
     set_seven_segment_LEDs(get_BPM());
 	
-	add_note_to_arpeggiator(&sequencer, 60, 100);
-	add_note_to_arpeggiator(&sequencer, 67, 100);
-	add_note_to_arpeggiator(&sequencer, 69, 100);
+	read_hardware();
+	
+	if (get_toggle_switch_state())
+	    enable_sequencer(&sequencer);
 
-    while(1){
+   /* while(1){
         read_hardware();
         
         if (get_encoder() == TURN_CW)
@@ -75,7 +80,7 @@ int main(void) {
         
         set_seven_segment_LEDs(sequencer.repeat_max);
 		
-/*        if (get_pushbutton_switch_edge() == EDGE_RISE)
+        if (get_pushbutton_switch_edge() == EDGE_RISE)
 		    continue_sequencer(&sequencer, 1);
 
 		if (get_toggle_switch_edge() == EDGE_FALL){
@@ -83,25 +88,35 @@ int main(void) {
 		}			
 		else if (get_encoder_switch_edge() == EDGE_RISE){
 			continue_sequencer(&sequencer, 1);
-		}				 */   
-    }
+		}				    
+    }*/
 	
-  /*  
+    
     while(1){
         read_hardware();
         
         if (get_encoder() == TURN_CW){
             increment_BPM();
+			bpm_change_postprocess(&sequencer);
             set_seven_segment_LEDs(get_BPM());
         }
         else if (get_encoder() == TURN_CCW){
             decrement_BPM();
+			bpm_change_postprocess(&sequencer);
             set_seven_segment_LEDs(get_BPM());
         }
         
         if (get_pushbutton_switch_edge() == EDGE_RISE)
-            continue_sequencer(sequencer, 1);
-    };
-   */            
+            continue_sequencer(&sequencer, 1);
+			
+		if (get_toggle_switch_edge() == EDGE_FALL)
+            disable_sequencer(&sequencer);
+			
+		if (get_toggle_switch_edge() == EDGE_RISE)
+		    enable_sequencer(&sequencer);
+			
+		set_seven_segment_LEDs(sequencer.pattern);
+    }
+               
     return 0;
 }

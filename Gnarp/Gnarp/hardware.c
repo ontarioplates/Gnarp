@@ -128,19 +128,19 @@ uint16_t get_pot_value(uint8_t pot_select, uint16_t output_min, uint16_t output_
     
     const uint16_t pot_range = POT_MAX - POT_MIN + 1; 
     volatile float temp;
-	volatile bool stop_me = 0;
     
     temp = 1.0*manager.pot_values[pot_select]/pot_range;
-    temp = temp*(output_max - output_min + 1) + output_min;
-    
+	
+	if (ALL_EIGHT_POSITION_SWITCHES && output_max <= 7)
+        temp = temp*(7 - output_min + 1) + output_min;
+	else
+        temp = temp*(output_max - output_min + 1) + output_min;
+		
     if (temp > output_max)
         temp = output_max;
         
     if (temp < output_min)
         temp = output_min;
-		
-	if (temp == 0 && pot_select == 4)
-	    stop_me = 1;
     
     return (uint16_t) temp;
 }
