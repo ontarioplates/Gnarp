@@ -55,6 +55,8 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 int main(void) {
     const uint16_t initial_BPM = 120;
 	
+	uint16_t BPM_add;
+	
     manager_ptr = initialize_hardware();
 	
     initialize_sequencer(&sequencer);
@@ -94,14 +96,19 @@ int main(void) {
     
     while(1){
         read_hardware();
+		
+		if (get_encoder_switch_state())
+		    BPM_add = 5;
+		else
+		    BPM_add = 1;
         
         if (get_encoder() == TURN_CW){
-            increment_BPM();
+            increment_BPM(BPM_add);
 			bpm_change_postprocess(&sequencer);
             set_seven_segment_LEDs(get_BPM());
         }
         else if (get_encoder() == TURN_CCW){
-            decrement_BPM();
+            decrement_BPM(BPM_add);
 			bpm_change_postprocess(&sequencer);
             set_seven_segment_LEDs(get_BPM());
         }
@@ -114,8 +121,6 @@ int main(void) {
 			
 		if (get_toggle_switch_edge() == EDGE_RISE)
 		    enable_sequencer(&sequencer);
-			
-		set_seven_segment_LEDs(sequencer.pattern);
     }
                
     return 0;

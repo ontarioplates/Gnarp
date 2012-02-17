@@ -13,6 +13,7 @@
 #define MAX_NOTE_DURATION 0xFF
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
+#define MIRROR_EDGE_DOUBLE true
 
 //correlate pots to control each parameter of the arpeggiator	
 #define POT_SEL_OCTAVE 3

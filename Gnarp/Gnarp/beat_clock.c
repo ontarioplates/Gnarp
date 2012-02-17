@@ -105,13 +105,13 @@ uint16_t get_BPM(){
     return BPM;
 }
 
-void increment_BPM(){
-    BPM += 1;
+void increment_BPM(int add_me){
+    BPM += add_me;
     configure_beat_clock_timer();
 }
 
-void decrement_BPM(){
-    BPM -= 1;
+void decrement_BPM(int subtract_me){
+    BPM -= subtract_me;
     configure_beat_clock_timer();
 }
 

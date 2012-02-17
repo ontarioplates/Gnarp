@@ -37,27 +37,34 @@ static void calculate_start_time_increment(Sequencer* sequencer){
     
     //based on the division selection, scale the time
     switch(sequencer->division){
+		//quarter note
         case 0:    break;
         
-        case 1: new_start_time_increment *= 3;
+		//dotted eighth
+        case 3: new_start_time_increment *= 3;
                 new_start_time_increment /= 4;
                 break;
-                
-        case 2: new_start_time_increment *= 2;
+        
+		//quarter triplet
+        case 5: new_start_time_increment *= 2;
                 new_start_time_increment /= 3;
                 break;
-                
-        case 3: new_start_time_increment /= 2;
+        
+		//eighth
+        case 1: new_start_time_increment /= 2;
                 break;
                 
+		//dotted 16th
         case 4: new_start_time_increment *= 3;
                 new_start_time_increment /= 8;
                 break;
         
-        case 5: new_start_time_increment /= 3;
+		//eighth triplet
+        case 6: new_start_time_increment /= 3;
                 break;
-                
-        case 6: new_start_time_increment /= 4;
+        
+		//sixteenth                
+        case 2: new_start_time_increment /= 4;
                 break;
     }
     
@@ -134,11 +141,47 @@ static void build_play_list(Sequencer* sequencer){
     uint8_t random_list_depth;      //index for random pattern
     
     uint8_t i;
-    uint8_t mirror = 0;
-
-//    pattern = 0;
-
+	
+    bool mirror = 0;
+    uint8_t pattern = 0;
+	
+	
     switch(sequencer->pattern){
+		case 0:
+		    pattern = 0;
+			mirror = 0;
+		    break;
+		case 1:
+		    pattern = 1;
+			mirror = 0;
+			break;
+		case 2:
+		    pattern = 0;
+			mirror = 1;
+			break;
+		case 3:
+		    pattern = 2;
+			mirror =  0;
+			break;
+		case 4:
+		    pattern = 3;
+			mirror = 0;
+			break;
+		case 5:
+		    pattern = 2;
+			mirror = 1;
+			break;
+		case 6:
+		    pattern = 4;
+			mirror = 0;
+			break;
+		case 7:
+		    pattern = 5;
+			mirror = 0;
+			break;
+	}
+
+    switch(pattern){
         //Asc pitch
         case 0:
             for(current_note = note_list->head_pitch; current_note; current_note=current_note->next_note_by_pitch)
@@ -181,6 +224,9 @@ static void build_play_list(Sequencer* sequencer){
 			}
 
             break;
+			
+		case 5:
+		    
     }
 
     //option to mirror the pattern
@@ -189,12 +235,12 @@ static void build_play_list(Sequencer* sequencer){
         uint8_t edge_scale;
         uint8_t k;
 
-        if (mirror == 2){
+        if (MIRROR_EDGE_DOUBLE == true){
             //double edge
             mirrored_length = play_list_index*2;
             edge_scale = 1;
         }
-        if (mirror == 1){
+        if (MIRROR_EDGE_DOUBLE == false){
             //single edge
             if (play_list_index < 3)
                 mirrored_length = 0;
