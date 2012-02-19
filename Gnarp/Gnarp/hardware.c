@@ -2,14 +2,20 @@
 
 #include "hardware.h"
 
-static turn_state encoder_state = TURN_NONE;
-static switch_edge pushbutton_switch_edge = EDGE_NONE;
-static switch_edge toggle_switch_edge = EDGE_NONE;
-static switch_edge encoder_switch_edge = EDGE_NONE;
-static bool pushbutton_switch_state = 0;
-static bool toggle_switch_state = 0;
-static bool encoder_switch_state = 0;
-static uint16_t pot_values[5] = {0,0,0,0,0};
+static Hardware_Manager manager;
+	
+void initialize_hardware_manager(){
+	manager.encoder_state = TURN_NONE;
+    manager.pushbutton_switch_edge = EDGE_NONE;
+    manager.toggle_switch_edge = EDGE_NONE;
+    manager.encoder_switch_edge = EDGE_NONE;
+    manager.pushbutton_switch_state = 0;
+    manager.toggle_switch_state = 0;
+    manager.encoder_switch_state = 0;
+	
+	for (uint8_t i = 0; i < NUM_POTS; i++)
+        manager.pot_values[i] = 0;
+}	
     
 static void initialize_clock(){
     //CLOCK AND PLL SETUP
@@ -59,23 +65,23 @@ static void read_encoder(){
     if (!last_a & current_a)
     {
         if (current_b)
-            encoder_state = TURN_CW;    //CW        
+            manager.encoder_state = TURN_CW;    //CW        
         else
-            encoder_state = TURN_CCW;    //CCW
+            manager.encoder_state = TURN_CCW;    //CCW
     }
     else
-        encoder_state = TURN_NONE;   
+        manager.encoder_state = TURN_NONE;   
     last_a = current_a;
 }
 
 turn_state get_encoder(){
-    return encoder_state;
+    return manager.encoder_state;
 }
 
 static void initialize_pots(){
     PORTA.DIRCLR = 0xF9;        //ADC3:7 and VREF input
     ADCA.CTRLA = 0x00;          //disable ADC
-    ADCA.CTRLB = 0x00;
+    ADCA.CTRLB = 0x10;          //ADC to signed mode
     ADCA.REFCTRL = 0x20;        //set PORTA reference voltage
     ADCA.EVCTRL = 0x00;
     ADCA.PRESCALER = 0x01;     //set prescaler to clk/8 for accuracy
@@ -88,6 +94,7 @@ static void initialize_pots(){
 
 static void read_pots(){
     volatile uint8_t i;
+	volatile int16_t new_reading;
     
     //cycle through each ADC input and read the values
     //and set the variables appropriately
@@ -99,14 +106,17 @@ static void read_pots(){
         
         while(!(ADCA.CH0.INTFLAGS & 0x01)){} //wait for read to complete
 
-        
-        pot_values[i] = ADCA.CH0.RESL;
-        pot_values[i] |= ADCA.CH0.RESH << 8;
-        
-        if (pot_values[i] < POT_MIN)
-            pot_values[i] = 0;
+        //load ADC value into the new variable
+        new_reading = ADCA.CH0.RESL;
+        new_reading |= ADCA.CH0.RESH << 8;
+		
+		if (new_reading < POT_MIN)
+            new_reading = POT_MIN;
         else
-            pot_values[i] = pot_values[i] - POT_MIN;
+            new_reading = new_reading - POT_MIN;
+		
+		//LPF on new value to reduce noise
+		manager.pot_values[i] = manager.pot_values[i] + (new_reading - (int16_t) manager.pot_values[i])/POT_FILTER_COEFF;
     }
     
 }
@@ -117,11 +127,15 @@ uint16_t get_pot_value(uint8_t pot_select, uint16_t output_min, uint16_t output_
     //output_max: maximum value to output
     
     const uint16_t pot_range = POT_MAX - POT_MIN + 1; 
-    float temp;
+    volatile float temp;
     
-    temp = 1.0*pot_values[pot_select]/pot_range;
-    temp = temp*(output_max - output_min + 1) + output_min;
-    
+    temp = 1.0*manager.pot_values[pot_select]/pot_range;
+	
+	if (ALL_EIGHT_POSITION_SWITCHES && output_max <= 7)
+        temp = temp*(7 - output_min + 1) + output_min;
+	else
+        temp = temp*(output_max - output_min + 1) + output_min;
+		
     if (temp > output_max)
         temp = output_max;
         
@@ -240,83 +254,85 @@ static void read_switches(){
     //set switch booleans for state and edges appropriately
     
     if (final_switch_states & 0x01){            //if toggle IS on
-        if (toggle_switch_state)                //if toggle WAS on
-            toggle_switch_edge = EDGE_NONE;     //no edge
+        if (manager.toggle_switch_state)                //if toggle WAS on
+            manager.toggle_switch_edge = EDGE_NONE;     //no edge
         else                                    //else (toggle WAS off)
-            toggle_switch_edge = EDGE_RISE;     //new on
-        toggle_switch_state = 1;                //set current value
+            manager.toggle_switch_edge = EDGE_RISE;     //new on
+        manager.toggle_switch_state = 1;                //set current value
     }        
     else{                                       //if toggle IS off
-        if (toggle_switch_state)                //if toggle WAS on
-            toggle_switch_edge = EDGE_FALL;     //new off
+        if (manager.toggle_switch_state)                //if toggle WAS on
+            manager.toggle_switch_edge = EDGE_FALL;     //new off
         else                                    //else (toggle WAS off)
-            toggle_switch_edge = EDGE_NONE;     //no edge
-        toggle_switch_state = 0;                //set current value
+            manager.toggle_switch_edge = EDGE_NONE;     //no edge
+        manager.toggle_switch_state = 0;                //set current value
     }        
     
     if (final_switch_states & 0x02){                //if pushbutton IS on
-        if (pushbutton_switch_state)                //if pushbutton WAS on
-            pushbutton_switch_edge = EDGE_NONE;     //no edge
+        if (manager.pushbutton_switch_state)                //if pushbutton WAS on
+            manager.pushbutton_switch_edge = EDGE_NONE;     //no edge
         else                                        //else (pushbutton WAS off)
-            pushbutton_switch_edge = EDGE_RISE;     //new on
-        pushbutton_switch_state = 1;                //set current value
+            manager.pushbutton_switch_edge = EDGE_RISE;     //new on
+        manager.pushbutton_switch_state = 1;                //set current value
     }        
     else{                                           //if pushbutton IS off
-        if (pushbutton_switch_state)                //if pushbutton WAS on
-            pushbutton_switch_edge = EDGE_FALL;     //new off
+        if (manager.pushbutton_switch_state)                //if pushbutton WAS on
+            manager.pushbutton_switch_edge = EDGE_FALL;     //new off
         else                                        //else (pushbutton WAS off)
-            pushbutton_switch_edge = EDGE_NONE;     //no edge
-        pushbutton_switch_state = 0;                //set current value
+            manager.pushbutton_switch_edge = EDGE_NONE;     //no edge
+        manager.pushbutton_switch_state = 0;                //set current value
     }        
     
     if (final_switch_states & 0x04){             //if encoder IS on
-        if (encoder_switch_state)                //if encoder WAS on
-            encoder_switch_edge = EDGE_NONE;     //no edge
+        if (manager.encoder_switch_state)                //if encoder WAS on
+            manager.encoder_switch_edge = EDGE_NONE;     //no edge
         else                                     //else (encoder WAS off)
-            encoder_switch_edge = EDGE_RISE;     //new on
-        encoder_switch_state = 1;                //set current value
+            manager.encoder_switch_edge = EDGE_RISE;     //new on
+        manager.encoder_switch_state = 1;                //set current value
     }        
     else{                                        //if encoder IS off
-        if (encoder_switch_state)                //if encoder WAS on
-            encoder_switch_edge = EDGE_FALL;     //new off
+        if (manager.encoder_switch_state)                //if encoder WAS on
+            manager.encoder_switch_edge = EDGE_FALL;     //new off
         else                                     //else (encoder WAS off)
-            encoder_switch_edge = EDGE_NONE;     //no edge
-        encoder_switch_state = 0;                //set current value
+            manager.encoder_switch_edge = EDGE_NONE;     //no edge
+        manager.encoder_switch_state = 0;                //set current value
     }        
   
 }
 
 bool get_encoder_switch_state(){
-    return encoder_switch_state;
+    return manager.encoder_switch_state;
 }
 
 switch_edge get_encoder_switch_edge(){
-    return encoder_switch_edge;
+    return manager.encoder_switch_edge;
 }
 
 bool get_pushbutton_switch_state(){
-    return pushbutton_switch_state;
+    return manager.pushbutton_switch_state;
 }
 
 switch_edge get_pushbutton_switch_edge(){
-    return pushbutton_switch_edge;
+    return manager.pushbutton_switch_edge;
 }
 
 bool get_toggle_switch_state(){
-    return toggle_switch_state;
+    return manager.toggle_switch_state;
 }
 
 switch_edge get_toggle_switch_edge(){
-    return toggle_switch_edge;
+    return manager.toggle_switch_edge;
 }
 
-void initialize_hardware(){
+Hardware_Manager* initialize_hardware(){
+	initialize_hardware_manager();
     initialize_clock();
     initialize_MIDI();
     initialize_pots();
     initialize_switches();
     initialize_encoder();
     initialize_LEDs();
+	return &manager;
 }
 
 void read_hardware(){

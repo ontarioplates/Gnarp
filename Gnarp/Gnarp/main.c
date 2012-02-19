@@ -14,6 +14,7 @@
 
 static Sequencer sequencer;
 static MidiDevice midi_device;
+static Hardware_Manager* manager_ptr;
 
 ISR(USARTD1_RXC_vect){
     midi_device_input(&midi_device,1,&(USARTD1.DATA));
@@ -52,15 +53,26 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 }
 
 int main(void) {
-    const uint16_t initial_BPM = 60;
+    const uint16_t initial_BPM = 120;
 	
-    initialize_hardware();
+	uint16_t BPM_add;
+	
+    manager_ptr = initialize_hardware();
+	
     initialize_sequencer(&sequencer);
+	
 	initialize_serial_midi(&midi_device, &sequencer);
+	
     initialize_beat_clock(initial_BPM);
+	
     set_seven_segment_LEDs(get_BPM());
+	
+	read_hardware();
+	
+	if (get_toggle_switch_state())
+	    enable_sequencer(&sequencer);
 
-    while(1){
+   /* while(1){
         read_hardware();
         
         if (get_encoder() == TURN_CW)
@@ -68,8 +80,8 @@ int main(void) {
         else if (get_encoder() == TURN_CCW)
             decrement_BPM();    
         
-        set_seven_segment_LEDs(get_BPM());
-
+        set_seven_segment_LEDs(sequencer.repeat_max);
+		
         if (get_pushbutton_switch_edge() == EDGE_RISE)
 		    continue_sequencer(&sequencer, 1);
 
@@ -79,24 +91,39 @@ int main(void) {
 		else if (get_encoder_switch_edge() == EDGE_RISE){
 			continue_sequencer(&sequencer, 1);
 		}				    
-    }
+    }*/
 	
-  /*  
+    
     while(1){
         read_hardware();
+		
+		if (get_encoder_switch_state())
+		    BPM_add = 5;
+		else
+		    BPM_add = 1;
         
         if (get_encoder() == TURN_CW){
-            increment_BPM();
-            set_seven_segment_LEDs(get_BPM());
+            if (increment_BPM(BPM_add)){
+			    bpm_change_postprocess(&sequencer);
+                set_seven_segment_LEDs(get_BPM());
+			}				
         }
         else if (get_encoder() == TURN_CCW){
-            decrement_BPM();
-            set_seven_segment_LEDs(get_BPM());
+            if (decrement_BPM(BPM_add)){
+			    bpm_change_postprocess(&sequencer);
+                set_seven_segment_LEDs(get_BPM());
+			}				
         }
         
         if (get_pushbutton_switch_edge() == EDGE_RISE)
-            continue_sequencer(sequencer, 1);
-    };
-   */            
+            continue_sequencer(&sequencer, 1);
+			
+		if (get_toggle_switch_edge() == EDGE_FALL)
+            disable_sequencer(&sequencer);
+			
+		if (get_toggle_switch_edge() == EDGE_RISE)
+		    enable_sequencer(&sequencer);
+    }
+               
     return 0;
 }

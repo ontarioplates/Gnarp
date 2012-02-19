@@ -28,11 +28,11 @@
       <ToolNumber>00A20002303C</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1057</port>
+        <port>1490</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>
-        <InterfaceName>PDI</InterfaceName>
+        <InterfaceName>JTAG</InterfaceName>
         <InterfaceProperties>
           <JtagDbgClock>1000000</JtagDbgClock>
           <JtagProgClock>1000000</JtagProgClock>
@@ -64,7 +64,7 @@
       <ToolNumber>00B000006113</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1110</port>
+        <port>1496</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>

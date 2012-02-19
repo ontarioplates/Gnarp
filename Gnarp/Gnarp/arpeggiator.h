@@ -13,6 +13,27 @@
 #define MAX_NOTE_DURATION 0xFF
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
+#define MIRROR_EDGE_DOUBLE true
+
+//correlate pots to control each parameter of the arpeggiator	
+#define POT_SEL_OCTAVE 3
+#define POT_SEL_REPEAT 4
+#define POT_SEL_DIVISION 2
+#define POT_SEL_DURATION 0
+#define POT_SEL_PATTERN 1
+
+#define POT_MIN_OCTAVE 0
+#define POT_MIN_REPEAT 0
+#define POT_MIN_DIVISION 0
+#define POT_MIN_DURATION 11
+#define POT_MIN_PATTERN 0
+
+#define POT_MAX_OCTAVE 7
+#define POT_MAX_REPEAT 7
+#define POT_MAX_DIVISION 6
+#define POT_MAX_DURATION 255
+#define POT_MAX_PATTERN 4
+
 
 typedef enum {QUARTER, EIGHTH, SIXTEENTH}
 note_time_division;
@@ -22,6 +43,7 @@ note_time_variation;
 
 struct Sequencer
 {
+	bool    enable;
     bool    run_status;
     bool    play_status;
     bool    rebuild_play_list;
@@ -54,5 +76,10 @@ void remove_note_from_arpeggiator(Sequencer*, uint8_t pitch);
 
 void continue_sequencer(Sequencer* sequencer, bool restart);
 void stop_sequencer(Sequencer* sequencer, bool full_stop);
+
+void bpm_change_postprocess(Sequencer* sequencer);
+void disable_sequencer(Sequencer* sequencer);
+void enable_sequencer(Sequencer* sequencer);
+
 
 #endif /* ARPEGGIATOR_H_ */

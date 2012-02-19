@@ -105,14 +105,28 @@ uint16_t get_BPM(){
     return BPM;
 }
 
-void increment_BPM(){
-    BPM += 1;
+bool increment_BPM(int add_me){
+	if (BPM == BPM_MAX)
+	    return 0;
+		
+    BPM += add_me;
+	if (BPM > BPM_MAX)
+	    BPM = BPM_MAX;
     configure_beat_clock_timer();
+	
+	return 1;
 }
 
-void decrement_BPM(){
-    BPM -= 1;
+bool decrement_BPM(int subtract_me){
+	if (BPM == BPM_MIN)
+	    return 0;
+		
+    BPM -= subtract_me;
+	if (BPM < BPM_MIN)
+	    BPM = BPM_MIN;
     configure_beat_clock_timer();
+	
+	return 1;
 }
 
 
