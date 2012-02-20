@@ -381,7 +381,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     //turn off the current note if it is still playing
     if (sequencer->play_status){
         midi_send_noteoff(get_midi_device(),final_channel(sequencer),final_pitch(sequencer),final_velocity(sequencer));
-		set_LEDs_off(0,0,0,1);
+		set_LED_off(LED_STATUS);
         sequencer->play_status = 0;
     }
         
@@ -416,7 +416,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
 	
     //send midi message to start the note
     midi_send_noteon(get_midi_device(), final_channel(sequencer), final_pitch(sequencer), final_velocity(sequencer));
-    set_LEDs_on(1,0,0,0);
+    set_LED_on(LED_STATUS);
     
     //set play flag
     sequencer->play_status = 1;
@@ -443,7 +443,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     //stop the current note if it's playing
     if (sequencer->play_status){
         midi_send_noteoff(get_midi_device(), final_channel(sequencer), final_pitch(sequencer), final_velocity(sequencer));
-		set_LEDs_off(1,0,0,0);
+		set_LED_off(LED_STATUS);
         sequencer->play_status = 0;
     }
     

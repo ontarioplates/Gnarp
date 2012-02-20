@@ -14,7 +14,7 @@
 
 static Sequencer sequencer;
 static MidiDevice midi_device;
-static Hardware_Manager* manager_ptr;
+static HardwareManager* manager_ptr;
 
 ISR(USARTD1_RXC_vect){
     midi_device_input(&midi_device,1,&(USARTD1.DATA));

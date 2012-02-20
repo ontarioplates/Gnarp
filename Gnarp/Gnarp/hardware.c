@@ -2,9 +2,9 @@
 
 #include "hardware.h"
 
-static Hardware_Manager manager;
+static HardwareManager manager;
 	
-void initialize_hardware_manager(){
+void initialize_HardwareManager(){
 	manager.encoder_state = TURN_NONE;
     manager.pushbutton_switch_edge = EDGE_NONE;
     manager.toggle_switch_edge = EDGE_NONE;
@@ -182,34 +182,32 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
     }
 }
 
-void set_LEDs_on(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2){
+void set_LED_on(LED_choose choice){
     //booleans and such convert to LED out
-    if (status_LED)
-        PORTC.OUTCLR = 0x08;
-    
-    if (decimal_point_0)
-        PORTD.OUTSET = 0x04;
-        
-    if (decimal_point_1)
-        PORTD.OUTSET = 0x01;
-    
-    if (decimal_point_2)
-        PORTD.OUTSET = 0x02;
+	switch(choice){
+		case LED_STATUS:            PORTC.OUTCLR = 0x08;
+		                            break;
+		case LED_DECIMAL_POINT_0:   PORTD.OUTSET = 0x04;
+		                            break;
+		case LED_DECIMAL_POINT_1:   PORTD.OUTSET = 0x01;
+		                            break;
+		case LED_DECIMAL_POINT_2:   PORTD.OUTSET = 0x02;
+		                            break;
+	}
 }
 
-void set_LEDs_off(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2){
+void set_LED_off(LED_choose choice){
     //booleans and such convert to LED out
-    if (status_LED)
-        PORTC.OUTSET = 0x08;
-    
-    if (decimal_point_0)
-        PORTD.OUTCLR = 0x04;
-        
-    if (decimal_point_1)
-        PORTD.OUTCLR = 0x01;
-    
-    if (decimal_point_2)
-        PORTD.OUTCLR = 0x02;
+	switch(choice){
+		case LED_STATUS:            PORTC.OUTSET = 0x08;
+		                            break;
+		case LED_DECIMAL_POINT_0:   PORTD.OUTCLR = 0x04;
+		                            break;
+		case LED_DECIMAL_POINT_1:   PORTD.OUTCLR = 0x01;
+		                            break;
+		case LED_DECIMAL_POINT_2:   PORTD.OUTCLR = 0x02;
+		                            break;
+	}
 }
 
 static void initialize_switches(){
@@ -324,8 +322,8 @@ switch_edge get_toggle_switch_edge(){
     return manager.toggle_switch_edge;
 }
 
-Hardware_Manager* initialize_hardware(){
-	initialize_hardware_manager();
+HardwareManager* initialize_hardware(){
+	initialize_HardwareManager();
     initialize_clock();
     initialize_MIDI();
     initialize_pots();
@@ -341,8 +339,8 @@ void read_hardware(){
     read_encoder();
 }
 
-void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value){
+/*void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value){
     
     
     //set_LEDs(status_LED, decimal_point_0, decimal_point_1, decimal_point_2, seven_segment_value);
-}
+}*/

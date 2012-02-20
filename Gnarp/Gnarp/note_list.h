@@ -7,8 +7,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MAX_LIST_NOTES 16
-
+#define MAX_LIST_NOTES 16 /**< Maximum number of simultaneous MIDI notes that the NoteList will track*/
 
 typedef struct Note Note;
 typedef struct NoteList NoteList;
@@ -41,7 +40,7 @@ struct Note
  *
  * This structure is an organized history of all the notes currently being played at the MIDI input jack.<br>
  * The list can be traversed forwards or backwards in order of pitch or the order which the notes were triggered.<br>  
- * MAX_LIST_NOTES determines the maximum number of notes that can be stored in the list.  Once this maximum is reached,
+ * #MAX_LIST_NOTES determines the maximum number of notes that can be stored in the list.  Once this maximum is reached,
  * newly inserted notes will not be tracked.
  * @see Note
  */
@@ -82,12 +81,13 @@ bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch);
  * @brief Insert a given note in proper order into a NoteList
  *
  * If the Note is not a duplicate, it is inserted into the NoteList in proper pitch order and at the end of the trigger order.  
- * If the Note is a duplicate, its velocity is updated and moved to the end of the trigger order.  
+ * If the Note is a duplicate, its velocity and channel is updated and the Note is moved to the end of the trigger order.  
  * If the #note_bank is filled, no new Note will be inserted.
  *
  * @param note_list pointer to the NoteList to use
  * @param pitch 8-bit pitch value of the new Note
  * @param velocity 8-bit velocity value of the new Note
+ * @param channel 8-bit channel value of the new Note
  * @return 1 if the new Note was inserted (including duplicates)
  * @return 0 otherwise 
  */
