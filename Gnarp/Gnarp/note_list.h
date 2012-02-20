@@ -28,6 +28,7 @@ struct Note
 	
     uint8_t pitch;      /**< Original MIDI pitch of the note (0-255)*/
     uint8_t velocity;   /**< Original MIDI velocity of the note (0-255)*/
+	uint8_t channel;    /**< Original MIDI channel of the note (0-15)*/
 
     Note*   next_note_by_pitch;        /**< Pointer to the next highest pitched note*/
 	Note*   previous_note_by_pitch;    /**< Pointer to the next lowest pitched note*/
@@ -90,6 +91,6 @@ bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch);
  * @return 1 if the new Note was inserted (including duplicates)
  * @return 0 otherwise 
  */
-bool insert_note(NoteList* note_list, uint8_t pitch, uint8_t velocity);
+bool insert_note(NoteList* note_list, uint8_t pitch, uint8_t velocity, uint8_t channel);
 
 #endif /* NOTE_LIST_H_ */

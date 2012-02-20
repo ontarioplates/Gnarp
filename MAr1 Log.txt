@@ -17,3 +17,4 @@ MAr1 Board Changes/Issues
 15. Swap MIDI Out pins 4/5
 16. ALPS SRBV181004 rotary switch to maybe replace ALPHA.  cheaper
 17. Pinouts for 1/8" jack are wrong.  TS and T are switched
+18. Rotary switches need additional resistors between the rails and the highest/lowest pins

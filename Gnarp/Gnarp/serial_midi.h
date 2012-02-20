@@ -13,8 +13,6 @@ extern "C" {
 
 #include "arpeggiator.h"
 
-#define MIDI_CHAN 0
-
 void initialize_serial_midi(MidiDevice* midi_device, Sequencer* sequencer);
 MidiDevice* get_midi_device();
 void serial_midi_config_active(MidiDevice* midi_device);

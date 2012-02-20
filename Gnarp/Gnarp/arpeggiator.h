@@ -71,7 +71,7 @@ typedef struct Sequencer Sequencer;
 
 void adjust_sequencer_to_bpm(Sequencer* sequencer);
 void initialize_sequencer(Sequencer* sequencer);
-void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity);
+void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity, uint8_t channel);
 void remove_note_from_arpeggiator(Sequencer*, uint8_t pitch);
 
 void continue_sequencer(Sequencer* sequencer, bool restart);

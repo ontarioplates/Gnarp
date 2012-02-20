@@ -2,6 +2,7 @@
 
 #include "serial_midi.h"
 
+#include "./xnorMIDI/midi.h"
 #include <avr/io.h>
 
 static Sequencer* stored_sequencer;
@@ -28,10 +29,12 @@ void serial_midi_send(MidiDevice* midi_device, uint8_t cnt, uint8_t inByte0, uin
 }
 
 void noteon_to_arpeggiator(MidiDevice * midi_device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
+	uint8_t channel = inByte0 - MIDI_NOTEON;
+	
 	if (inByte2 == 0)
 	    remove_note_from_arpeggiator(stored_sequencer, inByte1);
 	else
-        add_note_to_arpeggiator(stored_sequencer, inByte1, inByte2);
+        add_note_to_arpeggiator(stored_sequencer, inByte1, inByte2, channel);
 }
 
 void noteoff_to_arpeggiator(MidiDevice * midi_device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
