@@ -47,7 +47,7 @@ struct HardwareManager{
 };
 
 /**
- * @defgroup harware_functions I/O Hardware Functions
+ * @defgroup hardware_functions I/O Hardware Functions
  *
  * Functions used when reading and writing to the user interface hardware.
  *
