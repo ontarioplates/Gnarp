@@ -1,5 +1,21 @@
 var searchData=
 [
+  ['pot_5ffilter_5fcoeff',['POT_FILTER_COEFF',['../hardware_8h.html#a2a7015e49e130b180c278e17336d318f',1,'hardware.h']]],
   ['pot_5fmax',['POT_MAX',['../hardware_8h.html#ac8d5e6e525a3a85550ed6aa7735f7c14',1,'hardware.h']]],
-  ['pot_5fmin',['POT_MIN',['../hardware_8h.html#aea3ccefce70cb33234d4f2da59f2d2f2',1,'hardware.h']]]
+  ['pot_5fmax_5fdivision',['POT_MAX_DIVISION',['../arpeggiator_8h.html#aa0014f06fbfd4d6abde72e4987f22ab2',1,'arpeggiator.h']]],
+  ['pot_5fmax_5fduration',['POT_MAX_DURATION',['../arpeggiator_8h.html#a48c15263de8e51559a558adfb5110754',1,'arpeggiator.h']]],
+  ['pot_5fmax_5foctave',['POT_MAX_OCTAVE',['../arpeggiator_8h.html#a13cce59db681081bcb29c9706036fbe6',1,'arpeggiator.h']]],
+  ['pot_5fmax_5fpattern',['POT_MAX_PATTERN',['../arpeggiator_8h.html#acf824535ef349d4a81d11e14477b48c5',1,'arpeggiator.h']]],
+  ['pot_5fmax_5frepeat',['POT_MAX_REPEAT',['../arpeggiator_8h.html#ad6b6f20fd85f6a5c10412eaf2319da26',1,'arpeggiator.h']]],
+  ['pot_5fmin',['POT_MIN',['../hardware_8h.html#aea3ccefce70cb33234d4f2da59f2d2f2',1,'hardware.h']]],
+  ['pot_5fmin_5fdivision',['POT_MIN_DIVISION',['../arpeggiator_8h.html#a73723d8c027d11f0e090017ed3ab25be',1,'arpeggiator.h']]],
+  ['pot_5fmin_5fduration',['POT_MIN_DURATION',['../arpeggiator_8h.html#aef3e5080f24bb1ef997324abe3dcc3d6',1,'arpeggiator.h']]],
+  ['pot_5fmin_5foctave',['POT_MIN_OCTAVE',['../arpeggiator_8h.html#a18fd1f9ae860dce5777d9ae1bf6efaaa',1,'arpeggiator.h']]],
+  ['pot_5fmin_5fpattern',['POT_MIN_PATTERN',['../arpeggiator_8h.html#ac94a953b4604d0590a587840399faa7f',1,'arpeggiator.h']]],
+  ['pot_5fmin_5frepeat',['POT_MIN_REPEAT',['../arpeggiator_8h.html#a62bc71b5dc6d836290e97a250b88004b',1,'arpeggiator.h']]],
+  ['pot_5fsel_5fdivision',['POT_SEL_DIVISION',['../arpeggiator_8h.html#a592c330f972ae2f975efa5beff5dcafd',1,'arpeggiator.h']]],
+  ['pot_5fsel_5fduration',['POT_SEL_DURATION',['../arpeggiator_8h.html#af5b97acad27742fabb623ba96e68ac7a',1,'arpeggiator.h']]],
+  ['pot_5fsel_5foctave',['POT_SEL_OCTAVE',['../arpeggiator_8h.html#a36476e64ea6fe731ada618388edfc450',1,'arpeggiator.h']]],
+  ['pot_5fsel_5fpattern',['POT_SEL_PATTERN',['../arpeggiator_8h.html#aabed41244badec9cbec198c5b0215415',1,'arpeggiator.h']]],
+  ['pot_5fsel_5frepeat',['POT_SEL_REPEAT',['../arpeggiator_8h.html#a700a13ef7cb305672b3144aabda84357',1,'arpeggiator.h']]]
 ];

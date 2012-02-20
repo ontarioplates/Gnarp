@@ -47,6 +47,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -76,31 +77,65 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div>
 <div class="header">
   <div class="summary">
+<a href="#define-members">Defines</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">C:/Documents and Settings/Davidd/My Documents/AVRStudio/Gnarp/Gnarp/Gnarp/beat_clock.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;stdint.h&gt;</code><br/>
+<code>#include &lt;stdbool.h&gt;</code><br/>
 </div>
 <p><a href="beat__clock_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr><td colspan="2"><h2><a name="define-members"></a>
+Defines</h2></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#a2b1b6c355ccb6d1c24872a5a6a5a89da">BPM_MAX</a>&#160;&#160;&#160;400</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#ad8f61b86a7e83a1e027bd82f24be85bc">BPM_MIN</a>&#160;&#160;&#160;20</td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#a057e52f9ca9e72f0a689eb6fc47d13cd">initialize_beat_clock</a> (uint16_t BPM)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#a29706767c023b915996240595909c892">increment_BPM</a> ()</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#ad957516566905c89245aa80ac558de69">decrement_BPM</a> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#ad83805f32b94b81e7931e164b3f40b4c">increment_BPM</a> (int add_me)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#a30d85717ac1acfaf5055b8fdcaf7e522">decrement_BPM</a> (int subtract_me)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="beat__clock_8h.html#afc21c04122b41a762f30b947a8771d7d">get_BPM</a> ()</td></tr>
 </table>
-<hr/><h2>Function Documentation</h2>
-<a class="anchor" id="ad957516566905c89245aa80ac558de69"></a><!-- doxytag: member="beat_clock.h::decrement_BPM" ref="ad957516566905c89245aa80ac558de69" args="()" -->
+<hr/><h2>Define Documentation</h2>
+<a class="anchor" id="a2b1b6c355ccb6d1c24872a5a6a5a89da"></a><!-- doxytag: member="beat_clock.h::BPM_MAX" ref="a2b1b6c355ccb6d1c24872a5a6a5a89da" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="beat__clock_8h.html#ad957516566905c89245aa80ac558de69">decrement_BPM</a> </td>
+          <td class="memname">#define <a class="el" href="beat__clock_8h.html#a2b1b6c355ccb6d1c24872a5a6a5a89da">BPM_MAX</a>&#160;&#160;&#160;400</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad8f61b86a7e83a1e027bd82f24be85bc"></a><!-- doxytag: member="beat_clock.h::BPM_MIN" ref="ad8f61b86a7e83a1e027bd82f24be85bc" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define <a class="el" href="beat__clock_8h.html#ad8f61b86a7e83a1e027bd82f24be85bc">BPM_MIN</a>&#160;&#160;&#160;20</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+</div>
+</div>
+<hr/><h2>Function Documentation</h2>
+<a class="anchor" id="a30d85717ac1acfaf5055b8fdcaf7e522"></a><!-- doxytag: member="beat_clock.h::decrement_BPM" ref="a30d85717ac1acfaf5055b8fdcaf7e522" args="(int subtract_me)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="beat__clock_8h.html#a30d85717ac1acfaf5055b8fdcaf7e522">decrement_BPM</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>subtract_me</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -125,14 +160,15 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a29706767c023b915996240595909c892"></a><!-- doxytag: member="beat_clock.h::increment_BPM" ref="a29706767c023b915996240595909c892" args="()" -->
+<a class="anchor" id="ad83805f32b94b81e7931e164b3f40b4c"></a><!-- doxytag: member="beat_clock.h::increment_BPM" ref="ad83805f32b94b81e7931e164b3f40b4c" args="(int add_me)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="beat__clock_8h.html#a29706767c023b915996240595909c892">increment_BPM</a> </td>
+          <td class="memname">bool <a class="el" href="beat__clock_8h.html#ad83805f32b94b81e7931e164b3f40b4c">increment_BPM</a> </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>add_me</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -164,7 +200,7 @@ Functions</h2></td></tr>
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -176,7 +212,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 3 2012 17:46:42 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 20 2012 14:26:28 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

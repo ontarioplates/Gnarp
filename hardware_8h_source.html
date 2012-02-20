@@ -47,6 +47,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Classes</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -91,42 +92,73 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00010"></a>00010 <span class="preprocessor">#include &lt;avr/interrupt.h&gt;</span>
 <a name="l00011"></a>00011 <span class="preprocessor">#include &lt;avr/io.h&gt;</span>
 <a name="l00012"></a>00012 
-<a name="l00013"></a><a class="code" href="hardware_8h.html#a171ef18ea7b584f85234640a918da857">00013</a> <span class="preprocessor">#define DEBOUNCE 8</span>
-<a name="l00014"></a><a class="code" href="hardware_8h.html#aea3ccefce70cb33234d4f2da59f2d2f2">00014</a> <span class="preprocessor"></span><span class="preprocessor">#define POT_MIN 0x00E0</span>
-<a name="l00015"></a><a class="code" href="hardware_8h.html#ac8d5e6e525a3a85550ed6aa7735f7c14">00015</a> <span class="preprocessor"></span><span class="preprocessor">#define POT_MAX 0x0FFF</span>
-<a name="l00016"></a>00016 <span class="preprocessor"></span>
-<a name="l00017"></a><a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">00017</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> {<a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728ea859308501a74dc19c751649b179900e1">TURN_NONE</a>, <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728ea4c940a96a49383a6f4bbfd2a4fa0d11d">TURN_CW</a>, <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728ea84812c2fea43fc6f2c184f52e0e46d34">TURN_CCW</a>}
-<a name="l00018"></a>00018 <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">turn_state</a>;
-<a name="l00019"></a>00019 
-<a name="l00020"></a><a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">00020</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> {<a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749a07a014328ff0accb92c7f1ac246b8b2c">EDGE_NONE</a>, <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749a2444f6a15da1112ae5a486f77359b0e2">EDGE_RISE</a>, <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749a696ac287421a5ca01318b7debb971b53">EDGE_FALL</a>}
-<a name="l00021"></a>00021 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a>;
-<a name="l00022"></a>00022     
-<a name="l00023"></a>00023 <span class="keywordtype">void</span> <a class="code" href="hardware_8h.html#afa402716aa64282819669dbfe0df67c2">initialize_hardware</a>();
-<a name="l00024"></a>00024 <span class="keywordtype">void</span> <a class="code" href="hardware_8h.html#a22f915145906ff3097528fb3d40a0172">read_hardware</a>();
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026 <span class="keywordtype">void</span> <a class="code" href="hardware_8h.html#ae3bcfd688ae5780845c3c702758af8f2">set_LEDs_on</a>(<span class="keywordtype">bool</span> status_LED, <span class="keywordtype">bool</span> decimal_point_0, <span class="keywordtype">bool</span> decimal_point_1, <span class="keywordtype">bool</span> decimal_point_2);
-<a name="l00027"></a>00027 <span class="keywordtype">void</span> <a class="code" href="hardware_8h.html#a93e3c6d0e8a4c6a165ede29d5891ea8d">set_LEDs_off</a>(<span class="keywordtype">bool</span> status_LED, <span class="keywordtype">bool</span> decimal_point_0, <span class="keywordtype">bool</span> decimal_point_1, <span class="keywordtype">bool</span> decimal_point_2);
-<a name="l00028"></a>00028 <span class="keywordtype">void</span> <a class="code" href="hardware_8h.html#a6a9d69161baa0f8f627ecb3a6bd3a24d">set_seven_segment_LEDs</a>(uint16_t seven_segment_value);
-<a name="l00029"></a>00029 <span class="keywordtype">void</span> <a class="code" href="hardware_8h.html#a39cb629b018651ffdb6f389bb88b21fe">postloop_functions</a>(<span class="keywordtype">bool</span> status_LED, <span class="keywordtype">bool</span> decimal_point_0, <span class="keywordtype">bool</span> decimal_point_1, <span class="keywordtype">bool</span> decimal_point_2, uint16_t seven_segment_value);
-<a name="l00030"></a>00030 
-<a name="l00031"></a>00031 <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">turn_state</a> <a class="code" href="hardware_8h.html#a5da9bd84ff1d9131e636f21a4c2b8b72">get_encoder</a>();
-<a name="l00032"></a>00032 uint16_t <a class="code" href="hardware_8h.html#ad630763be2e6dbc4321eee6c6f576113">get_pot_value</a>(uint8_t pot, uint16_t outmin, uint16_t outmax);
-<a name="l00033"></a>00033 <span class="keywordtype">bool</span> <a class="code" href="hardware_8h.html#a93aa106a4504d5835a44e5dc577add85">get_encoder_switch_state</a>();
-<a name="l00034"></a>00034 <span class="keywordtype">bool</span> <a class="code" href="hardware_8h.html#a61071a4f38c2399b4b62333b071b4bf7">get_pushbutton_switch_state</a>();
-<a name="l00035"></a>00035 <span class="keywordtype">bool</span> <a class="code" href="hardware_8h.html#a1b94fa50620123603c1664a64392ca94">get_toggle_switch_state</a>();
-<a name="l00036"></a>00036 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="hardware_8h.html#a082c9035476238f078b12c72f3b86645">get_encoder_switch_edge</a>();
-<a name="l00037"></a>00037 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="hardware_8h.html#a13721aeff72c47f60a05531f2c85504e">get_pushbutton_switch_edge</a>();
-<a name="l00038"></a>00038 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="hardware_8h.html#a20d3f06f44f09672f522ff0a129c3564">get_toggle_switch_edge</a>();
-<a name="l00039"></a>00039 
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 <span class="preprocessor">#endif </span><span class="comment">/* HARDWARE_H_ */</span>
+<a name="l00013"></a><a class="code" href="hardware_8h.html#a2a7015e49e130b180c278e17336d318f">00013</a> <span class="preprocessor">#define POT_FILTER_COEFF 20.0 </span>
+<a name="l00014"></a><a class="code" href="hardware_8h.html#a103d35f985ec321828356877c4edfa35">00014</a> <span class="preprocessor">#define NUM_POTS 5</span>
+<a name="l00015"></a><a class="code" href="hardware_8h.html#a171ef18ea7b584f85234640a918da857">00015</a> <span class="preprocessor"></span><span class="preprocessor">#define DEBOUNCE 8</span>
+<a name="l00016"></a><a class="code" href="hardware_8h.html#aea3ccefce70cb33234d4f2da59f2d2f2">00016</a> <span class="preprocessor"></span><span class="preprocessor">#define POT_MIN 0</span>
+<a name="l00017"></a><a class="code" href="hardware_8h.html#ac8d5e6e525a3a85550ed6aa7735f7c14">00017</a> <span class="preprocessor"></span><span class="preprocessor">#define POT_MAX 2047</span>
+<a name="l00018"></a>00018 <span class="preprocessor"></span>
+<a name="l00019"></a><a class="code" href="hardware_8h.html#af3ebe243a1ee098979edeedd9f4f0678">00019</a> <span class="preprocessor">#define ALL_EIGHT_POSITION_SWITCHES true</span>
+<a name="l00020"></a>00020 <span class="preprocessor"></span>
+<a name="l00021"></a><a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">00021</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> {<a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728ea859308501a74dc19c751649b179900e1">TURN_NONE</a>, <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728ea4c940a96a49383a6f4bbfd2a4fa0d11d">TURN_CW</a>, <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728ea84812c2fea43fc6f2c184f52e0e46d34">TURN_CCW</a>}
+<a name="l00022"></a>00022 <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">turn_state</a>;
+<a name="l00023"></a>00023 
+<a name="l00024"></a><a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">00024</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> {<a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749a07a014328ff0accb92c7f1ac246b8b2c">EDGE_NONE</a>, <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749a2444f6a15da1112ae5a486f77359b0e2">EDGE_RISE</a>, <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749a696ac287421a5ca01318b7debb971b53">EDGE_FALL</a>}
+<a name="l00025"></a>00025 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a>;
+<a name="l00026"></a>00026 
+<a name="l00027"></a><a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745a4a78d2895d5b6820a7af24835ca126b3">00027</a> <span class="keyword">typedef</span> <span class="keyword">enum</span> {<a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745a4a78d2895d5b6820a7af24835ca126b3">LED_STATUS</a>, <a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745a90056cc25e4bb63ce5174922ae259396">LED_DECIMAL_POINT_0</a>, <a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745a24827602d7282422cb99ea3f61599e5b">LED_DECIMAL_POINT_1</a>, <a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745a8d71593dade27977dc9e8c12dd1aa76e">LED_DECIMAL_POINT_2</a>}
+<a name="l00028"></a>00028 <a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745">LED_choose</a>;
+<a name="l00029"></a>00029 
+<a name="l00030"></a>00030 <span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="struct_hardware_manager.html" title="This structure stores the information for all the input hardware.">HardwareManager</a> <a class="code" href="struct_hardware_manager.html" title="This structure stores the information for all the input hardware.">HardwareManager</a>;
+<a name="l00031"></a>00031 
+<a name="l00035"></a><a class="code" href="struct_hardware_manager.html">00035</a> <span class="keyword">struct </span><a class="code" href="struct_hardware_manager.html" title="This structure stores the information for all the input hardware.">HardwareManager</a>{
+<a name="l00036"></a><a class="code" href="struct_hardware_manager.html#ad434feedcf483ba77023bb14c6805066">00036</a>     <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">turn_state</a> <a class="code" href="struct_hardware_manager.html#ad434feedcf483ba77023bb14c6805066" title="Tracks movement of the rotary encoder.">encoder_state</a>; 
+<a name="l00038"></a><a class="code" href="struct_hardware_manager.html#ac52aca93414706cd2610a2f30d47e6b2">00038</a>     <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="struct_hardware_manager.html#ac52aca93414706cd2610a2f30d47e6b2" title="Tracks movement of the pushbutton.">pushbutton_switch_edge</a>; 
+<a name="l00039"></a><a class="code" href="struct_hardware_manager.html#ae5e1e6ea1c2ca2debec4663bdf59654e">00039</a>     <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="struct_hardware_manager.html#ae5e1e6ea1c2ca2debec4663bdf59654e" title="Tracks movement of the toggle switch.">toggle_switch_edge</a>; 
+<a name="l00040"></a><a class="code" href="struct_hardware_manager.html#a8066b6e7469dffeff6a1f7168224e9dc">00040</a>     <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="struct_hardware_manager.html#a8066b6e7469dffeff6a1f7168224e9dc" title="Tracks movement of the encoder pushbutton.">encoder_switch_edge</a>; 
+<a name="l00042"></a><a class="code" href="struct_hardware_manager.html#affca91974e9f434e103a6a787d767fc0">00042</a>     <span class="keywordtype">bool</span> <a class="code" href="struct_hardware_manager.html#affca91974e9f434e103a6a787d767fc0" title="Current state of the pushbutton.">pushbutton_switch_state</a>; 
+<a name="l00043"></a><a class="code" href="struct_hardware_manager.html#a2daf7b741da8fbb6f9a5379f193a2f58">00043</a>     <span class="keywordtype">bool</span> <a class="code" href="struct_hardware_manager.html#a2daf7b741da8fbb6f9a5379f193a2f58" title="Current state of the toggle switch.">toggle_switch_state</a>; 
+<a name="l00044"></a><a class="code" href="struct_hardware_manager.html#adda34204ef936957112b399743c0c59a">00044</a>     <span class="keywordtype">bool</span> <a class="code" href="struct_hardware_manager.html#adda34204ef936957112b399743c0c59a" title="Current state of the encoder pushbutton.">encoder_switch_state</a>; 
+<a name="l00046"></a><a class="code" href="struct_hardware_manager.html#ac53de9d5a9f290b18bef339d23894925">00046</a>     uint16_t <a class="code" href="struct_hardware_manager.html#ac53de9d5a9f290b18bef339d23894925" title="Array of the raw values of each pot/switch (bounded by POT_MIN and POT_MAX)">pot_values</a>[5]; 
+<a name="l00047"></a>00047 };
+<a name="l00048"></a>00048 
+<a name="l00070"></a>00070 <a class="code" href="struct_hardware_manager.html" title="This structure stores the information for all the input hardware.">HardwareManager</a>* <a class="code" href="group__harware__functions.html#ga4dee1203ad585e562854acb0d4ee68ce" title="Initialize all necessary MCU registers for Hardware I/O.">initialize_hardware</a>();
+<a name="l00071"></a>00071 
+<a name="l00078"></a>00078 <span class="keywordtype">void</span> <a class="code" href="group__harware__functions.html#ga22f915145906ff3097528fb3d40a0172" title="Read the instantaneous hardware values and load them into the HardwareManager.">read_hardware</a>();
+<a name="l00079"></a>00079 
+<a name="l00085"></a>00085 <span class="keywordtype">void</span> <a class="code" href="group__harware__functions.html#gaf96f46b62125e25792da9356dd6dab1b" title="Turn on the specified LED.">set_LED_on</a>(<a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745">LED_choose</a> choice);
+<a name="l00086"></a>00086 
+<a name="l00092"></a>00092 <span class="keywordtype">void</span> <a class="code" href="group__harware__functions.html#ga0c7d079ca3dfb56a1c867153c29b8246" title="Turn off the specified LED.">set_LED_off</a>(<a class="code" href="hardware_8h.html#ae84b174f0f97be2633e1110dc913d745">LED_choose</a> choice);
+<a name="l00093"></a>00093 
+<a name="l00099"></a>00099 <span class="keywordtype">void</span> <a class="code" href="group__harware__functions.html#ga6a9d69161baa0f8f627ecb3a6bd3a24d" title="Illuminate the 7-segment display to the specified number.">set_seven_segment_LEDs</a>(uint16_t seven_segment_value);
+<a name="l00100"></a>00100 
+<a name="l00101"></a>00101 
+<a name="l00102"></a>00102 <span class="comment">//void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value);</span>
+<a name="l00103"></a>00103 
+<a name="l00111"></a>00111 <a class="code" href="hardware_8h.html#a9d5f29d21d52e2c8f4226e75de1b728e">turn_state</a> <a class="code" href="group__harware__functions.html#ga5da9bd84ff1d9131e636f21a4c2b8b72" title="Request the turn state of the rotary encoder.">get_encoder</a>();
+<a name="l00112"></a>00112 
+<a name="l00121"></a>00121 uint16_t <a class="code" href="group__harware__functions.html#gad630763be2e6dbc4321eee6c6f576113" title="Request a linearly scaled value of a specified pot (or rotary switch)">get_pot_value</a>(uint8_t pot, uint16_t outmin, uint16_t outmax);
+<a name="l00122"></a>00122 
+<a name="l00129"></a>00129 <span class="keywordtype">bool</span> <a class="code" href="group__harware__functions.html#ga93aa106a4504d5835a44e5dc577add85" title="Request the state of the encoder pushbutton.">get_encoder_switch_state</a>();
+<a name="l00130"></a>00130 
+<a name="l00137"></a>00137 <span class="keywordtype">bool</span> <a class="code" href="group__harware__functions.html#ga61071a4f38c2399b4b62333b071b4bf7" title="Request the state of the pushbutton.">get_pushbutton_switch_state</a>();
+<a name="l00138"></a>00138 
+<a name="l00145"></a>00145 <span class="keywordtype">bool</span> <a class="code" href="group__harware__functions.html#ga1b94fa50620123603c1664a64392ca94" title="Request the state of the toggle switch.">get_toggle_switch_state</a>();
+<a name="l00146"></a>00146 
+<a name="l00154"></a>00154 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="group__harware__functions.html#ga082c9035476238f078b12c72f3b86645" title="Request the transient state of the encoder pushbutton.">get_encoder_switch_edge</a>();
+<a name="l00155"></a>00155 
+<a name="l00163"></a>00163 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="group__harware__functions.html#ga13721aeff72c47f60a05531f2c85504e" title="Request the transient state of the pushbutton.">get_pushbutton_switch_edge</a>();
+<a name="l00164"></a>00164 
+<a name="l00172"></a>00172 <a class="code" href="hardware_8h.html#aeb51d8ece4460704b259a1c0ad98f749">switch_edge</a> <a class="code" href="group__harware__functions.html#ga20d3f06f44f09672f522ff0a129c3564" title="Request the transient state of the toggle switch.">get_toggle_switch_edge</a>();
+<a name="l00173"></a>00173 
+<a name="l00177"></a>00177 <span class="preprocessor">#endif </span><span class="comment">/* HARDWARE_H_ */</span>
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Defines</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Defines</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -138,7 +170,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 3 2012 17:46:42 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Feb 20 2012 14:26:28 for Gnarp by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
