@@ -21,7 +21,7 @@ static Note* allocate_note(NoteList* note_list){
 static void free_note(Note* note){
     note->pitch = 0;
     note->velocity = 0;
-	note->channel = 0;
+    note->channel = 0;
     note->status = 0;
     note->next_note_by_pitch = NULL;
     note->previous_note_by_pitch = NULL;
@@ -116,7 +116,7 @@ bool remove_note_by_pitch(NoteList* note_list, uint8_t pitch){
 //Change the velocity of an existing note
 static Note* update_note_velocity_and_channel(Note* note, uint8_t velocity, uint8_t channel){
     note->velocity = velocity;
-	note->channel = channel;
+    note->channel = channel;
 }
 
 //Allocate new note
@@ -135,7 +135,7 @@ static Note* add_note_at_previous_pitch(NoteList* note_list, Note* target_note, 
     //set data of new note
     new_note->pitch = pitch;
     new_note->velocity = velocity;
-	new_note->channel = channel;
+    new_note->channel = channel;
     
     //new_note is the only member of the list
     if (note_list->length == 1){

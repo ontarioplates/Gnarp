@@ -24,13 +24,13 @@ struct Note
      * @see NoteList.note_bank
      */
     bool    status;
-	
+    
     uint8_t pitch;      /**< Original MIDI pitch of the note (0-255)*/
     uint8_t velocity;   /**< Original MIDI velocity of the note (0-255)*/
-	uint8_t channel;    /**< Original MIDI channel of the note (0-15)*/
+    uint8_t channel;    /**< Original MIDI channel of the note (0-15)*/
 
     Note*   next_note_by_pitch;        /**< Pointer to the next highest pitched note*/
-	Note*   previous_note_by_pitch;    /**< Pointer to the next lowest pitched note*/
+    Note*   previous_note_by_pitch;    /**< Pointer to the next lowest pitched note*/
     Note*   next_note_by_trigger;      /**< Pointer to the subsequently triggered note*/
     Note*   previous_note_by_trigger;  /**< Pointer to the previously triggered note*/
 };
@@ -48,13 +48,13 @@ struct Note
 struct NoteList
 {
     uint8_t length; /**< Number of Notes in the notelist*/
-	
-	Note   note_bank[MAX_LIST_NOTES]; /**< The statically allocated array of Notes to store all the incoming info*/
-	
+    
+    Note   note_bank[MAX_LIST_NOTES]; /**< The statically allocated array of Notes to store all the incoming info*/
+    
     Note*   head_pitch;    /**< The Note with the lowest pitch*/
-	Note*   tail_pitch;    /**< The Note with the highest pitch*/
-	Note*   head_trigger;  /**< The least-recently triggered Note*/
-	Note*   tail_trigger;  /**< The most-recently triggered Note*/
+    Note*   tail_pitch;    /**< The Note with the highest pitch*/
+    Note*   head_trigger;  /**< The least-recently triggered Note*/
+    Note*   tail_trigger;  /**< The most-recently triggered Note*/
 };
 
 /**

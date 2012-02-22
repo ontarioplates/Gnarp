@@ -34,15 +34,15 @@ typedef struct HardwareManager HardwareManager;
  */
 struct HardwareManager{
     turn_state encoder_state; /**< Tracks movement of the rotary encoder*/
-	
+    
     switch_edge pushbutton_switch_edge; /**< Tracks movement of the pushbutton*/
     switch_edge toggle_switch_edge; /**< Tracks movement of the toggle switch*/
     switch_edge encoder_switch_edge; /**< Tracks movement of the encoder pushbutton*/
-	
+    
     bool pushbutton_switch_state; /**< Current state of the pushbutton*/
     bool toggle_switch_state; /**< Current state of the toggle switch*/
     bool encoder_switch_state; /**< Current state of the encoder pushbutton*/
-	
+    
     uint16_t pot_values[5]; /**< Array of the raw values of each pot/switch (bounded by #POT_MIN and #POT_MAX)*/
 };
 

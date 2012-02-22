@@ -3,19 +3,19 @@
 #include "hardware.h"
 
 static HardwareManager manager;
-	
+    
 void initialize_HardwareManager(){
-	manager.encoder_state = TURN_NONE;
+    manager.encoder_state = TURN_NONE;
     manager.pushbutton_switch_edge = EDGE_NONE;
     manager.toggle_switch_edge = EDGE_NONE;
     manager.encoder_switch_edge = EDGE_NONE;
     manager.pushbutton_switch_state = 0;
     manager.toggle_switch_state = 0;
     manager.encoder_switch_state = 0;
-	
-	for (uint8_t i = 0; i < NUM_POTS; i++)
+    
+    for (uint8_t i = 0; i < NUM_POTS; i++)
         manager.pot_values[i] = 0;
-}	
+}    
     
 static void initialize_clock(){
     //CLOCK AND PLL SETUP
@@ -94,7 +94,7 @@ static void initialize_pots(){
 
 static void read_pots(){
     volatile uint8_t i;
-	volatile int16_t new_reading;
+    volatile int16_t new_reading;
     
     //cycle through each ADC input and read the values
     //and set the variables appropriately
@@ -109,14 +109,14 @@ static void read_pots(){
         //load ADC value into the new variable
         new_reading = ADCA.CH0.RESL;
         new_reading |= ADCA.CH0.RESH << 8;
-		
-		if (new_reading < POT_MIN)
+        
+        if (new_reading < POT_MIN)
             new_reading = POT_MIN;
         else
             new_reading = new_reading - POT_MIN;
-		
-		//LPF on new value to reduce noise
-		manager.pot_values[i] = manager.pot_values[i] + (new_reading - (int16_t) manager.pot_values[i])/POT_FILTER_COEFF;
+        
+        //LPF on new value to reduce noise
+        manager.pot_values[i] = manager.pot_values[i] + (new_reading - (int16_t) manager.pot_values[i])/POT_FILTER_COEFF;
     }
     
 }
@@ -130,12 +130,12 @@ uint16_t get_pot_value(uint8_t pot_select, uint16_t output_min, uint16_t output_
     volatile float temp;
     
     temp = 1.0*manager.pot_values[pot_select]/pot_range;
-	
-	if (ALL_EIGHT_POSITION_SWITCHES && output_max <= 7)
+    
+    if (ALL_EIGHT_POSITION_SWITCHES && output_max <= 7)
         temp = temp*(7 - output_min + 1) + output_min;
-	else
+    else
         temp = temp*(output_max - output_min + 1) + output_min;
-		
+        
     if (temp > output_max)
         temp = output_max;
         
@@ -184,30 +184,30 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
 
 void set_LED_on(LED_choose choice){
     //booleans and such convert to LED out
-	switch(choice){
-		case LED_STATUS:            PORTC.OUTCLR = 0x08;
-		                            break;
-		case LED_DECIMAL_POINT_0:   PORTD.OUTSET = 0x04;
-		                            break;
-		case LED_DECIMAL_POINT_1:   PORTD.OUTSET = 0x01;
-		                            break;
-		case LED_DECIMAL_POINT_2:   PORTD.OUTSET = 0x02;
-		                            break;
-	}
+    switch(choice){
+        case LED_STATUS:            PORTC.OUTCLR = 0x08;
+                                    break;
+        case LED_DECIMAL_POINT_0:   PORTD.OUTSET = 0x04;
+                                    break;
+        case LED_DECIMAL_POINT_1:   PORTD.OUTSET = 0x01;
+                                    break;
+        case LED_DECIMAL_POINT_2:   PORTD.OUTSET = 0x02;
+                                    break;
+    }
 }
 
 void set_LED_off(LED_choose choice){
     //booleans and such convert to LED out
-	switch(choice){
-		case LED_STATUS:            PORTC.OUTSET = 0x08;
-		                            break;
-		case LED_DECIMAL_POINT_0:   PORTD.OUTCLR = 0x04;
-		                            break;
-		case LED_DECIMAL_POINT_1:   PORTD.OUTCLR = 0x01;
-		                            break;
-		case LED_DECIMAL_POINT_2:   PORTD.OUTCLR = 0x02;
-		                            break;
-	}
+    switch(choice){
+        case LED_STATUS:            PORTC.OUTSET = 0x08;
+                                    break;
+        case LED_DECIMAL_POINT_0:   PORTD.OUTCLR = 0x04;
+                                    break;
+        case LED_DECIMAL_POINT_1:   PORTD.OUTCLR = 0x01;
+                                    break;
+        case LED_DECIMAL_POINT_2:   PORTD.OUTCLR = 0x02;
+                                    break;
+    }
 }
 
 static void initialize_switches(){
@@ -323,14 +323,14 @@ switch_edge get_toggle_switch_edge(){
 }
 
 HardwareManager* initialize_hardware(){
-	initialize_HardwareManager();
+    initialize_HardwareManager();
     initialize_clock();
     initialize_MIDI();
     initialize_pots();
     initialize_switches();
     initialize_encoder();
     initialize_LEDs();
-	return &manager;
+    return &manager;
 }
 
 void read_hardware(){

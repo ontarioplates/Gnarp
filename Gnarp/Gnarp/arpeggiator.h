@@ -14,8 +14,9 @@
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
 #define MIRROR_EDGE_DOUBLE true
+#define RESTART_DELAY_IN_MS 500
 
-//correlate pots to control each parameter of the arpeggiator	
+//correlate pots to control each parameter of the arpeggiator    
 #define POT_SEL_OCTAVE 3
 #define POT_SEL_REPEAT 4
 #define POT_SEL_DIVISION 2
@@ -43,7 +44,7 @@ note_time_variation;
 
 struct Sequencer
 {
-	bool    enable;
+    bool    enable;
     bool    run_status;
     bool    play_status;
     bool    rebuild_play_list;
