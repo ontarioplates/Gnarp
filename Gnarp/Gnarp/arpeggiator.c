@@ -353,7 +353,7 @@ static void increment_play_list_indeces(Sequencer* sequencer){
 }
 
 
-static void set_sequencer_parameters(Sequencer* sequencer, bool restart){
+void set_sequencer_parameters(Sequencer* sequencer, bool restart){
     //read the new values from the pots
     volatile uint8_t octave_max_new = get_pot_value(POT_SEL_OCTAVE, POT_MIN_OCTAVE, POT_MAX_OCTAVE);
     volatile uint8_t repeat_max_new = get_pot_value(POT_SEL_REPEAT, POT_MIN_REPEAT, POT_MAX_REPEAT);

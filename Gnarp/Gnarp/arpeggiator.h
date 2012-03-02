@@ -81,6 +81,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop);
 void bpm_change_postprocess(Sequencer* sequencer);
 void disable_sequencer(Sequencer* sequencer);
 void enable_sequencer(Sequencer* sequencer);
+void set_sequencer_parameters(Sequencer* sequencer, bool restart);
 
 
 #endif /* ARPEGGIATOR_H_ */

@@ -10,7 +10,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#define POT_FILTER_COEFF 20.0 /**< LPF coefficient used while reading pots and rotary switches.  As this increases, value changes will be slower and noise is reduced.*/
+#define POT_FILTER_COEFF 10.0 /**< LPF coefficient used while reading pots and rotary switches.  As this increases, value changes will be slower and noise is reduced.*/
 #define NUM_POTS 5
 #define DEBOUNCE 8
 #define POT_MIN 0

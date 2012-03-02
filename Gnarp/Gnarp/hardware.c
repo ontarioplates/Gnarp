@@ -84,7 +84,7 @@ static void initialize_pots(){
     ADCA.CTRLB = 0x10;          //ADC to signed mode
     ADCA.REFCTRL = 0x20;        //set PORTA reference voltage
     ADCA.EVCTRL = 0x00;
-    ADCA.PRESCALER = 0x01;     //set prescaler to clk/8 for accuracy
+    ADCA.PRESCALER = 0x02;     //set prescaler to clk/16 for accuracy
     ADCA.INTFLAGS = 0x00;
     ADCA.CTRLA |= 0x01;         //enable ADC
     ADCA.CH0.CTRL = 0x01;       //select external single-ended input
