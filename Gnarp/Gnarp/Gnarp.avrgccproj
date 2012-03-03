@@ -21,7 +21,7 @@
     <AssemblyName>GnarpAVRSTUDIO</AssemblyName>
     <Name>GnarpAVRSTUDIO</Name>
     <RootNamespace>GnarpAVRSTUDIO</RootNamespace>
-    <avrtool>com.atmel.avrdbg.tool.avrdragon</avrtool>
+    <avrtool>com.atmel.avrdbg.tool.jtagicemkii</avrtool>
     <com_atmel_avrdbg_tool_avrdragon>
       <ToolType>com.atmel.avrdbg.tool.avrdragon</ToolType>
       <ToolName>AVR Dragon</ToolName>
@@ -54,7 +54,7 @@
       </ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1057</port>
+        <port>4147</port>
         <ssl>False</ssl>
       </Channel>
     </com_atmel_avrdbg_tool_simulator>
@@ -64,7 +64,7 @@
       <ToolNumber>00B000006113</ToolNumber>
       <Channel>
         <host>127.0.0.1</host>
-        <port>1496</port>
+        <port>4147</port>
         <ssl>False</ssl>
       </Channel>
       <ToolOptions>

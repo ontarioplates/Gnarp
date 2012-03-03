@@ -1,3 +1,9 @@
 html/
+<<<<<<< HEAD
 *.o
 *.d
+=======
+Gnarp/Gnarp/Debug/
+*.tmp
+TcfTransactionLog.csv
+>>>>>>> origin/master

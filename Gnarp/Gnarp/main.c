@@ -14,7 +14,7 @@
 
 static Sequencer sequencer;
 static MidiDevice midi_device;
-static Hardware_Manager* manager_ptr;
+static HardwareManager* manager_ptr;
 
 ISR(USARTD1_RXC_vect){
     midi_device_input(&midi_device,1,&(USARTD1.DATA));
@@ -31,6 +31,19 @@ ISR(TCC0_CCB_vect){
 ISR(TCC0_CCC_vect){
     //stop the sequencer note without a full stop
     stop_sequencer(&sequencer, 0);
+}
+
+//interrupt for sequencer restart delay
+ISR(TCC1_CCA_vect){
+    //stop and reset the counter
+    TCC1.CTRLA = 0;
+    TCC1.CNT = 0;
+    
+    //disable CCA compare
+    TCC1.CTRLB &= ~0x10;
+    
+   //restart the sequencer
+//   continue_sequencer(&sequencer, 1);
 }
 
 
@@ -54,23 +67,23 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 
 int main(void) {
     const uint16_t initial_BPM = 120;
-	
-	uint16_t BPM_add;
-	
+    
+    uint16_t BPM_add;
+    
     manager_ptr = initialize_hardware();
-	
+    
     initialize_sequencer(&sequencer);
-	
-	initialize_serial_midi(&midi_device, &sequencer);
-	
+    
+    initialize_serial_midi(&midi_device, &sequencer);
+    
     initialize_beat_clock(initial_BPM);
-	
+    
     set_seven_segment_LEDs(get_BPM());
-	
-	read_hardware();
-	
-	if (get_toggle_switch_state())
-	    enable_sequencer(&sequencer);
+    
+    read_hardware();
+    
+    if (get_toggle_switch_state())
+        enable_sequencer(&sequencer);
 
    /* while(1){
         read_hardware();
@@ -81,48 +94,80 @@ int main(void) {
             decrement_BPM();    
         
         set_seven_segment_LEDs(sequencer.repeat_max);
-		
+        
         if (get_pushbutton_switch_edge() == EDGE_RISE)
-		    continue_sequencer(&sequencer, 1);
+            continue_sequencer(&sequencer, 1);
 
-		if (get_toggle_switch_edge() == EDGE_FALL){
-		    stop_sequencer(&sequencer, 1);
-		}			
-		else if (get_encoder_switch_edge() == EDGE_RISE){
-			continue_sequencer(&sequencer, 1);
-		}				    
+        if (get_toggle_switch_edge() == EDGE_FALL){
+            stop_sequencer(&sequencer, 1);
+        }            
+        else if (get_encoder_switch_edge() == EDGE_RISE){
+            continue_sequencer(&sequencer, 1);
+        }                    
     }*/
-	
     
+    uint16_t display_select = 0;
+	uint16_t number_to_display;
     while(1){
         read_hardware();
 		
-		if (get_encoder_switch_state())
-		    BPM_add = 5;
-		else
-		    BPM_add = 1;
+		set_sequencer_parameters(&sequencer,0);
+		
+		if (get_encoder_switch_edge() == EDGE_RISE){
+			display_select++;
+			if (display_select > 4)
+			    display_select = 0;
+		}
+		
+		if (get_encoder_switch_state()){
+		    set_seven_segment_LEDs(display_select);
+			continue;
+	    }			
+				
+		switch (display_select){
+			case POT_SEL_DIVISION:  number_to_display = sequencer.division;
+					                break;
+			case POT_SEL_REPEAT:  number_to_display = sequencer.repeat_max;
+					                break;
+			case POT_SEL_PATTERN:  number_to_display = sequencer.pattern;
+					                break;
+			case POT_SEL_OCTAVE:  number_to_display = sequencer.octave_max;
+					                break;
+			case POT_SEL_DURATION:  number_to_display = sequencer.duration;
+					                break;
+		}
+        
+		set_seven_segment_LEDs(number_to_display);
+		
+		continue;
+        
+        
+        if (get_encoder_switch_state())
+            BPM_add = 5;
+        else
+            BPM_add = 1;
         
         if (get_encoder() == TURN_CW){
             if (increment_BPM(BPM_add)){
-			    bpm_change_postprocess(&sequencer);
+                bpm_change_postprocess(&sequencer);
                 set_seven_segment_LEDs(get_BPM());
-			}				
+            }                
         }
         else if (get_encoder() == TURN_CCW){
             if (decrement_BPM(BPM_add)){
-			    bpm_change_postprocess(&sequencer);
+                bpm_change_postprocess(&sequencer);
                 set_seven_segment_LEDs(get_BPM());
-			}				
+            }                
         }
         
         if (get_pushbutton_switch_edge() == EDGE_RISE)
             continue_sequencer(&sequencer, 1);
-			
-		if (get_toggle_switch_edge() == EDGE_FALL)
+            
+        if (get_toggle_switch_edge() == EDGE_FALL)
             disable_sequencer(&sequencer);
-			
-		if (get_toggle_switch_edge() == EDGE_RISE)
-		    enable_sequencer(&sequencer);
+            
+        if (get_toggle_switch_edge() == EDGE_RISE)
+            enable_sequencer(&sequencer);
     }
                
     return 0;

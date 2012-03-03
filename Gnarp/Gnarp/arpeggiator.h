@@ -14,8 +14,9 @@
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
 #define MIRROR_EDGE_DOUBLE true
+#define RESTART_DELAY_IN_MS 500
 
-//correlate pots to control each parameter of the arpeggiator	
+//correlate pots to control each parameter of the arpeggiator    
 #define POT_SEL_OCTAVE 3
 #define POT_SEL_REPEAT 4
 #define POT_SEL_DIVISION 2
@@ -43,7 +44,7 @@ note_time_variation;
 
 struct Sequencer
 {
-	bool    enable;
+    bool    enable;
     bool    run_status;
     bool    play_status;
     bool    rebuild_play_list;
@@ -71,7 +72,7 @@ typedef struct Sequencer Sequencer;
 
 void adjust_sequencer_to_bpm(Sequencer* sequencer);
 void initialize_sequencer(Sequencer* sequencer);
-void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity);
+void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity, uint8_t channel);
 void remove_note_from_arpeggiator(Sequencer*, uint8_t pitch);
 
 void continue_sequencer(Sequencer* sequencer, bool restart);
@@ -80,6 +81,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop);
 void bpm_change_postprocess(Sequencer* sequencer);
 void disable_sequencer(Sequencer* sequencer);
 void enable_sequencer(Sequencer* sequencer);
+void set_sequencer_parameters(Sequencer* sequencer, bool restart);
 
 
 #endif /* ARPEGGIATOR_H_ */
