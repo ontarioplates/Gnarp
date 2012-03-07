@@ -505,8 +505,8 @@ void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t veloci
     if (insert_note(&(sequencer->note_list), pitch, velocity, channel)){
         sequencer->rebuild_play_list = 1;   
 
-        if (!sequencer->run_status)
-            delayed_restart();                  
+      /*  if (!sequencer->run_status)
+            delayed_restart();                  */
     }
 }
 
@@ -518,10 +518,12 @@ void remove_note_from_arpeggiator(Sequencer* sequencer, uint8_t pitch){
     //if note is playing, stop it
     if (sequencer->play_list[sequencer->note_index]->pitch == pitch)
         stop_sequencer(sequencer,0);
-        
+    
+	//if the note was successfully removed, flag to rebuild the playlist
     if (remove_note_by_pitch(&(sequencer->note_list), pitch)){
         sequencer->rebuild_play_list = 1;
         
+		//if there are no notes in the list, completely stop the sequencer
         if (sequencer->note_list.length == 0)
             stop_sequencer(sequencer, 1);
     }    
