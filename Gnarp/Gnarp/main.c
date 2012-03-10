@@ -42,8 +42,8 @@ ISR(TCC1_CCA_vect){
     //disable CCA compare
     TCC1.CTRLB &= ~0x10;
     
-   //restart the sequencer
-//   continue_sequencer(&sequencer, 1);
+    //restart the sequencer
+    continue_sequencer(&sequencer, 1);
 }
 
 

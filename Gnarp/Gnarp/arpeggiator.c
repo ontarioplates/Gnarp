@@ -128,16 +128,14 @@ static void calculate_stop_time_increment(Sequencer* sequencer){
 //Reset all data in the sequencer
 void initialize_sequencer(Sequencer* sequencer){  
     uint8_t i;
-    
-    //disable CCB (note on) and CCC (note off) interrupts
-    TCC0.CTRLB &= ~0x20; 
-    TCC0.CTRLB &= ~0x40;
-    
-    //configure CCB and CCC as mid-level interrupts
+	
+    //disable CCB (note-on) and CCC (note-off) interrupts
     TCC0.INTCTRLB &= ~0x30;
-    TCC0.INTCTRLB |= 0x20;
     TCC0.INTCTRLB &= ~0x0C;
-    TCC0.INTCTRLB |= 0x08;
+	
+	//clear CCB (note-on) and CCC (note-off) interrupt flags
+	TCC0.INTFLAGS |= 0x20;
+	TCC0.INTFLAGS |= 0x40;
     
     //initialize the note list
     initialize_note_list(&(sequencer->note_list));
@@ -397,13 +395,17 @@ void set_sequencer_parameters(Sequencer* sequencer, bool restart){
 }
 
 void continue_sequencer(Sequencer* sequencer, bool restart){
-    //disable noteon and noteoff timer compares
+    //disable CCB (note-on) and CCC (note-off) timer compares
     TCC0.CTRLB &= ~0x20; 
     TCC0.CTRLB &= ~0x40;
     
-    //clear noteon and noteoff interrupt flags
-    TCC0.INTFLAGS |= 0x20;
-    TCC0.INTFLAGS |= 0x40;
+    //disable CCB (note-on) and CCC (note-off) interrupts
+    TCC0.INTCTRLB &= ~0x30;
+    TCC0.INTCTRLB &= ~0x0C;
+	
+	//clear CCB (note-on) and CCC (note-off) interrupt flags
+	TCC0.INTFLAGS |= 0x20;
+	TCC0.INTFLAGS |= 0x40;
     
     volatile uint32_t current_time;
     volatile uint32_t next_start_time;
@@ -441,6 +443,10 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     //assign values to compare registers
     TCC0.CCB = (uint16_t) next_start_time;
     TCC0.CCC = (uint16_t) next_stop_time;
+	
+	//enable CCB (note-on) and CCC (note-off) compares
+    TCC0.CTRLB |= 0x20; 
+    TCC0.CTRLB |= 0x40;	
     
     //rebuild the pattern if necessary
     if (sequencer->rebuild_play_list)
@@ -464,18 +470,21 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     //set run flag
     sequencer->run_status = 1;
     
-    //enable note on and note off timer compares
-    TCC0.CTRLB |= 0x20; 
-    TCC0.CTRLB |= 0x40;
+    //enable CCB (note-on) and CCC (note-off) interrupts (mid-level)
+    TCC0.INTCTRLB |= 0x20;
+    TCC0.INTCTRLB |= 0x08;
 }
 
-void stop_sequencer(Sequencer* sequencer, bool full_stop){    
-    //disable CCB (note on) and CCC (note off) interrupts
-    TCC0.CTRLB &= ~0x20; 
-    TCC0.CTRLB &= ~0x40;
+void stop_sequencer(Sequencer* sequencer, bool full_stop){
+    //disable CCC (note-off) timer compares
+    TCC0.CTRLB &= ~0x20;
     
-    //clear note off interrupt flag
-    TCC0.INTFLAGS |= 0x40;
+    //disable CCB (note-on) and CCC (note-off) interrupts
+    TCC0.INTCTRLB &= ~0x30;
+    TCC0.INTCTRLB &= ~0x0C;
+	
+	//clear CCC (note-off) interrupt flags
+	TCC0.INTFLAGS |= 0x40;
     
     if (!(sequencer->enable) || (sequencer->note_list.length == 0)){
         sequencer->run_status = 0;
@@ -494,7 +503,7 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     if (full_stop)
         sequencer->run_status = 0;
     else    
-        TCC0.CTRLB |= 0x20;
+        TCC0.INTCTRLB |= 0x08;
 }
 
 void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t velocity, uint8_t channel){
@@ -505,8 +514,8 @@ void add_note_to_arpeggiator(Sequencer* sequencer, uint8_t pitch, uint8_t veloci
     if (insert_note(&(sequencer->note_list), pitch, velocity, channel)){
         sequencer->rebuild_play_list = 1;   
 
-      /*  if (!sequencer->run_status)
-            delayed_restart();                  */
+        if (!sequencer->run_status)
+            delayed_restart();                  
     }
 }
 

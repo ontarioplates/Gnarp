@@ -14,7 +14,7 @@
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
 #define MIRROR_EDGE_DOUBLE true
-#define RESTART_DELAY_IN_MS 500
+#define RESTART_DELAY_IN_MS 50
 
 //correlate pots to control each parameter of the arpeggiator    
 #define POT_SEL_OCTAVE 3
