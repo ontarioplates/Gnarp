@@ -4,16 +4,35 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/eeprom.h>
 #include "./xnorMIDI/midi.h"
 
 #include "serial_midi.h"
 #include "hardware.h"
 
-static void initialize_delayed_restart(){
+uint8_t initialize_delayed_restart(uint16_t new_delay_value, bool write_to_eeprom){
     //(1 tick / 1024 cycles)(24*10^6 cycles / 1 second)(1 second / 1000 milliseconds)(x milliseconds / 1 compare)
     const float compare_factor = 23.4375;
+	
+	//retrieve delay value from the eeprom on the first call
+	static bool first_time = true;	
+	static int8_t delay_value_in_ms;	
+	if (first_time)
+	    delay_value_in_ms = eeprom_read_byte(EEPROM_ADDR_DELAY);
+	first_time = false;
+	
+	//write to the eeprom and exit if the flag is set
+	if (write_to_eeprom){
+	    eeprom_write_byte(EEPROM_ADDR_DELAY, (uint8_t) delay_value_in_ms);
+		return delay_value_in_ms;
+	}		
+	
+	//update the value if it's valid
+	if (new_delay_value < 256)
+	    delay_value_in_ms = new_delay_value;
     
-    int16_t compare_value = compare_factor * RESTART_DELAY_IN_MS;
+	//multiply for counter compare value
+    int16_t compare_value = compare_factor * delay_value_in_ms;
     
     //stop and reset the counter
     TCC1.CTRLA = 0;
@@ -29,6 +48,9 @@ static void initialize_delayed_restart(){
     //configure CCA as low-level interrupt
     TCC1.INTCTRLB &= ~0x03;
     TCC1.INTCTRLB |= 0x01;
+	
+	//return the current delay in ms
+	return delay_value_in_ms;
 }
 
 static void delayed_restart(){    
@@ -140,8 +162,8 @@ void initialize_sequencer(Sequencer* sequencer){
     //initialize the note list
     initialize_note_list(&(sequencer->note_list));
     
-    //initialize the delayed restart timer
-    initialize_delayed_restart();
+    //initialize the delayed restart timer, set to value>256 to disable update
+    initialize_delayed_restart(257, 0);
     
     //empty the play list
     for (i = 0; i < MAX_PLAY_NOTES; i++)

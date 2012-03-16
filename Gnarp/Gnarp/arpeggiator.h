@@ -14,6 +14,8 @@
 #define MIDI_OCTAVE 12
 #define RAND_BUFF 10
 #define MIRROR_EDGE_DOUBLE true
+
+#define EEPROM_ADDR_DELAY (uint8_t*)0
 #define RESTART_DELAY_IN_MS 50
 
 //correlate pots to control each parameter of the arpeggiator    
@@ -82,6 +84,8 @@ void bpm_change_postprocess(Sequencer* sequencer);
 void disable_sequencer(Sequencer* sequencer);
 void enable_sequencer(Sequencer* sequencer);
 void set_sequencer_parameters(Sequencer* sequencer, bool restart);
+
+uint8_t initialize_delayed_restart(uint16_t new_delay_value, bool write_to_eeprom);
 
 
 #endif /* ARPEGGIATOR_H_ */

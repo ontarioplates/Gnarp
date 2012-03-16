@@ -7,10 +7,13 @@
 #include <stdint.h>
 
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 
 #include "hardware.h"
 #include "serial_midi.h"
 #include "arpeggiator.h"
+
+#define TEST_EEPROM_ADDR (uint16_t*)0
 
 static Sequencer sequencer;
 static MidiDevice midi_device;
@@ -65,6 +68,31 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
     midi_device_process(midi_device);
 }
 
+void edit_delayed_restart(){
+	//read the current value
+	uint8_t delay_value_in_ms = initialize_delayed_restart(257,0);
+	
+	while(1){
+		read_hardware();
+		
+		//display the delayed_restart value
+		set_seven_segment_LEDs(delay_value_in_ms);
+		
+		//adjust the value in RAM (this should affect the note sounds
+		if (get_encoder() == TURN_CW && delay_value_in_ms < 255)
+		    initialize_delayed_restart(++delay_value_in_ms, 0);
+		if (get_encoder() == TURN_CCW && delay_value_in_ms > 0)
+		    initialize_delayed_restart(--delay_value_in_ms, 0);
+		
+		
+		//press the encoder to save the value into EEPROM and exit edit mode                	
+		if (get_encoder_switch_edge() == EDGE_RISE){
+			initialize_delayed_restart(257, 1);
+			return;
+		}			
+	}
+}
+
 int main(void) {
     const uint16_t initial_BPM = 120;
     
@@ -84,9 +112,36 @@ int main(void) {
     
     if (get_toggle_switch_state())
         enable_sequencer(&sequencer);
-
+	
+/*	uint16_t eeprom_data = eeprom_read_byte(TEST_EEPROM_ADDR);
+	
+    while(1){
+		read_hardware();
+		
+		set_seven_segment_LEDs(eeprom_data);
+		
+		if (get_encoder() == TURN_CW && eeprom_data < 0xff)
+		    eeprom_data++;
+		if (get_encoder() == TURN_CCW && eeprom_data > 0)
+		    eeprom_data--;
+		
+		if (get_encoder_switch_edge() == EDGE_RISE){
+		    eeprom_write_byte(TEST_EEPROM_ADDR, eeprom_data);
+		    set_LED_on(LED_STATUS);
+		}			
+		if (get_encoder_switch_edge() == EDGE_FALL){
+		    set_LED_off(LED_STATUS);
+		}
+	}
+*/	
     while(1){
         read_hardware();
+		
+		//press the encoder and pushbutton to enter edit mode for the delayed restart
+		if (get_encoder_switch_state() && get_pushbutton_switch_state()){
+		    edit_delayed_restart();
+			set_seven_segment_LEDs(get_BPM());
+		}			
 		
         if (get_encoder_switch_state())
             BPM_add = 5;
@@ -116,7 +171,7 @@ int main(void) {
             enable_sequencer(&sequencer);
     }
 	
-	
+
                
     return 0;
 }
