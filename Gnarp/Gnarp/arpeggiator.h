@@ -35,7 +35,7 @@
 #define POT_MAX_REPEAT 7
 #define POT_MAX_DIVISION 6
 #define POT_MAX_DURATION 255
-#define POT_MAX_PATTERN 4
+#define POT_MAX_PATTERN 5
 
 
 typedef enum {QUARTER, EIGHTH, SIXTEENTH}

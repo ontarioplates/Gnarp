@@ -166,6 +166,12 @@
     <Compile Include="serial_midi.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="test_log.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="test_log.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="xnorMIDI\bytequeue\bytequeue.c">
       <SubType>compile</SubType>
     </Compile>

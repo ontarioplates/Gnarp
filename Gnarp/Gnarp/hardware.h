@@ -59,6 +59,8 @@ struct HardwareManager{
  * @{
  */
 
+HardwareManager* get_hardware_manager_ptr();
+
 /**
  * @brief Initialize all necessary MCU registers for Hardware I/O
  * 

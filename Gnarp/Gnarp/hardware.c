@@ -3,6 +3,10 @@
 #include "hardware.h"
 
 static HardwareManager manager;
+
+get_hardware_manager_ptr(){
+	return &manager;
+}	
     
 void initialize_HardwareManager(){
     manager.encoder_state = TURN_NONE;

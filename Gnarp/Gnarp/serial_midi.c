@@ -1,6 +1,7 @@
 // Copyright (c) 2012, David Tuzman, All Right Reserved
 
 #include "serial_midi.h"
+#include "test_log.h"
 
 #include "./xnorMIDI/midi.h"
 #include <avr/io.h>
@@ -13,6 +14,9 @@ MidiDevice* get_midi_device() {
 }
 
 void serial_midi_send(MidiDevice* midi_device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
+	//debug routine to produce logs
+	create_log(uint8_t inByte0, uint8_t inByte1, uint8_t inByte2);
+	
    //we always send the first byte
     while (!(USARTD1.STATUS & 0x20)){}; // Wait for empty transmit buffer
     USARTD1.DATA = inByte0;
@@ -70,6 +74,5 @@ void serial_midi_config_bypass(MidiDevice* midi_device){
     midi_register_catchall_callback(midi_device, serial_midi_send);
     
     //disable THRU for only non-arpeggiator messages
-    midi_register_fallthrough_callback(midi_device, NULL);
-    
+    midi_register_fallthrough_callback(midi_device, NULL);   
 }
