@@ -4,7 +4,7 @@
 
 static HardwareManager manager;
 
-get_hardware_manager_ptr(){
+HardwareManager* get_hardware_manager_ptr(){
 	return &manager;
 }	
     

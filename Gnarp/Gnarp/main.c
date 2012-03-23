@@ -12,6 +12,7 @@
 #include "hardware.h"
 #include "serial_midi.h"
 #include "arpeggiator.h"
+#include "beat_clock.h"
 
 #define TEST_EEPROM_ADDR (uint16_t*)0
 

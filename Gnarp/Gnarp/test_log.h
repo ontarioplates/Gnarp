@@ -3,14 +3,21 @@
 #ifndef TEST_LOG_H_
 #define TEST_LOG_H_
 
-struct LogEntry
-{
-	uint
-	
+#include <stdint.h>
+#include <stdbool.h>
+
+#include "hardware.h"
+
+typedef struct LogEntry LogEntry;
+
+struct LogEntry {
+	uint16_t timestamp;
+	bool midi_in_flag;
+	uint8_t midi_message[3];
     HardwareManager hardware_snapshot;
 };
 
-typedef struct LogEntry LogEntry;
+
 
 
 
