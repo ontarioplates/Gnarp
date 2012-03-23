@@ -17,7 +17,7 @@
 #define LOG_EEPROM_INITAL_ADDR 3
 
 const size_t size_of_log_entry = sizeof(LogEntry);
-
+//
 static uint16_t log_array_index = 0;
 static LogEntry log_array[LOG_BLOCK_SIZE];
 static bool all_logs_valid = false;
