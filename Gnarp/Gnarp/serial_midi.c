@@ -14,9 +14,9 @@ MidiDevice* get_midi_device() {
 }
 
 void serial_midi_send(MidiDevice* midi_device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
-	//debug routine to produce logs
-	//create_log(uint8_t inByte0, uint8_t inByte1, uint8_t inByte2);
-	
+    //debug routine to produce logs
+    //create_log(uint8_t inByte0, uint8_t inByte1, uint8_t inByte2);
+    
    //we always send the first byte
     while (!(USARTD1.STATUS & 0x20)){}; // Wait for empty transmit buffer
     USARTD1.DATA = inByte0;

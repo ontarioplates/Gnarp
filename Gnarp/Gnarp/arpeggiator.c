@@ -13,25 +13,25 @@
 uint8_t initialize_delayed_restart(uint16_t new_delay_value, bool write_to_eeprom){
     //(1 tick / 1024 cycles)(24*10^6 cycles / 1 second)(1 second / 1000 milliseconds)(x milliseconds / 1 compare)
     const float compare_factor = 23.4375;
-	
-	//retrieve delay value from the eeprom on the first call
-	static bool first_time = true;	
-	static int8_t delay_value_in_ms;	
-	if (first_time)
-	    delay_value_in_ms = eeprom_read_byte(EEPROM_ADDR_DELAY);
-	first_time = false;
-	
-	//write to the eeprom and exit if the flag is set
-	if (write_to_eeprom){
-	    eeprom_write_byte(EEPROM_ADDR_DELAY, (uint8_t) delay_value_in_ms);
-		return delay_value_in_ms;
-	}		
-	
-	//update the value if it's valid
-	if (new_delay_value < 256)
-	    delay_value_in_ms = new_delay_value;
     
-	//multiply for counter compare value
+    //retrieve delay value from the eeprom on the first call
+    static bool first_time = true;    
+    static int8_t delay_value_in_ms;    
+    if (first_time)
+        delay_value_in_ms = eeprom_read_byte(EEPROM_ADDR_DELAY);
+    first_time = false;
+    
+    //write to the eeprom and exit if the flag is set
+    if (write_to_eeprom){
+        eeprom_write_byte(EEPROM_ADDR_DELAY, (uint8_t) delay_value_in_ms);
+        return delay_value_in_ms;
+    }        
+    
+    //update the value if it's valid
+    if (new_delay_value < 256)
+        delay_value_in_ms = new_delay_value;
+    
+    //multiply for counter compare value
     int16_t compare_value = compare_factor * delay_value_in_ms;
     
     //stop and reset the counter
@@ -48,9 +48,9 @@ uint8_t initialize_delayed_restart(uint16_t new_delay_value, bool write_to_eepro
     //configure CCA as low-level interrupt
     TCC1.INTCTRLB &= ~0x03;
     TCC1.INTCTRLB |= 0x01;
-	
-	//return the current delay in ms
-	return delay_value_in_ms;
+    
+    //return the current delay in ms
+    return delay_value_in_ms;
 }
 
 static void delayed_restart(){    
@@ -150,14 +150,14 @@ static void calculate_stop_time_increment(Sequencer* sequencer){
 //Reset all data in the sequencer
 void initialize_sequencer(Sequencer* sequencer){  
     uint8_t i;
-	
+    
     //disable CCB (note-on) and CCC (note-off) interrupts
     TCC0.INTCTRLB &= ~0x30;
     TCC0.INTCTRLB &= ~0x0C;
-	
-	//clear CCB (note-on) and CCC (note-off) interrupt flags
-	TCC0.INTFLAGS |= 0x20;
-	TCC0.INTFLAGS |= 0x40;
+    
+    //clear CCB (note-on) and CCC (note-off) interrupt flags
+    TCC0.INTFLAGS |= 0x20;
+    TCC0.INTFLAGS |= 0x40;
     
     //initialize the note list
     initialize_note_list(&(sequencer->note_list));
@@ -424,10 +424,10 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     //disable CCB (note-on) and CCC (note-off) interrupts
     TCC0.INTCTRLB &= ~0x30;
     TCC0.INTCTRLB &= ~0x0C;
-	
-	//clear CCB (note-on) and CCC (note-off) interrupt flags
-	TCC0.INTFLAGS |= 0x20;
-	TCC0.INTFLAGS |= 0x40;
+    
+    //clear CCB (note-on) and CCC (note-off) interrupt flags
+    TCC0.INTFLAGS |= 0x20;
+    TCC0.INTFLAGS |= 0x40;
     
     volatile uint32_t current_time;
     volatile uint32_t next_start_time;
@@ -465,10 +465,10 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     //assign values to compare registers
     TCC0.CCB = (uint16_t) next_start_time;
     TCC0.CCC = (uint16_t) next_stop_time;
-	
-	//enable CCB (note-on) and CCC (note-off) compares
+    
+    //enable CCB (note-on) and CCC (note-off) compares
     TCC0.CTRLB |= 0x20; 
-    TCC0.CTRLB |= 0x40;	
+    TCC0.CTRLB |= 0x40;    
     
     //rebuild the pattern if necessary
     if (sequencer->rebuild_play_list)
@@ -504,9 +504,9 @@ void stop_sequencer(Sequencer* sequencer, bool full_stop){
     //disable CCB (note-on) and CCC (note-off) interrupts
     TCC0.INTCTRLB &= ~0x30;
     TCC0.INTCTRLB &= ~0x0C;
-	
-	//clear CCC (note-off) interrupt flags
-	TCC0.INTFLAGS |= 0x40;
+    
+    //clear CCC (note-off) interrupt flags
+    TCC0.INTFLAGS |= 0x40;
     
     if (!(sequencer->enable) || (sequencer->note_list.length == 0)){
         sequencer->run_status = 0;
@@ -550,11 +550,11 @@ void remove_note_from_arpeggiator(Sequencer* sequencer, uint8_t pitch){
     if (sequencer->play_list[sequencer->note_index]->pitch == pitch)
         stop_sequencer(sequencer,0);
     
-	//if the note was successfully removed, flag to rebuild the playlist
+    //if the note was successfully removed, flag to rebuild the playlist
     if (remove_note_by_pitch(&(sequencer->note_list), pitch)){
         sequencer->rebuild_play_list = 1;
         
-		//if there are no notes in the list, completely stop the sequencer
+        //if there are no notes in the list, completely stop the sequencer
         if (sequencer->note_list.length == 0)
             stop_sequencer(sequencer, 1);
     }    

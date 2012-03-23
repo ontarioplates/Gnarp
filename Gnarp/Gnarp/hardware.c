@@ -5,8 +5,8 @@
 static HardwareManager manager;
 
 HardwareManager* get_hardware_manager_ptr(){
-	return &manager;
-}	
+    return &manager;
+}    
     
 void initialize_HardwareManager(){
     manager.encoder_state = TURN_NONE;
