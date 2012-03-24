@@ -1,9 +1,12 @@
 html/
-<<<<<<< HEAD
 *.o
 *.d
-=======
-Gnarp/Gnarp/Debug/
+*.avrgccproj
+*.cproj
+*.atsln
+*.atsuo
+*.avrsln
+*.avrsuo
+firmware/Debug/
 *.tmp
 TcfTransactionLog.csv
->>>>>>> origin/master

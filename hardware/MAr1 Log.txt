@@ -1,0 +1,20 @@
+MAr1 Board Changes/Issues
+
+1. SW7 footprint is incorrect (decide on toggle switch)
+2. D2 footprint is incorrect (too small for SMA)
+3. R68 -> 220R
+4. Add an LED and 200R on VC3 for debug
+5. Add through-hole power jack footprint for debug
+7. U5, U6, U7 (CD4511B) footprint is TSSOP-16 (#CD4511BPWR) on PCB, ordered SOIC-16.  Order new parts... consider changing PCB
+8. Increase hole size for pots
+9. PDI interface has wrong pinouts... must rewire and edit PCB to communicate to AVR Dragon.  See: http://www.nongnu.org/avrdude/user-manual/avrdude_20.html#Troubleshooting
+10. 7 Segment LEDs seem to be upside down, middle seg is swapped with DP
+11. Connect CD4511s to 5V instead of 3V rail
+12. Add 0.1uF capacitors at all 7 segment pins
+13. Larger potentiometer holes
+14. Fix footprint for pushbutton switch
+15. Connect LED 7 segments and DPs in correct order to MCU (0: 1's, 1: 10's, 2: 100's)
+16. Swap MIDI Out pins 4/5
+17. ALPS SRBV181004 rotary switch to maybe replace ALPHA.  cheaper
+18. Pinouts for 1/8" jack are wrong.  TS and T are switched
+19. Rotary switches need additional resistors between the rails and the highest/lowest pins
