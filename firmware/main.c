@@ -13,7 +13,9 @@
 #include "serial_midi.h"
 #include "arpeggiator.h"
 #include "beat_clock.h"
+#include "eeprom_comm.h"
 
+#define SOFTWARE_VERSION 0
 #define TEST_EEPROM_ADDR (uint16_t*)0
 
 static Sequencer sequencer;
@@ -69,9 +71,9 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
     midi_device_process(midi_device);
 }
 
-void edit_delayed_restart(){
+void edit_restart_delay(){
     //read the current value
-    uint8_t delay_value_in_ms = initialize_delayed_restart(257,0);
+    uint8_t delay_value_in_ms = get_eeprom_restart_delay();
     
     while(1){
         read_hardware();
@@ -81,17 +83,31 @@ void edit_delayed_restart(){
         
         //adjust the value in RAM (this should affect the note sounds
         if (get_encoder() == TURN_CW && delay_value_in_ms < 255)
-            initialize_delayed_restart(++delay_value_in_ms, 0);
+            change_restart_delay(++delay_value_in_ms);
         if (get_encoder() == TURN_CCW && delay_value_in_ms > 0)
-            initialize_delayed_restart(--delay_value_in_ms, 0);
+            change_restart_delay(--delay_value_in_ms);
         
         
         //press the encoder to save the value into EEPROM and exit edit mode                    
         if (get_encoder_switch_edge() == EDGE_RISE){
-            initialize_delayed_restart(257, 1);
+            set_eeprom_restart_delay(delay_value_in_ms);
             return;
         }            
     }
+}
+
+void log_storage_test(uint8_t group_size){
+	int logs_made = 0;
+	
+	while (logs_made<group_size){
+		create_log_entry(logs_made,logs_made,logs_made,logs_made);
+	    set_seven_segment_LEDs(++logs_made);
+	}
+	
+	read_hardware();
+	while(get_encoder_switch_edge() != EDGE_RISE){
+		read_hardware();
+	}
 }
 
 int main(void) {
@@ -100,6 +116,26 @@ int main(void) {
     uint16_t BPM_add;
     
     manager_ptr = initialize_hardware();
+	
+	initialize_eeprom(SOFTWARE_VERSION);
+	
+	set_seven_segment_LEDs(888);
+	
+	uint8_t log_groups_made = 0;
+	
+	while(1){
+		read_hardware();
+		
+		set_seven_segment_LEDs(log_groups_made);
+		
+		if (get_encoder_switch_edge() == EDGE_RISE){
+		    log_storage_test(30);
+			log_groups_made++;
+		}
+		
+		if (get_pushbutton_switch_edge() == EDGE_RISE)
+		    store_log_block_into_eeprom();
+	}		
     
     initialize_sequencer(&sequencer);
     
@@ -140,7 +176,7 @@ int main(void) {
         
         //press the encoder and pushbutton to enter edit mode for the delayed restart
         if (get_encoder_switch_state() && get_pushbutton_switch_state()){
-            edit_delayed_restart();
+            edit_restart_delay();
             set_seven_segment_LEDs(get_BPM());
         }            
         

@@ -1,7 +1,7 @@
 // Copyright (c) 2012, David Tuzman, All Right Reserved
 
 #include "serial_midi.h"
-#include "test_log.h"
+#include "eeprom_comm.h"
 
 #include "./xnorMIDI/midi.h"
 #include <avr/io.h>
