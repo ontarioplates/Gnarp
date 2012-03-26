@@ -184,18 +184,24 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
         
         seven_segment_value = seven_segment_value/10;           //shift 7seg number down to next digit 
     }
+	
+	manager.seven_segment_LEDs_state = seven_segment_value;
 }
 
 void set_LED_on(LED_choose choice){
     //booleans and such convert to LED out
     switch(choice){
         case LED_STATUS:            PORTC.OUTCLR = 0x08;
+		                            manager.led_status_state = 1;
                                     break;
         case LED_DECIMAL_POINT_0:   PORTD.OUTSET = 0x04;
+		                            manager.led_decimal_point_0_state = 1;
                                     break;
         case LED_DECIMAL_POINT_1:   PORTD.OUTSET = 0x01;
+		                            manager.led_decimal_point_1_state = 1;
                                     break;
         case LED_DECIMAL_POINT_2:   PORTD.OUTSET = 0x02;
+		                            manager.led_decimal_point_2_state = 1;
                                     break;
     }
 }
@@ -204,14 +210,27 @@ void set_LED_off(LED_choose choice){
     //booleans and such convert to LED out
     switch(choice){
         case LED_STATUS:            PORTC.OUTSET = 0x08;
-                                    break;
+                                    manager.led_status_state = 0;
+									break;
         case LED_DECIMAL_POINT_0:   PORTD.OUTCLR = 0x04;
-                                    break;
+                                    manager.led_decimal_point_0_state = 0;
+									break;
         case LED_DECIMAL_POINT_1:   PORTD.OUTCLR = 0x01;
-                                    break;
+                                    manager.led_decimal_point_1_state = 0;
+									break;
         case LED_DECIMAL_POINT_2:   PORTD.OUTCLR = 0x02;
-                                    break;
+                                    manager.led_decimal_point_2_state = 0;
+									break;
     }
+}
+
+bool get_LED_state(LED_choose choice){
+	switch(choice){
+        case LED_STATUS:            return manager.led_status_state;
+        case LED_DECIMAL_POINT_0:   return manager.led_decimal_point_0_state;
+        case LED_DECIMAL_POINT_1:   return manager.led_decimal_point_1_state;
+        case LED_DECIMAL_POINT_2:   return manager.led_decimal_point_2_state;
+	}
 }
 
 static void initialize_switches(){

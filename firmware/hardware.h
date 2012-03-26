@@ -21,7 +21,7 @@
 typedef enum {TURN_NONE, TURN_CW, TURN_CCW}
 turn_state;
 
-typedef enum {EDGE_NONE, EDGE_RISE, EDGE_FALL}
+typedef enum {EDGE_NONE, EDGE_FALL, EDGE_RISE}
 switch_edge;
 
 typedef enum {LED_STATUS, LED_DECIMAL_POINT_0, LED_DECIMAL_POINT_1, LED_DECIMAL_POINT_2}
@@ -44,6 +44,12 @@ struct HardwareManager{
     bool encoder_switch_state; /**< Current state of the encoder pushbutton*/
     
     uint16_t pot_values[5]; /**< Array of the raw values of each pot/switch (bounded by #POT_MIN and #POT_MAX)*/
+	
+	uint16_t seven_segment_LEDs_state; /**< Current number displayed on the seven segment*/
+	bool led_decimal_point_0_state; /**< Current state of the 0th decimal point LED*/
+	bool led_decimal_point_1_state; /**< Current state of the 1st decimal point LED*/
+	bool led_decimal_point_2_state; /**< Current state of the 2nd decimal point LED*/
+	bool led_status_state; /**< Current state of the status LED*/
 };
 
 /**
@@ -94,14 +100,27 @@ void set_LED_on(LED_choose choice);
 void set_LED_off(LED_choose choice);
 
 /**
+ * @brief Request the state of the specified LED
+ *
+ * @return 0 if the LED is off
+ * @return 1 if the LED is on
+ */
+bool get_LED_state(LED_choose choice);
+
+/**
  * @brief Illuminate the 7-segment display to the specified number
  *
  * @param seven_segment_value 1-3 digit number to write on the 7-segment display
  */
 void set_seven_segment_LEDs(uint16_t seven_segment_value);
 
+/**
+ * @brief Request the current number illuminated by the seven segment display
+ *
+ * @return seven_segment_value 1-3 digit number assigned to the 7-segment display
+ */
+uint16_t get_seven_segment_LED_state();
 
-//void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value);
 
 /**
  * @brief Request the turn state of the rotary encoder

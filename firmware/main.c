@@ -129,7 +129,7 @@ int main(void) {
 		set_seven_segment_LEDs(log_groups_made);
 		
 		if (get_encoder_switch_edge() == EDGE_RISE){
-		    log_storage_test(30);
+		    log_storage_test(1);
 			log_groups_made++;
 		}
 		
