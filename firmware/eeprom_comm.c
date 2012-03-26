@@ -67,7 +67,7 @@ void store_log_block_into_eeprom(){
     uint8_t last_log_array_index;
     uint8_t logs_to_write;
     size_t bytes_to_write;
-    uint8_t bytes_available;
+    uint16_t bytes_available;
     
     if (all_logs_valid){
         first_log_array_index = log_array_index;
