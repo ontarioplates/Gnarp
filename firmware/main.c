@@ -72,11 +72,21 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
     midi_device_process(midi_device);
 }
 
-void aux_restart_delay(){
+bool aux_restart_delay(){
     //read the current value
     uint8_t delay_value_in_ms = get_eeprom_restart_delay();
     
-    while(1){
+    for (uint8_t i = 0; true; i++){
+		if (i > 0x7F){
+		    set_LED_on(LED_DECIMAL_POINT_0);
+			set_LED_on(LED_DECIMAL_POINT_1);
+		}			
+		else{
+    		set_LED_off(LED_DECIMAL_POINT_0);
+			set_LED_off(LED_DECIMAL_POINT_1);
+		}			
+			
+			
         read_hardware();
         
         //display the delayed_restart value
@@ -92,16 +102,16 @@ void aux_restart_delay(){
         //press the encoder to save the value into EEPROM and exit edit mode                    
         if (get_encoder_switch_edge() == EDGE_RISE){
             set_eeprom_restart_delay(delay_value_in_ms);
-			BLINKSEVSEG(delay_value_in_ms,80,20,5);
-            return;
+			set_seven_segment_LEDs(delay_value_in_ms);
+            return true;
         }
 	
 		//press pushbutton to cancel and exit
 		if (get_pushbutton_switch_edge() == EDGE_RISE){
 		    initialize_restart_delay();
 			delay_value_in_ms = get_eeprom_restart_delay();
-            BLINKSEVSEG(delay_value_in_ms,160,100,5);
-			return;
+            set_seven_segment_LEDs(delay_value_in_ms);
+			return false;
 		}			        
     }
 }
@@ -120,38 +130,63 @@ void log_storage_test(uint8_t group_size){
 	}
 }
 
-void aux_menu(){
-	const uint8_t mode_max = 15;
-	uint8_t mode = 0;
-	
+void aux_exit(bool success){
+	for (uint8_t i = 0; i < 500; i++){
+		for (uint8_t j = 0; j < 0xFF; j++){
+			if (j < 0x80){
+				set_LED_on(LED_DECIMAL_POINT_0);
+				set_LED_on(LED_DECIMAL_POINT_1);
+				set_LED_on(LED_DECIMAL_POINT_2);
+			}
+			else {
+				set_LED_off(LED_DECIMAL_POINT_0);
+				set_LED_off(LED_DECIMAL_POINT_1);
+				set_LED_off(LED_DECIMAL_POINT_2);
+			}
+			j++;
+		}
+	}
+}
 
-	set_LEDs_four_bits(mode);
+void aux_menu(){
+	const uint8_t mode_max = 1;
+	uint8_t mode = 0;
+	bool exit_mode;
 	
+	set_seven_segment_LEDs(mode);
 	
-	while(1){
-		set_seven_segment_LEDs(get_LEDs_four_bits());
+	for(uint8_t i = 0; true; i++){
+		if (i < 0x80)
+		    set_LED_on(LED_DECIMAL_POINT_0);
+		else
+    		set_LED_off(LED_DECIMAL_POINT_0);
+		
 		read_hardware();
 		
 		if (get_encoder() == TURN_CW){
 		    mode++;
 		    if (mode > mode_max)
 			    mode = 0;
-			set_LEDs_four_bits(mode);
+			set_seven_segment_LEDs(mode);
 		}
 		else if (get_encoder() == TURN_CCW){
 			if (mode == 0)
 			    mode = mode_max;
 			else
 			    mode--;
-			set_LEDs_four_bits(mode);
+			set_seven_segment_LEDs(mode);
 		}
 		else if (get_encoder_switch_edge() == EDGE_RISE) {
 		    switch(mode) {
 				case 0: ;//aux_logs();
-				        return;
-				case 1: aux_restart_delay();
-				        return;
+				        break;
+				case 1: exit_mode = aux_restart_delay();
+				        break;
+				
+				default: continue;
 			}
+			aux_exit(exit_mode);
+			return;
 		}
 		else if (get_pushbutton_switch_edge() == EDGE_RISE) {
 		    return;
@@ -178,7 +213,7 @@ int main(void) {
 		if (get_encoder_switch_state() && get_pushbutton_switch_state()){
             aux_menu();
             set_seven_segment_LEDs(222);
-        }            
+        }
 	}
 	
 	uint8_t log_groups_made = 0;

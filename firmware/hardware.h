@@ -203,5 +203,7 @@ switch_edge get_toggle_switch_edge();
 
 /**@}*/
 
+void stream_decimal_points(uint8_t loops);
+
 
 #endif /* HARDWARE_H_ */
