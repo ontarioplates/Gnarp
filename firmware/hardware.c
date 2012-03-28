@@ -2,6 +2,9 @@
 
 #include "hardware.h"
 
+#include <util/delay.h>
+
+
 static HardwareManager manager;
 
 HardwareManager* get_hardware_manager_ptr(){
@@ -169,12 +172,13 @@ static void initialize_LEDs(){
 }
 
 void set_seven_segment_LEDs(uint16_t seven_segment_value){
-    uint8_t i;
+	uint8_t i;
     uint8_t digit;
+	bool all_blank = seven_segment_value > 999;
     
     for (i=0 ; i<3 ; i++){
         digit = seven_segment_value%10;                 //extract lowest current digit of 7seg
-        if (seven_segment_value==0 && (i>0))            //if the rest of the 7seg is zero, blank LEDS (except for 1st digit)
+        if (all_blank || (seven_segment_value==0 && (i>0)))            //if the rest of the 7seg is zero, blank LEDS (except for 1st digit)
             digit = 10;
             
         PORTD.OUTCLR = 0x08 << (i+2)%3;         //arm appropriate 7 segment        (CHANGE INDEX SCALING FOR NEXT REVISION)
@@ -186,7 +190,7 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
     }
 	
 	manager.seven_segment_LEDs_state = seven_segment_value;
-}
+}		
 
 void set_LED_on(LED_choose choice){
     //booleans and such convert to LED out
@@ -224,6 +228,19 @@ void set_LED_off(LED_choose choice){
     }
 }
 
+void set_LEDs_four_bits(uint8_t decimal){
+	const uint8_t power_of_two[4] = {1, 2, 4, 8};
+		
+	for (int i = 0; i<4; i++){
+		if (power_of_two[3-i] > decimal)
+		    set_LED_off(3-i);
+		else {
+			set_LED_on(3-i);
+			decimal -= power_of_two[3-i];
+		}
+	}
+}
+
 bool get_LED_state(LED_choose choice){
 	switch(choice){
         case LED_STATUS:            return manager.led_status_state;
@@ -231,6 +248,16 @@ bool get_LED_state(LED_choose choice){
         case LED_DECIMAL_POINT_1:   return manager.led_decimal_point_1_state;
         case LED_DECIMAL_POINT_2:   return manager.led_decimal_point_2_state;
 	}
+}
+
+uint8_t get_LEDs_four_bits(){
+	uint8_t ret_val = 0;
+	
+	for (int i = 0; i < 4; i++){
+		ret_val |= get_LED_state(i) << i;
+	}
+	
+	return ret_val;
 }
 
 static void initialize_switches(){
@@ -361,9 +388,3 @@ void read_hardware(){
     read_pots();
     read_encoder();
 }
-
-/*void postloop_functions(bool status_LED, bool decimal_point_0, bool decimal_point_1, bool decimal_point_2, uint16_t seven_segment_value){
-    
-    
-    //set_LEDs(status_LED, decimal_point_0, decimal_point_1, decimal_point_2, seven_segment_value);
-}*/

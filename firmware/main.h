@@ -7,6 +7,7 @@
 extern "C" {
 #endif
 
+#define F_CPU 24000000
 
 #ifdef __cplusplus
 }

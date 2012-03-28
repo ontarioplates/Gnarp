@@ -82,6 +82,7 @@ void disable_sequencer(Sequencer* sequencer);
 void enable_sequencer(Sequencer* sequencer);
 void set_sequencer_parameters(Sequencer* sequencer, bool restart);
 
+void initialize_restart_delay();
 void change_restart_delay(uint8_t new_value);
 
 

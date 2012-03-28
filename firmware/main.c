@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <util/delay.h>
 
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
@@ -71,7 +72,7 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
     midi_device_process(midi_device);
 }
 
-void edit_restart_delay(){
+void aux_restart_delay(){
     //read the current value
     uint8_t delay_value_in_ms = get_eeprom_restart_delay();
     
@@ -91,8 +92,17 @@ void edit_restart_delay(){
         //press the encoder to save the value into EEPROM and exit edit mode                    
         if (get_encoder_switch_edge() == EDGE_RISE){
             set_eeprom_restart_delay(delay_value_in_ms);
+			BLINKSEVSEG(delay_value_in_ms,80,20,5);
             return;
-        }            
+        }
+	
+		//press pushbutton to cancel and exit
+		if (get_pushbutton_switch_edge() == EDGE_RISE){
+		    initialize_restart_delay();
+			delay_value_in_ms = get_eeprom_restart_delay();
+            BLINKSEVSEG(delay_value_in_ms,160,100,5);
+			return;
+		}			        
     }
 }
 
@@ -110,6 +120,48 @@ void log_storage_test(uint8_t group_size){
 	}
 }
 
+void aux_menu(){
+	const uint8_t mode_max = 15;
+	uint8_t mode = 0;
+	
+
+	set_LEDs_four_bits(mode);
+	
+	
+	while(1){
+		set_seven_segment_LEDs(get_LEDs_four_bits());
+		read_hardware();
+		
+		if (get_encoder() == TURN_CW){
+		    mode++;
+		    if (mode > mode_max)
+			    mode = 0;
+			set_LEDs_four_bits(mode);
+		}
+		else if (get_encoder() == TURN_CCW){
+			if (mode == 0)
+			    mode = mode_max;
+			else
+			    mode--;
+			set_LEDs_four_bits(mode);
+		}
+		else if (get_encoder_switch_edge() == EDGE_RISE) {
+		    switch(mode) {
+				case 0: ;//aux_logs();
+				        return;
+				case 1: aux_restart_delay();
+				        return;
+			}
+		}
+		else if (get_pushbutton_switch_edge() == EDGE_RISE) {
+		    return;
+		}			
+		    
+		
+	}
+}
+
+
 int main(void) {
     const uint16_t initial_BPM = 120;
     
@@ -117,9 +169,17 @@ int main(void) {
     
     manager_ptr = initialize_hardware();
 	
-	initialize_eeprom(SOFTWARE_VERSION);
+	//initialize_eeprom(SOFTWARE_VERSION);
 	
-	set_seven_segment_LEDs(888);
+	BLINKSEVSEG(888,30,30,10);
+	
+	while(1){
+		read_hardware();
+		if (get_encoder_switch_state() && get_pushbutton_switch_state()){
+            aux_menu();
+            set_seven_segment_LEDs(222);
+        }            
+	}
 	
 	uint8_t log_groups_made = 0;
 	

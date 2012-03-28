@@ -27,6 +27,9 @@ switch_edge;
 typedef enum {LED_STATUS, LED_DECIMAL_POINT_0, LED_DECIMAL_POINT_1, LED_DECIMAL_POINT_2}
 LED_choose;
 
+#define BLINKSEVSEG(val,ms_on,ms_off,loop) for (int i = 0; i < loop; i++){set_seven_segment_LEDs(8888);_delay_ms(ms_off);set_seven_segment_LEDs(val);_delay_ms(ms_off);}
+
+
 typedef struct HardwareManager HardwareManager;
 
 /**
@@ -99,6 +102,8 @@ void set_LED_on(LED_choose choice);
  */
 void set_LED_off(LED_choose choice);
 
+void set_LEDs_four_bits(uint8_t decimal);
+
 /**
  * @brief Request the state of the specified LED
  *
@@ -106,6 +111,8 @@ void set_LED_off(LED_choose choice);
  * @return 1 if the LED is on
  */
 bool get_LED_state(LED_choose choice);
+
+uint8_t get_LEDs_four_bits();
 
 /**
  * @brief Illuminate the 7-segment display to the specified number
@@ -119,6 +126,8 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value);
  *
  * @return seven_segment_value 1-3 digit number assigned to the 7-segment display
  */
+
+//void blink_seven_segment_LEDs(uint16_t seven_segment_value, uint16_t ms_on, uint16_t ms_off, uint8_t loops);
 uint16_t get_seven_segment_LED_state();
 
 
