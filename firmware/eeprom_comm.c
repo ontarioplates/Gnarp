@@ -11,6 +11,9 @@
 
 #define LOG_GROUP_SIZE 50
 
+#define STORE_ERROR_NO_LOGS 101
+#define STORE_ERROR_INSUFFICIENT_SPACE 102
+
 const size_t size_of_log_entry = sizeof(LogEntry);
 
 static uint8_t log_id = 0;
@@ -30,21 +33,21 @@ void set_eeprom_restart_delay(uint8_t new_value) {
 
 void initialize_logs() {
     //load the eeprom log index from the eeprom
-    log_eeprom_index = eeprom_read_word((uint16_t*)EEPROM_ADDR_LOG_INDEX);
+    log_eeprom_index = eeprom_read_word((uint16_t*)EEPROM_ADDR_LOG_INDEX_UNUSED);
     
     //check if the eeprom index is valid
     //if the eeprom index has been reset, the eeprom index will read as all ones
     if (log_eeprom_index == 0xFFFF){
 		//reset the eeprom index
         log_eeprom_index = EEPROM_ADDR_LOGS_BEGIN;
-		eeprom_update_word(EEPROM_ADDR_LOG_INDEX, log_eeprom_index);
+		eeprom_update_word(EEPROM_ADDR_LOG_INDEX_UNUSED, log_eeprom_index);
 		
 		//reset the maximum log group id
 		log_group_id = 0;
-		eeprom_write_byte(EEPROM_ADDR_LOG_GROUP_ID_MAX, log_group_id);
+		eeprom_write_byte(EEPROM_ADDR_LOG_GROUP_ID_UNUSED, log_group_id);
 	}
 	else
-	    log_group_id = eeprom_read_byte(EEPROM_ADDR_LOG_GROUP_ID_MAX) + 1;
+	    log_group_id = eeprom_read_byte(EEPROM_ADDR_LOG_GROUP_ID_UNUSED);
 }    
 
 void create_log_entry(bool midi_in_flag, uint8_t byte0, uint8_t byte1, uint8_t byte2){
@@ -93,7 +96,7 @@ void create_log_entry(bool midi_in_flag, uint8_t byte0, uint8_t byte1, uint8_t b
     }
 }
 
-void store_log_block_into_eeprom(){
+bool store_log_block_into_eeprom(){
     uint8_t first_log_array_index;
     uint8_t last_log_array_index;
     uint8_t logs_to_write;
@@ -112,8 +115,10 @@ void store_log_block_into_eeprom(){
     }        
     else{
         //if there are no log entries, exit the routine
-        if (log_array_index == 0)
-            return;
+        if (log_array_index == 0){
+			set_seven_segment_LEDs(STORE_ERROR_NO_LOGS);
+            return false;
+		}			
         
         first_log_array_index = 0;
         last_log_array_index = log_array_index - 1;
@@ -131,8 +136,7 @@ void store_log_block_into_eeprom(){
         
         //if there isn't even enough space to write a single log, exit the routine
         if (logs_to_write == 0){
-			set_LED_on(LED_STATUS);
-            //write some routine for LED indication
+            set_seven_segment_LEDs(STORE_ERROR_INSUFFICIENT_SPACE);
             return;
         }
         
@@ -146,14 +150,14 @@ void store_log_block_into_eeprom(){
     
     //now there is guaranteed to be enough space in the eeprom to store the prepared logs
 	
-	//write the log_group_id to eeprom and increment both
+	//write the log_group_id to eeprom
 	eeprom_write_byte(log_eeprom_index, log_group_id);
 	
-	//write the log_group_id to the max_id space
-	eeprom_write_byte(EEPROM_ADDR_LOG_GROUP_ID_MAX, log_group_id);
+	//routine will succeed, so set indication to eeprom address of the new log block
+	set_seven_segment_LEDs(log_eeprom_index);
 	
-	log_eeprom_index++;	
-	log_group_id++;
+	//increment the eeprom index
+	log_eeprom_index++;
 	
 	if (first_log_array_index < last_log_array_index) {
         //no circular buffer consideration, just one block to write
@@ -175,18 +179,22 @@ void store_log_block_into_eeprom(){
         bytes_to_write = size_of_log_entry * (last_log_array_index + 1);   
         eeprom_write_block(&log_array[first_log_array_index], (uint8_t*) log_eeprom_index, bytes_to_write);    
         log_eeprom_index += bytes_to_write;	    
-	}		
-
-    
+	}
+	
+//	log_eeprom_index++;   
     //store the new eeprom index into the eeprom
-    eeprom_update_word((uint16_t*)EEPROM_ADDR_LOG_INDEX, log_eeprom_index);
-    
-    //write some LED indication routine
+    eeprom_update_word((uint16_t*)EEPROM_ADDR_LOG_INDEX_UNUSED, log_eeprom_index);
+	
+	log_group_id++;	
+	//write the log_group_id to the unused_id space
+	eeprom_update_byte((uint8_t*)EEPROM_ADDR_LOG_GROUP_ID_UNUSED, log_group_id);
 
     //reset the log array to avoid duplicate logs
 	log_array_index = 0;
 	log_id = 0;
 	all_logs_valid = false;
+	
+	return true;
 }
 
 void initialize_eeprom(uint8_t version){

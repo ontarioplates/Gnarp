@@ -205,5 +205,12 @@ switch_edge get_toggle_switch_edge();
 
 void stream_decimal_points(uint8_t loops);
 
+void realtime_pause(uint16_t pause_ms);
+
+void realtime_count_start();
+
+void realtime_count_stop();
+
+bool realtime_count_compare(uint16_t compare_ms);
 
 #endif /* HARDWARE_H_ */

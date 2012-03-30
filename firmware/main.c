@@ -63,7 +63,7 @@ void fake_midi_noteon_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
     midi_device_process(midi_device);
 }
 
-void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velocity){
+void fake_midi_noteoff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velocity){
     const uint8_t noteoff_byte1 = 128;
     
     midi_device_input(midi_device, 1, &noteoff_byte1);
@@ -73,20 +73,25 @@ void fake_midi_noteff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 }
 
 bool aux_restart_delay(){
+	bool LED_on;
+	realtime_count_start();
+	
     //read the current value
     uint8_t delay_value_in_ms = get_eeprom_restart_delay();
     
-    for (uint8_t i = 0; true; i++){
-		if (i > 0x7F){
-		    set_LED_on(LED_DECIMAL_POINT_0);
-			set_LED_on(LED_DECIMAL_POINT_1);
-		}			
-		else{
-    		set_LED_off(LED_DECIMAL_POINT_0);
-			set_LED_off(LED_DECIMAL_POINT_1);
-		}			
-			
-			
+    while(1){
+		if (realtime_count_compare(50)){
+    		if (LED_on){
+    		    set_LED_off(LED_DECIMAL_POINT_0);
+				set_LED_off(LED_DECIMAL_POINT_1);
+			}				
+    		else{
+    		    set_LED_on(LED_DECIMAL_POINT_0);
+				set_LED_on(LED_DECIMAL_POINT_1);
+			}				
+			LED_on = !LED_on;
+    	}	
+						
         read_hardware();
         
         //display the delayed_restart value
@@ -130,36 +135,59 @@ void log_storage_test(uint8_t group_size){
 	}
 }
 
+bool aux_logs() {
+	return store_log_block_into_eeprom();
+}
+
 void aux_exit(bool success){
-	for (uint8_t i = 0; i < 500; i++){
-		for (uint8_t j = 0; j < 0xFF; j++){
-			if (j < 0x80){
-				set_LED_on(LED_DECIMAL_POINT_0);
-				set_LED_on(LED_DECIMAL_POINT_1);
-				set_LED_on(LED_DECIMAL_POINT_2);
-			}
-			else {
-				set_LED_off(LED_DECIMAL_POINT_0);
-				set_LED_off(LED_DECIMAL_POINT_1);
-				set_LED_off(LED_DECIMAL_POINT_2);
-			}
-			j++;
-		}
+	realtime_count_stop();
+	
+	set_LED_off(LED_DECIMAL_POINT_0);
+	set_LED_off(LED_DECIMAL_POINT_1);
+	set_LED_off(LED_DECIMAL_POINT_2);
+	
+	if (success){
+	    for (LED_choose i = 0; i < 3; i++){
+		    for (int j = 0; j < 3; j++){
+		        set_LED_on(3-i);
+		        realtime_pause(40);
+		        set_LED_off(3-i);
+		        realtime_pause(40);
+		    }			
+	    }
+	}
+	else {
+		for (int j = 0; j <3; j++){
+		    set_LED_on(LED_DECIMAL_POINT_0);
+	        set_LED_on(LED_DECIMAL_POINT_1);
+	        set_LED_on(LED_DECIMAL_POINT_2);
+			realtime_pause(100);
+	        set_LED_off(LED_DECIMAL_POINT_0);
+        	set_LED_off(LED_DECIMAL_POINT_1);
+        	set_LED_off(LED_DECIMAL_POINT_2);
+			realtime_pause(100);
+		}			
 	}
 }
 
 void aux_menu(){
 	const uint8_t mode_max = 1;
 	uint8_t mode = 0;
-	bool exit_mode;
+	bool exit_mode = false;
+	bool LED_on = false;
 	
 	set_seven_segment_LEDs(mode);
 	
-	for(uint8_t i = 0; true; i++){
-		if (i < 0x80)
-		    set_LED_on(LED_DECIMAL_POINT_0);
-		else
-    		set_LED_off(LED_DECIMAL_POINT_0);
+	realtime_count_start();
+	
+	while(1){
+		if (realtime_count_compare(80)){
+    		if (LED_on)
+    		    set_LED_off(LED_DECIMAL_POINT_0);
+    		else
+    		    set_LED_on(LED_DECIMAL_POINT_0);
+			LED_on = !LED_on;
+    	}
 		
 		read_hardware();
 		
@@ -178,7 +206,7 @@ void aux_menu(){
 		}
 		else if (get_encoder_switch_edge() == EDGE_RISE) {
 		    switch(mode) {
-				case 0: ;//aux_logs();
+				case 0: //exit_mode = aux_logs();
 				        break;
 				case 1: exit_mode = aux_restart_delay();
 				        break;
@@ -189,6 +217,7 @@ void aux_menu(){
 			return;
 		}
 		else if (get_pushbutton_switch_edge() == EDGE_RISE) {
+			aux_exit(exit_mode);
 		    return;
 		}			
 		    
@@ -204,9 +233,23 @@ int main(void) {
     
     manager_ptr = initialize_hardware();
 	
-	//initialize_eeprom(SOFTWARE_VERSION);
+	initialize_eeprom(SOFTWARE_VERSION);
 	
-	BLINKSEVSEG(888,30,30,10);
+/*	uint16_t val = 0;
+	
+	set_seven_segment_LEDs(val);
+	realtime_count_start();
+	while(1){
+		read_hardware();
+		
+		if (get_encoder_switch_edge() == EDGE_RISE || val > 999)
+		    val = 0;
+		
+		if (realtime_count_compare(10))
+		    set_seven_segment_LEDs(++val);
+		
+		
+	}
 	
 	while(1){
 		read_hardware();
@@ -231,7 +274,7 @@ int main(void) {
 		if (get_pushbutton_switch_edge() == EDGE_RISE)
 		    store_log_block_into_eeprom();
 	}		
-    
+    */
     initialize_sequencer(&sequencer);
     
     initialize_serial_midi(&midi_device, &sequencer);
@@ -271,7 +314,7 @@ int main(void) {
         
         //press the encoder and pushbutton to enter edit mode for the delayed restart
         if (get_encoder_switch_state() && get_pushbutton_switch_state()){
-            edit_restart_delay();
+            aux_menu();
             set_seven_segment_LEDs(get_BPM());
         }            
         
@@ -295,7 +338,12 @@ int main(void) {
         
         if (get_pushbutton_switch_edge() == EDGE_RISE)
             continue_sequencer(&sequencer, 1);
-            
+
+/*        if (get_pushbutton_switch_edge() == EDGE_RISE)
+		    fake_midi_noteon_input(&midi_device, get_BPM(), 100);
+        if (get_pushbutton_switch_edge() == EDGE_FALL)
+		    fake_midi_noteoff_input(&midi_device, get_BPM(), 100);
+ */           
         if (get_toggle_switch_edge() == EDGE_FALL)
             disable_sequencer(&sequencer);
             

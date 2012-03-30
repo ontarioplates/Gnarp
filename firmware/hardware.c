@@ -58,6 +58,73 @@ static void initialize_encoder(){
     PORTB.DIRCLR = 0x03;       //Encoder A and B input
 }
 
+static void initialize_realtime_utility(){
+	TCD0.CTRLA = 0x00;  //stop the counter
+	TCD0.CTRLB = 0x00;  //disable compares
+	TCD0.CNT = 0x0000;
+}
+
+void realtime_pause(uint16_t pause_ms){
+	const uint8_t count_per_ms = 23;
+	const uint8_t CTRLA_val = 0x07; // 1/1024 system clock (24M)
+	
+	uint16_t pause_count;
+	
+	if (pause_ms > 2796)
+	    pause_ms = 2796;
+		
+	pause_count = pause_ms * count_per_ms;
+	
+	bool was_running = TCD0.CTRLA;	
+	uint16_t count_at_start = 0;
+	
+	TCD0.CTRLA = 0x00;  //stop the counter
+	
+	if (was_running)        //log the current count
+	    count_at_start = TCD0.CNT;
+	
+	TCD0.CNT = 0;       //reset the count
+	
+	TCD0.CTRLA = CTRLA_val; //start the counter
+	
+	while (TCD0.CNT < pause_count) {};  //wait until the counter trips
+		
+	if (was_running){    //continue the counter from its last position
+		if (count_at_start + pause_count < count_at_start)
+		    TCD0.CNT = count_at_start;
+		else
+		    TCD0.CNT = count_at_start + pause_count;
+	}		
+	else                //stop the counter
+	    TCD0.CTRLA = 0x00;
+}
+
+void realtime_count_start(){
+	const uint8_t CTRLA_val = 0x07; // 1/1024 system clock (24M)
+	TCD0.CTRLA = CTRLA_val;
+	TCD0.CNT = 0;
+}
+
+void realtime_count_stop(){
+    TCD0.CTRLA = 0x00;
+	TCD0.CNT = 0;
+}
+
+bool realtime_count_compare(uint16_t compare_ms){
+	const uint8_t count_per_ms = 23;
+	if (TCD0.INTFLAGS & 0x01){  //if there was an overflow, return true and reset the count
+		TCD0.CNT = 0;
+	    TCD0.INTFLAGS |= 0x01;  //clear the overflow flag
+	    return true;
+	}		
+	else if (TCD0.CNT > count_per_ms * compare_ms){ //if the counter is larger than the compare, reset the count and return true
+	    TCD0.CNT = 0;
+		return true;
+	}
+	else
+	    return false;	    
+}
+
 static void read_encoder(){
     static bool last_a = 0;
     bool current_a;
@@ -380,6 +447,7 @@ HardwareManager* initialize_hardware(){
     initialize_switches();
     initialize_encoder();
     initialize_LEDs();
+	initialize_realtime_utility();
     return &manager;
 }
 
