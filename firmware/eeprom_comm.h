@@ -20,7 +20,7 @@ typedef struct LogEntry LogEntry;
 typedef struct HardwareSnapshot HardwareSnapshot;
 
 struct LogEntry {
-	uint8_t log_id; /**< Identification number.  MSB indicates a MIDI IN*/
+	uint16_t log_id__bpm; /**< Identification number.  MSB indicates a MIDI IN*/
     uint16_t timestamp; /**< Amount of time since the last log*/
     uint8_t midi_message[3]; /**< Midi Message at moment of log*/
 

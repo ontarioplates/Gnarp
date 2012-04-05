@@ -8,6 +8,7 @@
 #include <avr/eeprom.h>
 
 #include "hardware.h"
+#include "beat_clock.h"
 
 #define LOG_GROUP_SIZE 40
 
@@ -67,7 +68,7 @@ void create_log_entry(bool midi_in_flag, uint8_t byte0, uint8_t byte1, uint8_t b
 	    TCD1.INTFLAGS |= 0x01;  //and reset the overflow flag
 	}		
     
-	new_log->log_id = log_id++;
+	new_log->log_id__bpm = (log_id++ << 10) | (get_BPM() & 0x03FF);
 
 	new_log->timestamp = time;  //set timestamp to relative timer
 
