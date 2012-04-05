@@ -9,6 +9,7 @@ extern "C" {
 
 #include <stdlib.h>
 
+#include "./xnorMIDI/midi.h"
 #include "./xnorMIDI/midi_device.h"
 
 #include "arpeggiator.h"

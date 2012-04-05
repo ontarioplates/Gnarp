@@ -1,4 +1,4 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #ifndef ARPEGGIATOR_H_
 #define ARPEGGIATOR_H_

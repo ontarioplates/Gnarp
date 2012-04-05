@@ -1,4 +1,4 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #ifndef HARDWARE_H_
 #define HARDWARE_H_
@@ -18,6 +18,9 @@
 
 #define ALL_EIGHT_POSITION_SWITCHES true
 
+typedef enum {SWITCH_TOGGLE, SWITCH_PUSHBUTTON, SWITCH_ENCODER}
+switch_select;
+
 typedef enum {TURN_NONE, TURN_CW, TURN_CCW}
 turn_state;
 
@@ -27,15 +30,14 @@ switch_edge;
 typedef enum {LED_STATUS, LED_DECIMAL_POINT_0, LED_DECIMAL_POINT_1, LED_DECIMAL_POINT_2}
 LED_choose;
 
-#define BLINKSEVSEG(val,ms_on,ms_off,loop) for (int i = 0; i < loop; i++){set_seven_segment_LEDs(8888);_delay_ms(ms_off);set_seven_segment_LEDs(val);_delay_ms(ms_off);}
-
-
 typedef struct HardwareManager HardwareManager;
 
 /**
  * @brief This structure stores the information for all the input hardware
  */
 struct HardwareManager{
+	uint8_t encoder_and_switch_info;    //encoder turn, encoder switch, pushbutton switch, toggle switch
+	
     turn_state encoder_state; /**< Tracks movement of the rotary encoder*/
     
     switch_edge pushbutton_switch_edge; /**< Tracks movement of the pushbutton*/
@@ -156,54 +158,8 @@ uint16_t get_pot_value(uint8_t pot, uint16_t outmin, uint16_t outmax);
  * @return 1 if the switch is currently pressed
  * @return 0 otherwise
  */
-bool get_encoder_switch_state();
-
-/**
- * @brief Request the state of the pushbutton
- *
- * @return 1 if the switch is currently pressed
- * @return 0 otherwise
- */
-bool get_pushbutton_switch_state();
-
-/**
- * @brief Request the state of the toggle switch
- *
- * @return 1 if the switch is currently in the on position
- * @return 0 otherwise
- */
-bool get_toggle_switch_state();
-
-/**
- * @brief Request the transient state of the encoder pushbutton
- *
- * @return EDGE_RISE if the switch is turning on
- * @return EDGE_FALL if the switch is turning off
- * @return EDGE_NONE otherwise (no change)
- */
-switch_edge get_encoder_switch_edge();
-
-/**
- * @brief Request the transient state of the pushbutton
- *
- * @return EDGE_RISE if the switch is turning on
- * @return EDGE_FALL if the switch is turning off
- * @return EDGE_NONE otherwise (no change)
- */
-switch_edge get_pushbutton_switch_edge();
-
-/**
- * @brief Request the transient state of the toggle switch
- *
- * @return EDGE_RISE if the switch is turning on
- * @return EDGE_FALL if the switch is turning off
- * @return EDGE_NONE otherwise (no change)
- */
-switch_edge get_toggle_switch_edge();
 
 /**@}*/
-
-void stream_decimal_points(uint8_t loops);
 
 void realtime_pause(uint16_t pause_ms);
 
@@ -212,5 +168,11 @@ void realtime_count_start();
 void realtime_count_stop();
 
 bool realtime_count_compare(uint16_t compare_ms);
+
+bool get_switch_state(switch_select);
+
+switch_edge get_switch_edge(switch_select);
+
+uint8_t get_raw_encoder_and_switch_info();
 
 #endif /* HARDWARE_H_ */

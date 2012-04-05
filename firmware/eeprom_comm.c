@@ -1,4 +1,4 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #include "eeprom_comm.h"
 
@@ -9,7 +9,7 @@
 
 #include "hardware.h"
 
-#define LOG_GROUP_SIZE 50
+#define LOG_GROUP_SIZE 40
 
 #define STORE_ERROR_NO_LOGS 101
 #define STORE_ERROR_INSUFFICIENT_SPACE 102
@@ -48,46 +48,43 @@ void initialize_logs() {
 	}
 	else
 	    log_group_id = eeprom_read_byte(EEPROM_ADDR_LOG_GROUP_ID_UNUSED);
+		
+
+	TCD1.CTRLB = 0x00;  //disable compares
+	TCD1.CNT = 0x0000;
+	TCD1.INTFLAGS |= 0x01;  //reset the overflow flag
+	TCD1.CTRLA = 0x07;  //start the counter with 1/1024 clock speed
 }    
 
 void create_log_entry(bool midi_in_flag, uint8_t byte0, uint8_t byte1, uint8_t byte2){
 	LogEntry* new_log = &log_array[log_array_index];
 	
-    //uint16_t time = TCD0.CNT;  //capture relative timer
-    //TCD0.CNT = 0;                //reset relative timer
+    uint16_t time = TCD1.CNT;  //capture relative timer
+    TCD1.CNT = 0;                //reset relative timer
+	
+	if (TCD1.INTFLAGS & 0x01){   //check if the counter overflowed
+	    time = 0xFFFF;  //set time to max if so
+	    TCD1.INTFLAGS |= 0x01;  //and reset the overflow flag
+	}		
     
 	new_log->log_id = log_id++;
 
-	new_log->timestamp = log_array_index;
-    //log_array[log_array_index].timestamp = time;    //set timestamp to relative timer
+	new_log->timestamp = time;  //set timestamp to relative timer
 
     new_log->midi_message[0] = byte0;
     new_log->midi_message[1] = byte1;
     new_log->midi_message[2] = byte2;
 	
-	//log the pot positions
-	for (int i = 0; i < 5; i++)
-	    new_log->hardware_pot_values[i] = get_pot_value(i, 0, 0xFF);
+	new_log->midi_in_flag__hardware_seven_segment = (midi_in_flag << 15) | get_seven_segment_LED_state();
+	new_log->hardware_LEDs__hardware_pot_value_0 = (get_LEDs_four_bits() << 4) | (get_pot_value(0,0,0xF) & 0x0F);
 	
-	//log the encoder turn and switch states
-	new_log->hardware_encoder = 0x00;
-	new_log->hardware_encoder |= get_encoder();
-	if (get_encoder_switch_edge() == EDGE_NONE)
-	    new_log->hardware_encoder |= (uint8_t) get_encoder_switch_state << 2;
-	else
-	    new_log->hardware_encoder |= ((uint8_t) get_encoder_switch_edge() + 1) << 2;
-	
-	//log the pushbutton and toggle switch states
-	new_log->hardware_push_and_toggle = 0x00;
-	if (get_pushbutton_switch_edge() == EDGE_NONE)
-	    new_log->hardware_push_and_toggle |= (uint8_t) get_pushbutton_switch_state;
-	else
-	    new_log->hardware_push_and_toggle |= ((uint8_t) get_pushbutton_switch_edge() + 1);
-	if (get_toggle_switch_edge() == EDGE_NONE)
-	    new_log->hardware_push_and_toggle |= (uint8_t) get_toggle_switch_state() << 2;
-	else
-	    new_log->hardware_push_and_toggle |= ((uint8_t) get_toggle_switch_edge() + 1) << 2;
-	
+	//log the pots 1-4 positions scaled 0-15
+	new_log->hardware_pot_values_1thru4 = 0x0000;
+	for (int i = 1; i < 5; i++)
+	    new_log->hardware_pot_values_1thru4 |= ( (get_pot_value(i, 0, 0xF) & 0x0F) << (4 * (4 - i)) );
+
+    new_log->hardware_encoder_and_switches = get_raw_encoder_and_switch_info();
+    
 	//increment array counter and check for overflow
     log_array_index++;
     if (log_array_index >= LOG_GROUP_SIZE){
@@ -127,7 +124,9 @@ bool store_log_block_into_eeprom(){
     
 	
 	//calculate how many bytes are available (minus the space to be used for the log_group_id)
-    bytes_available = EEPROM_ADDR_LOGS_END - log_eeprom_index - 1;
+    bytes_available = EEPROM_ADDR_LOGS_END - log_eeprom_index;
+	if (bytes_available > 0)
+	    bytes_available -= 1;
     
     //if there is not enough memory available to store all of the logs,
     //store as many as possible of the most recent longs
@@ -137,7 +136,7 @@ bool store_log_block_into_eeprom(){
         //if there isn't even enough space to write a single log, exit the routine
         if (logs_to_write == 0){
             set_seven_segment_LEDs(STORE_ERROR_INSUFFICIENT_SPACE);
-            return;
+            return false;
         }
         
         //adjust the first index to fit exactly the number of logs to write
@@ -176,8 +175,8 @@ bool store_log_block_into_eeprom(){
         //calculate the number of bytes for the second chunk
         //write the block to memory
         //increment the eeprom index
-        bytes_to_write = size_of_log_entry * (last_log_array_index + 1);   
-        eeprom_write_block(&log_array[first_log_array_index], (uint8_t*) log_eeprom_index, bytes_to_write);    
+        bytes_to_write = size_of_log_entry * (last_log_array_index + 1);
+        eeprom_write_block(&log_array[0], (uint8_t*) log_eeprom_index, bytes_to_write);    
         log_eeprom_index += bytes_to_write;	    
 	}
 	

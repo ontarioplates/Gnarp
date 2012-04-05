@@ -1,4 +1,4 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #include "arpeggiator.h"
 
@@ -34,7 +34,14 @@ void change_restart_delay(uint8_t new_value){
 }
 
 void initialize_restart_delay() {
-    change_restart_delay(get_eeprom_restart_delay());
+	uint8_t stored_delay = get_eeprom_restart_delay();
+	
+	if (stored_delay == 0xFF)
+	    stored_delay = 20;
+		
+	set_eeprom_restart_delay(stored_delay);
+	
+    change_restart_delay(stored_delay);
 }
 
 static void restart_delay(){    
@@ -331,11 +338,10 @@ static void reset_play_list_indeces(Sequencer* sequencer){
 }
 
 static void increment_play_list_indeces(Sequencer* sequencer){
-    //increment repeat count
-    sequencer->repeat_index += 1;
-    
+	sequencer->repeat_index += 1;
+	
     //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
-    if (sequencer->repeat_index > sequencer->repeat_max){
+	if (sequencer->repeat_index > sequencer->repeat_max){
         sequencer->repeat_index = 0;
         sequencer->note_index += 1;
     }

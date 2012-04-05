@@ -1,9 +1,6 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #include "hardware.h"
-
-#include <util/delay.h>
-
 
 static HardwareManager manager;
 
@@ -138,18 +135,26 @@ static void read_encoder(){
     //and set encoder_state appropriately
     if (!last_a & current_a)
     {
+		manager.encoder_and_switch_info |= (1 << 7);    //set turn flag
         if (current_b)
-            manager.encoder_state = TURN_CW;    //CW        
+		    manager.encoder_and_switch_info |= (1 << 6); //set direction flag
         else
-            manager.encoder_state = TURN_CCW;    //CCW
+            manager.encoder_and_switch_info &= ~(1 << 6);    //clear direction flag
     }
     else
-        manager.encoder_state = TURN_NONE;   
+        manager.encoder_and_switch_info &= ~(3 << 6);  //clear turn and direction flags  
     last_a = current_a;
 }
 
 turn_state get_encoder(){
-    return manager.encoder_state;
+	if (manager.encoder_and_switch_info & (1 << 7)){
+	    if (manager.encoder_and_switch_info & (1 << 6))
+		    return TURN_CW;
+		else
+		    return TURN_CCW;
+	}			
+	else
+        return TURN_NONE;
 }
 
 static void initialize_pots(){
@@ -242,6 +247,8 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
 	uint8_t i;
     uint8_t digit;
 	bool all_blank = seven_segment_value > 999;
+	
+	manager.seven_segment_LEDs_state = seven_segment_value;
     
     for (i=0 ; i<3 ; i++){
         digit = seven_segment_value%10;                 //extract lowest current digit of 7seg
@@ -256,7 +263,7 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
         seven_segment_value = seven_segment_value/10;           //shift 7seg number down to next digit 
     }
 	
-	manager.seven_segment_LEDs_state = seven_segment_value;
+
 }		
 
 void set_LED_on(LED_choose choice){
@@ -314,6 +321,8 @@ bool get_LED_state(LED_choose choice){
         case LED_DECIMAL_POINT_0:   return manager.led_decimal_point_0_state;
         case LED_DECIMAL_POINT_1:   return manager.led_decimal_point_1_state;
         case LED_DECIMAL_POINT_2:   return manager.led_decimal_point_2_state;
+		
+		default: return false;
 	}
 }
 
@@ -330,6 +339,8 @@ uint8_t get_LEDs_four_bits(){
 static void initialize_switches(){
     PORTB.DIRCLR = 0x0C;                //SW8(push) and Encoder pushbutton input
     PORTE.DIRCLR = 0x08;                //SW7(toggle) input
+	
+    manager.encoder_and_switch_info = 0x00;
 }
 
 static void read_switches(){
@@ -340,7 +351,7 @@ static void read_switches(){
     static uint8_t final_switch_states = 0x00;
     
     static uint8_t switch_history_counts[3] = {0,0,0};
-    
+
     uint8_t i;
     
     //read current physical switch states
@@ -365,24 +376,27 @@ static void read_switches(){
     
     last_switch_states = current_switch_states;                    //set last switch position to current switch position
     
+	final_switch_states = current_switch_states; //DELETE THIS.. JUST FOR DEBUGGING!!!!
     //detect rising and falling edges
     //set switch booleans for state and edges appropriately
     
-    if (final_switch_states & 0x01){            //if toggle IS on
-        if (manager.toggle_switch_state)                //if toggle WAS on
-            manager.toggle_switch_edge = EDGE_NONE;     //no edge
-        else                                    //else (toggle WAS off)
-            manager.toggle_switch_edge = EDGE_RISE;     //new on
-        manager.toggle_switch_state = 1;                //set current value
-    }        
-    else{                                       //if toggle IS off
-        if (manager.toggle_switch_state)                //if toggle WAS on
-            manager.toggle_switch_edge = EDGE_FALL;     //new off
-        else                                    //else (toggle WAS off)
-            manager.toggle_switch_edge = EDGE_NONE;     //no edge
-        manager.toggle_switch_state = 0;                //set current value
-    }        
-    
+	for (int i = 0; i < 3; i++){
+        if (final_switch_states & (1 << i)){                        //if switch IS on
+            if (manager.encoder_and_switch_info & (1 << 2*i))         //if switch WAS on
+			    manager.encoder_and_switch_info &= ~(1 << (2*i+1));   //maintain state (set), clear the edge
+            else                                                    //else (switch WAS off)
+                manager.encoder_and_switch_info |= (0x03 << 2*i);     //set edge and set state
+        }        
+        else{                                                       //if switch IS off
+            if (manager.encoder_and_switch_info & (1 << 2*i)){         //if switch WAS on
+                manager.encoder_and_switch_info |= (1 << (2*i+1));     //set edge
+				manager.encoder_and_switch_info &= ~(1 << 2*i);        //and clear state
+			}				
+            else                                                    //else (switch WAS off)
+                 manager.encoder_and_switch_info &= ~(1 << (2*i+1));  //maintain state (clear), clear the edge
+        }        
+	}
+	/*  
     if (final_switch_states & 0x02){                //if pushbutton IS on
         if (manager.pushbutton_switch_state)                //if pushbutton WAS on
             manager.pushbutton_switch_edge = EDGE_NONE;     //no edge
@@ -412,31 +426,30 @@ static void read_switches(){
             manager.encoder_switch_edge = EDGE_NONE;     //no edge
         manager.encoder_switch_state = 0;                //set current value
     }        
-  
+  */
 }
 
-bool get_encoder_switch_state(){
-    return manager.encoder_switch_state;
+switch_edge get_switch_edge(switch_select s){
+	if (manager.encoder_and_switch_info & (1 << (2*s+1))){
+		if (manager.encoder_and_switch_info & (1 << 2*s))
+		    return EDGE_RISE;
+		else
+		    return EDGE_FALL;
+	}
+	else
+	    return EDGE_NONE;    
 }
 
-switch_edge get_encoder_switch_edge(){
-    return manager.encoder_switch_edge;
+bool get_switch_state(switch_select s){
+	return manager.encoder_and_switch_info & (1 << 2*s);
 }
 
-bool get_pushbutton_switch_state(){
-    return manager.pushbutton_switch_state;
+uint8_t get_raw_encoder_and_switch_info(){
+	return manager.encoder_and_switch_info;
 }
 
-switch_edge get_pushbutton_switch_edge(){
-    return manager.pushbutton_switch_edge;
-}
-
-bool get_toggle_switch_state(){
-    return manager.toggle_switch_state;
-}
-
-switch_edge get_toggle_switch_edge(){
-    return manager.toggle_switch_edge;
+uint16_t get_seven_segment_LED_state(){
+	return manager.seven_segment_LEDs_state;
 }
 
 HardwareManager* initialize_hardware(){

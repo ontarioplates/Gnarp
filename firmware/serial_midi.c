@@ -1,9 +1,8 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #include "serial_midi.h"
 #include "eeprom_comm.h"
 
-#include "./xnorMIDI/midi.h"
 #include <avr/io.h>
 
 static Sequencer* stored_sequencer;
@@ -15,7 +14,7 @@ MidiDevice* get_midi_device() {
 
 void serial_midi_send(MidiDevice* midi_device, uint8_t cnt, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
     //debug routine to produce logs
-    //create_log(uint8_t inByte0, uint8_t inByte1, uint8_t inByte2);
+    create_log_entry(false, inByte0, inByte1, inByte2);
     
    //we always send the first byte
     while (!(USARTD1.STATUS & 0x20)){}; // Wait for empty transmit buffer
@@ -35,16 +34,17 @@ void serial_midi_send(MidiDevice* midi_device, uint8_t cnt, uint8_t inByte0, uin
 void noteon_to_arpeggiator(MidiDevice * midi_device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
     uint8_t channel = inByte0 - MIDI_NOTEON;
 	
-//	create_log_entry(true, inByte0, inByte1, inByte2);
+    create_log_entry(true, inByte0, inByte1, inByte2);
     
     if (inByte2 == 0)
         remove_note_from_arpeggiator(stored_sequencer, inByte1);
-    else
+    else{
         add_note_to_arpeggiator(stored_sequencer, inByte1, inByte2, channel);
+	}		
 }
 
 void noteoff_to_arpeggiator(MidiDevice * midi_device, uint8_t inByte0, uint8_t inByte1, uint8_t inByte2){
-//	create_log_entry(true, inByte0, inByte1, inByte2);
+	create_log_entry(true, inByte0, inByte1, inByte2);
 	
     remove_note_from_arpeggiator(stored_sequencer, inByte1);
 }

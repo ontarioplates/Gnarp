@@ -1,4 +1,4 @@
-// Copyright (c) 2012, David Tuzman, All Right Reserved
+// Copyright (c) 2012, David Tuzman, All Rights Reserved
 
 #ifndef EEPROM_COMM_H_
 #define EEPROM_COMM_H_
@@ -23,25 +23,13 @@ struct LogEntry {
 	uint8_t log_id; /**< Identification number.  MSB indicates a MIDI IN*/
     uint16_t timestamp; /**< Amount of time since the last log*/
     uint8_t midi_message[3]; /**< Midi Message at moment of log*/
+
+	uint16_t midi_in_flag__hardware_seven_segment; /**< The seven segment display at moment of log*/	
+	uint8_t hardware_LEDs__hardware_pot_value_0; /**< Each bit represents one LED: MSB(status, dp0, dp1, dp2)LSB*/
 	
-	uint8_t hardware_LEDs; /**< Each bit represents one LED: MSB(status, dp0, dp1, dp2)LSB*/
-	uint16_t hardware_seven_segment; /**< The seven segment display at moment of log*/
+	uint16_t hardware_pot_values_1thru4; /**< Positions of the pots at moment of log (scaled to 8 bits)*/
 	
-	uint8_t hardware_pot_values[5]; /**< Positions of the pots at moment of log (scaled to 8 bits)*/
-	
-	//turn state:
-	//0 - static
-	//1 - CW
-	//2 - CCW
-	
-	//switch state:
-	//0 - off
-	//1 - on
-	//2 - edge off
-	//3 - edge on
-	
-	uint8_t hardware_encoder; /**< Bits 0:1 indicate the turn state.  Bits 2:3 indicate the switch state*/
-    uint8_t hardware_push_and_toggle; /**< Bits 0:1 indicate pushbutton state.  Bits 2:3 indicate toggle state*/
+	uint8_t hardware_encoder_and_switches;
 };
 
 
