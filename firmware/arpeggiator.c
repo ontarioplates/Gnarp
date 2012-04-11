@@ -91,37 +91,45 @@ static void calculate_start_time_increment(Sequencer* sequencer){
     //start with the time for a single beat
     volatile uint32_t new_start_time_increment = (uint32_t) TCC0.CCA;
     
+	
     //based on the division selection, scale the time
     switch(sequencer->division){
         //quarter note
-        case 0:    break;
+        case DIVISION_QUARTER:    
+		    break;
         
         //dotted eighth
-        case 3: new_start_time_increment *= 3;
-                new_start_time_increment /= 4;
-                break;
+        case DIVISION_EIGHTH_D:
+		    new_start_time_increment *= 3;
+            new_start_time_increment /= 4;
+            break;
         
         //quarter triplet
-        case 5: new_start_time_increment *= 2;
-                new_start_time_increment /= 3;
-                break;
+        case DIVISION_QUARTER_T:
+		    new_start_time_increment *= 2;
+            new_start_time_increment /= 3;
+            break;
         
         //eighth
-        case 1: new_start_time_increment /= 2;
-                break;
+        case DIVISION_EIGHTH:
+		    new_start_time_increment /= 2;
+            break;
                 
         //dotted 16th
-        case 4: new_start_time_increment *= 3;
-                new_start_time_increment /= 8;
-                break;
+        case DIVISION_SIXTEENTH_D:
+	        new_start_time_increment *= 3;
+            new_start_time_increment /= 8;
+            break;
         
         //eighth triplet
-        case 6: new_start_time_increment /= 3;
-                break;
+        case DIVISION_EIGHTH_T:
+		    new_start_time_increment /= 3;
+            break;
         
         //sixteenth                
-        case 2: new_start_time_increment /= 4;
-                break;
+        case DIVISION_SIXTEENTH:
+		    new_start_time_increment /= 4;
+            break;
     }
     
     //divide by repeat parameter to fit in all the repeats
@@ -193,14 +201,10 @@ static void build_play_list(Sequencer* sequencer){
     uint8_t note_list_size = note_list->length;
     
     uint8_t random_order[note_list_size];
-    uint8_t j;
     uint8_t temp;
-    uint8_t random_list_depth;      //index for random pattern
-    
-    uint8_t i;
     
     bool mirror = 0;
-    uint8_t pattern = 0;
+    pattern_select pattern = 0;
     
     
     switch(sequencer->pattern){
@@ -238,59 +242,53 @@ static void build_play_list(Sequencer* sequencer){
             break;
     }
 
-    switch(pattern){
-        //Asc pitch
-        case 0:
+    switch(sequencer->pattern){
+        case PATTERN_PITCH_ASC:
+		case PATTERN_PITCH_ASCDEC:
             for(current_note = note_list->head_pitch; current_note; current_note=current_note->next_note_by_pitch)
                 sequencer->play_list[play_list_index++] = current_note;
             break;
 
-        //Desc pitch
-        case 1:
+        case PATTERN_PITCH_DEC:
             for(current_note = note_list->tail_pitch; current_note; current_note=current_note->previous_note_by_pitch)
                 sequencer->play_list[play_list_index++] = current_note;
             break;
 
-        //Asc trigger
-        case 2:
+        case PATTERN_CHRONO_ASC:
+        case PATTERN_CHRONO_ASCDEC:
             for(current_note = note_list->head_trigger; current_note; current_note=current_note->next_note_by_trigger)
                 sequencer->play_list[play_list_index++] = current_note;
             break;
 
-        //Desc trigger
-        case 3:
+        case PATTERN_CHRONO_DEC:
             for(current_note = note_list->tail_trigger; current_note; current_note=current_note->previous_note_by_trigger)
                 sequencer->play_list[play_list_index++] = current_note;
             break;
 
-        //random
-        case 4:
-            for (i = 0; i<note_list_size; i++)
+        case PATTERN_RANDOM:
+            for (int i = 0; i<note_list_size; i++)
                 random_order[i] = i;
-            for (i = 0; i<note_list_size; i++){
+            for (int i,j = 0; i<note_list_size; i++){
                 j = rand() % note_list_size;
                 temp = random_order[i];
                 random_order[i] = random_order[j];
                 random_order[j] = temp;
             }            
-            for (i=0; i<note_list_size; i++){
+            for (int i=0; i<note_list_size; i++){
                 current_note = note_list->head_pitch;
-                for (j = 0; j < random_order[i]; j++)
+                for (int j = 0; j < random_order[i]; j++)
                     current_note = current_note->next_note_by_pitch;
                 sequencer->play_list[play_list_index++] = current_note;
             }
 
             break;
             
-        //case 5:
-            
     }
 
     //option to mirror the pattern
-    if (mirror){
+    if (sequencer->pattern == PATTERN_PITCH_ASCDEC || sequencer->pattern == PATTERN_CHRONO_ASCDEC){
         uint8_t mirrored_length;
         uint8_t edge_scale;
-        uint8_t k;
 
         if (MIRROR_EDGE_DOUBLE == true){
             //double edge
@@ -308,7 +306,7 @@ static void build_play_list(Sequencer* sequencer){
         }
         if (mirrored_length){
             play_list_index += -1;
-            for (k = 1; play_list_index + k < mirrored_length; k++){
+            for (int k = 1; play_list_index + k < mirrored_length; k++){
                 sequencer->play_list[play_list_index + k] = sequencer->play_list[play_list_index - k + edge_scale];
             }
             play_list_index = mirrored_length;
@@ -326,11 +324,6 @@ static void build_play_list(Sequencer* sequencer){
     return;
 }
 
-
-void set_rebuild_play_list(Sequencer* sequencer, bool new_flag){
-    sequencer->rebuild_play_list = new_flag;
-}
-
 static void reset_play_list_indeces(Sequencer* sequencer){
     sequencer->octave_index = 0;
     sequencer->note_index = 0;
@@ -341,8 +334,11 @@ static void increment_play_list_indeces(Sequencer* sequencer){
 	sequencer->repeat_index += 1;
 	
     //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
+	//also poll for new repeat setting
 	if (sequencer->repeat_index > sequencer->repeat_max){
         sequencer->repeat_index = 0;
+		set_one_sequencer_parameter(sequencer, POT_SEL_REPEAT);
+		
         sequencer->note_index += 1;
     }
     
@@ -356,54 +352,70 @@ static void increment_play_list_indeces(Sequencer* sequencer){
     if (sequencer->octave_index > sequencer->octave_max){
         sequencer->octave_index = 0;
         
-        //build a new random playlist if necessary
+        //build a new random playlist if necessary (random)
         if (sequencer->pattern == 4)
             build_play_list(sequencer);
     }    
 }
 
+void set_one_sequencer_parameter(Sequencer* sequencer, uint8_t parameter){
+	uint8_t new_param_value;
+	uint8_t old_param_value;
+	
+	switch (parameter){
+		case POT_SEL_OCTAVE:
+		    new_param_value = get_pot_value(POT_SEL_OCTAVE, POT_MIN_OCTAVE, POT_MAX_OCTAVE);
+			old_param_value = sequencer->octave_max;
+			sequencer->octave_max = new_param_value;
+		    break;
+		case POT_SEL_REPEAT:
+		    new_param_value = get_pot_value(POT_SEL_REPEAT, POT_MIN_REPEAT, POT_MAX_REPEAT);
+			old_param_value = sequencer->repeat_max;
+			sequencer->repeat_max = new_param_value;
+		    break;
+		case POT_SEL_DIVISION:
+		    new_param_value = get_pot_value(POT_SEL_DIVISION, POT_MIN_DIVISION, POT_MAX_DIVISION);
+			old_param_value = sequencer->division;
+			sequencer->division = new_param_value;
+		    break;
+		case POT_SEL_DURATION:
+		    new_param_value = get_pot_value(POT_SEL_DURATION, POT_MIN_DURATION, POT_MAX_DURATION);
+			old_param_value = sequencer->duration;
+			sequencer->duration = new_param_value;
+		    break;
+		case POT_SEL_PATTERN:
+		    new_param_value = get_pot_value(POT_SEL_PATTERN, POT_MIN_PATTERN, POT_MAX_PATTERN);
+			old_param_value = sequencer->pattern;
+			sequencer->pattern = new_param_value;
+		    break;      
+	}
+	
+	if (old_param_value != new_param_value){
+	    switch (parameter){
+			case POT_SEL_PATTERN:
+			    sequencer->rebuild_play_list = 1;
+				break;
+		    case POT_SEL_REPEAT:
+		    case POT_SEL_DIVISION:
+		        calculate_start_time_increment(sequencer);
+			case POT_SEL_DURATION:
+			    calculate_stop_time_increment(sequencer);
+				break;
+	    }		
+	}
+}
 
-void set_sequencer_parameters(Sequencer* sequencer, bool restart){
-    //read the new values from the pots
-    volatile uint8_t octave_max_new = get_pot_value(POT_SEL_OCTAVE, POT_MIN_OCTAVE, POT_MAX_OCTAVE);
-    volatile uint8_t repeat_max_new = get_pot_value(POT_SEL_REPEAT, POT_MIN_REPEAT, POT_MAX_REPEAT);
-    volatile uint8_t division_new = get_pot_value(POT_SEL_DIVISION, POT_MIN_DIVISION, POT_MAX_DIVISION);
-    volatile uint8_t duration_new = get_pot_value(POT_SEL_DURATION, POT_MIN_DURATION, POT_MAX_DURATION);
-    volatile uint8_t pattern_new = get_pot_value(POT_SEL_PATTERN, POT_MIN_PATTERN, POT_MAX_PATTERN);
-    
-    bool update_start_time_increment = 0;
-    bool update_stop_time_increment = 0;
-    
-    //flag to calculate new interrupt times if necessary
-    if (sequencer->repeat_max != repeat_max_new){
-        update_start_time_increment = 1;
-        update_stop_time_increment = 1;
-    }
-    
-    if (sequencer->division != division_new){
-        update_start_time_increment = 1;
-        update_stop_time_increment = 1;
-    }
-    
-    if (sequencer->duration != duration_new){
-        update_stop_time_increment = 1;
-    }
-    
-    if (sequencer->pattern != pattern_new){
-        sequencer->rebuild_play_list = 1;
-    }
-    
-    //load the new parameters into the arpeggiator
-    sequencer->octave_max = octave_max_new;
-    sequencer->repeat_max = repeat_max_new;
-    sequencer->division = division_new;
-    sequencer->duration = duration_new;
-    sequencer->pattern = pattern_new;
-    
-    if (update_start_time_increment || restart)
-        calculate_start_time_increment(sequencer);
-    if (update_stop_time_increment || restart)
-        calculate_stop_time_increment(sequencer);
+void set_all_sequencer_parameters(Sequencer* sequencer, bool restart){
+	set_one_sequencer_parameter(sequencer, POT_SEL_DIVISION);
+	set_one_sequencer_parameter(sequencer, POT_SEL_REPEAT);
+	set_one_sequencer_parameter(sequencer, POT_SEL_PATTERN);
+	set_one_sequencer_parameter(sequencer, POT_SEL_OCTAVE);
+	set_one_sequencer_parameter(sequencer, POT_SEL_DURATION);
+	
+	if (restart){
+	    calculate_start_time_increment(sequencer);
+		calculate_stop_time_increment(sequencer);
+	}	
 }
 
 void continue_sequencer(Sequencer* sequencer, bool restart){
@@ -425,13 +437,11 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     
     current_time = (uint32_t) TCC0.CNT;
     
-    
     if (!(sequencer->enable) || (sequencer->note_list.length == 0)){
         sequencer->run_status = 0;
         return;
     }        
-    
-    
+  
     //turn off the current note if it is still playing
     if (sequencer->play_status){
         midi_send_noteoff(get_midi_device(),final_channel(sequencer),final_pitch(sequencer),final_velocity(sequencer));
@@ -440,7 +450,26 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     }
         
     //load the new hardware settings from the user
-    set_sequencer_parameters(sequencer, restart);
+	if (restart)
+        set_all_sequencer_parameters(sequencer, restart);
+	else{
+		set_one_sequencer_parameter(sequencer, POT_SEL_DIVISION);
+	    set_one_sequencer_parameter(sequencer, POT_SEL_PATTERN);
+	    set_one_sequencer_parameter(sequencer, POT_SEL_OCTAVE);
+	    set_one_sequencer_parameter(sequencer, POT_SEL_DURATION);
+	}
+
+    //rebuild the pattern if necessary
+    if (sequencer->rebuild_play_list)
+        build_play_list(sequencer);
+        
+    //if this is a continuation, increment the play list indeces
+    //otherwise, reset them all
+    if (!restart)
+        increment_play_list_indeces(sequencer);
+    else{
+        reset_play_list_indeces(sequencer);
+    }
     
     //compute next compare values
     next_start_time = current_time + sequencer->start_time_increment;
@@ -458,19 +487,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     
     //enable CCB (note-on) and CCC (note-off) compares
     TCC0.CTRLB |= 0x20; 
-    TCC0.CTRLB |= 0x40;    
-    
-    //rebuild the pattern if necessary
-    if (sequencer->rebuild_play_list)
-        build_play_list(sequencer);
-        
-    //if this is a continuation, increment the play list indeces
-    //otherwise, reset them all
-    if (!restart)
-        increment_play_list_indeces(sequencer);
-    else{
-        reset_play_list_indeces(sequencer);
-    }
+    TCC0.CTRLB |= 0x40;
     
     //send midi message to start the note
     midi_send_noteon(get_midi_device(), final_channel(sequencer), final_pitch(sequencer), final_velocity(sequencer));

@@ -15,7 +15,7 @@
 #include "beat_clock.h"
 #include "aux_menu.h"
 
-#define SOFTWARE_VERSION 0
+#define SOFTWARE_VERSION 1
 
 static Sequencer sequencer;
 static MidiDevice midi_device;

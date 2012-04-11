@@ -25,7 +25,7 @@ static bool all_logs_valid = false;
 static uint16_t log_eeprom_index;
 
 uint8_t get_eeprom_restart_delay() {
-	return eeprom_read_byte(EEPROM_ADDR_RESTART_DELAY);
+    return eeprom_read_byte(EEPROM_ADDR_RESTART_DELAY);
 }
 
 void set_eeprom_restart_delay(uint8_t new_value) {

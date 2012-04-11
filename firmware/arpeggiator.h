@@ -41,6 +41,17 @@ note_time_division;
 typedef enum {NONE, DOTTED, TRIPLET}
 note_time_variation;
 
+typedef enum    {PATTERN_PITCH_ASC, PATTERN_PITCH_DEC, PATTERN_PITCH_ASCDEC,
+                 PATTERN_CHRONO_ASC, PATTERN_CHRONO_DEC, PATTERN_CHRONO_ASCDEC,
+                 PATTERN_RANDOM}
+pattern_select;
+
+typedef enum    {DIVISION_QUARTER, DIVISION_EIGHTH, DIVISION_SIXTEENTH, 
+                 DIVISION_EIGHTH_D, DIVISION_SIXTEENTH_D, DIVISION_QUARTER_T,
+				 DIVISION_EIGHTH_T}
+division_select;
+	
+
 struct Sequencer
 {
     bool    enable;
@@ -59,9 +70,9 @@ struct Sequencer
     uint16_t start_time_increment;
     uint16_t stop_time_increment;
     
-    uint8_t pattern;
+    pattern_select pattern;
     uint8_t duration;
-    uint8_t division;
+    division_select division;
     
     Note*   play_list[MAX_PLAY_NOTES];
     NoteList note_list;
