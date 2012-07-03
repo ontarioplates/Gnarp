@@ -77,7 +77,7 @@ void create_log_entry(bool midi_in_flag, uint8_t byte0, uint8_t byte1, uint8_t b
     new_log->midi_message[2] = byte2;
 	
 	new_log->midi_in_flag__hardware_seven_segment = (midi_in_flag << 15) | get_seven_segment_LED_state();
-	new_log->hardware_LEDs__hardware_pot_value_0 = (get_LEDs_four_bits() << 4) | (get_pot_value(0,0,0xF) & 0x0F);
+	new_log->hardware_LEDs__hardware_pot_value_0 = (get_LEDs_nibble() << 4) | (get_pot_value(0,0,0xF) & 0x0F);
 	
 	//log the pots 1-4 positions scaled 0-15
 	new_log->hardware_pot_values_1thru4 = 0x0000;

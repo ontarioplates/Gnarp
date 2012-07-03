@@ -203,11 +203,7 @@ static void build_play_list(Sequencer* sequencer){
     uint8_t random_order[note_list_size];
     uint8_t temp;
     
-    bool mirror = 0;
-    pattern_select pattern = 0;
-    
-    
-    switch(sequencer->pattern){
+ /*   switch(sequencer->pattern){
         case 0:
             pattern = 0;
             mirror = 0;
@@ -240,7 +236,7 @@ static void build_play_list(Sequencer* sequencer){
             pattern = 5;
             mirror = 0;
             break;
-    }
+    }*/
 
     switch(sequencer->pattern){
         case PATTERN_PITCH_ASC:
@@ -268,7 +264,7 @@ static void build_play_list(Sequencer* sequencer){
         case PATTERN_RANDOM:
             for (int i = 0; i<note_list_size; i++)
                 random_order[i] = i;
-            for (int i,j = 0; i<note_list_size; i++){
+            for (int i = 0,j = 0; i<note_list_size; i++){
                 j = rand() % note_list_size;
                 temp = random_order[i];
                 random_order[i] = random_order[j];
@@ -324,43 +320,9 @@ static void build_play_list(Sequencer* sequencer){
     return;
 }
 
-static void reset_play_list_indeces(Sequencer* sequencer){
-    sequencer->octave_index = 0;
-    sequencer->note_index = 0;
-    sequencer->repeat_index = 0;
-}
-
-static void increment_play_list_indeces(Sequencer* sequencer){
-	sequencer->repeat_index += 1;
-	
-    //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
-	//also poll for new repeat setting
-	if (sequencer->repeat_index > sequencer->repeat_max){
-        sequencer->repeat_index = 0;
-		set_one_sequencer_parameter(sequencer, POT_SEL_REPEAT);
-		
-        sequencer->note_index += 1;
-    }
-    
-    //if the play list is at the end, reset the note index and increment the octave index
-    if (sequencer->note_index > sequencer->note_max){
-        sequencer->note_index = 0;
-        sequencer->octave_index += 1;        
-    }
-    
-    //if the last octave is reached, reset the octave index
-    if (sequencer->octave_index > sequencer->octave_max){
-        sequencer->octave_index = 0;
-        
-        //build a new random playlist if necessary (random)
-        if (sequencer->pattern == 4)
-            build_play_list(sequencer);
-    }    
-}
-
 void set_one_sequencer_parameter(Sequencer* sequencer, uint8_t parameter){
-	uint8_t new_param_value;
-	uint8_t old_param_value;
+	uint8_t new_param_value = 0;
+	uint8_t old_param_value = 0;
 	
 	switch (parameter){
 		case POT_SEL_OCTAVE:
@@ -405,6 +367,41 @@ void set_one_sequencer_parameter(Sequencer* sequencer, uint8_t parameter){
 	}
 }
 
+static void reset_play_list_indeces(Sequencer* sequencer){
+    sequencer->octave_index = 0;
+    sequencer->note_index = 0;
+    sequencer->repeat_index = 0;
+}
+
+static void increment_play_list_indeces(Sequencer* sequencer){
+	sequencer->repeat_index += 1;
+	
+    //if note has repeated enough times, reset the repeat index and increment the note index to get the next note to play
+	//also poll for new repeat setting
+	if (sequencer->repeat_index > sequencer->repeat_max){
+        sequencer->repeat_index = 0;
+		set_one_sequencer_parameter(sequencer, POT_SEL_REPEAT);
+        sequencer->note_index += 1;
+    }
+    
+    //if the play list is at the end, reset the note index and increment the octave index
+    if (sequencer->note_index > sequencer->note_max){
+        sequencer->note_index = 0;
+        sequencer->octave_index += 1;        
+    }
+    
+    //if the last octave is reached, reset the octave index
+    if (sequencer->octave_index > sequencer->octave_max){
+        sequencer->octave_index = 0;
+        
+        //build a new random playlist if necessary (random)
+        if (sequencer->pattern == PATTERN_RANDOM)
+            build_play_list(sequencer);
+    }    
+}
+
+
+
 void set_all_sequencer_parameters(Sequencer* sequencer, bool restart){
 	set_one_sequencer_parameter(sequencer, POT_SEL_DIVISION);
 	set_one_sequencer_parameter(sequencer, POT_SEL_REPEAT);
@@ -435,8 +432,10 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
     volatile uint32_t next_start_time;
     volatile uint32_t next_stop_time;
     
+	//log the time at the beginning of the function
     current_time = (uint32_t) TCC0.CNT;
     
+	//abort if the sequencer isn't on, or if the note list is empty
     if (!(sequencer->enable) || (sequencer->note_list.length == 0)){
         sequencer->run_status = 0;
         return;
@@ -453,6 +452,7 @@ void continue_sequencer(Sequencer* sequencer, bool restart){
 	if (restart)
         set_all_sequencer_parameters(sequencer, restart);
 	else{
+		//load all settings except for repeat
 		set_one_sequencer_parameter(sequencer, POT_SEL_DIVISION);
 	    set_one_sequencer_parameter(sequencer, POT_SEL_PATTERN);
 	    set_one_sequencer_parameter(sequencer, POT_SEL_OCTAVE);

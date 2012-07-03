@@ -37,24 +37,12 @@ typedef struct HardwareManager HardwareManager;
  */
 struct HardwareManager{
 	uint8_t encoder_and_switch_info;    //encoder turn, encoder switch, pushbutton switch, toggle switch
-	
-    turn_state encoder_state; /**< Tracks movement of the rotary encoder*/
-    
-    switch_edge pushbutton_switch_edge; /**< Tracks movement of the pushbutton*/
-    switch_edge toggle_switch_edge; /**< Tracks movement of the toggle switch*/
-    switch_edge encoder_switch_edge; /**< Tracks movement of the encoder pushbutton*/
-    
-    bool pushbutton_switch_state; /**< Current state of the pushbutton*/
-    bool toggle_switch_state; /**< Current state of the toggle switch*/
-    bool encoder_switch_state; /**< Current state of the encoder pushbutton*/
     
     uint16_t pot_values[5]; /**< Array of the raw values of each pot/switch (bounded by #POT_MIN and #POT_MAX)*/
 	
 	uint16_t seven_segment_LEDs_state; /**< Current number displayed on the seven segment*/
-	bool led_decimal_point_0_state; /**< Current state of the 0th decimal point LED*/
-	bool led_decimal_point_1_state; /**< Current state of the 1st decimal point LED*/
-	bool led_decimal_point_2_state; /**< Current state of the 2nd decimal point LED*/
-	bool led_status_state; /**< Current state of the status LED*/
+	
+	uint8_t LEDs_states; /**< Current state of each LED (x.x.x.x.dec2.dec1.dec0.status)*/
 };
 
 /**
@@ -104,7 +92,12 @@ void set_LED_on(LED_choose choice);
  */
 void set_LED_off(LED_choose choice);
 
-void set_LEDs_four_bits(uint8_t decimal);
+/**
+ * @brief Turn on/off all LEDs according to a four-bit input
+ *
+ * @param nibble (x.x.x.x.Decimal_2.Decimal_1.Decimal_0.Status)
+ */
+void set_LEDs_nibble(uint8_t nibble);
 
 /**
  * @brief Request the state of the specified LED
@@ -114,7 +107,12 @@ void set_LEDs_four_bits(uint8_t decimal);
  */
 bool get_LED_state(LED_choose choice);
 
-uint8_t get_LEDs_four_bits();
+/**
+ * @brief Request the state of all LEDs
+ *
+ * @param 4 LSB represent each LED (x.x.x.x.Decimal_2.Decimal_1.Decimal_0.Status)
+ */
+uint8_t get_LEDs_nibble();
 
 /**
  * @brief Illuminate the 7-segment display to the specified number
@@ -169,9 +167,9 @@ void realtime_count_stop();
 
 bool realtime_count_compare(uint16_t compare_ms);
 
-bool get_switch_state(switch_select);
+//bool get_switch_state(switch_select);
 
-switch_edge get_switch_edge(switch_select);
+//switch_edge get_switch_edge(switch_select);
 
 uint8_t get_raw_encoder_and_switch_info();
 

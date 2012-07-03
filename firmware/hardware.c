@@ -9,13 +9,7 @@ HardwareManager* get_hardware_manager_ptr(){
 }    
     
 void initialize_HardwareManager(){
-    manager.encoder_state = TURN_NONE;
-    manager.pushbutton_switch_edge = EDGE_NONE;
-    manager.toggle_switch_edge = EDGE_NONE;
-    manager.encoder_switch_edge = EDGE_NONE;
-    manager.pushbutton_switch_state = 0;
-    manager.toggle_switch_state = 0;
-    manager.encoder_switch_state = 0;
+    manager.encoder_and_switch_info = 0x00;
     
     for (uint8_t i = 0; i < NUM_POTS; i++)
         manager.pot_values[i] = 0;
@@ -267,73 +261,43 @@ void set_seven_segment_LEDs(uint16_t seven_segment_value){
 }		
 
 void set_LED_on(LED_choose choice){
-    //booleans and such convert to LED out
+    manager.LEDs_states |= (1 << choice);
     switch(choice){
         case LED_STATUS:            PORTC.OUTCLR = 0x08;
-		                            manager.led_status_state = 1;
                                     break;
         case LED_DECIMAL_POINT_0:   PORTD.OUTSET = 0x04;
-		                            manager.led_decimal_point_0_state = 1;
                                     break;
         case LED_DECIMAL_POINT_1:   PORTD.OUTSET = 0x01;
-		                            manager.led_decimal_point_1_state = 1;
                                     break;
         case LED_DECIMAL_POINT_2:   PORTD.OUTSET = 0x02;
-		                            manager.led_decimal_point_2_state = 1;
                                     break;
     }
 }
 
 void set_LED_off(LED_choose choice){
-    //booleans and such convert to LED out
+    manager.LEDs_states &= ~(1 << choice);
     switch(choice){
         case LED_STATUS:            PORTC.OUTSET = 0x08;
-                                    manager.led_status_state = 0;
 									break;
         case LED_DECIMAL_POINT_0:   PORTD.OUTCLR = 0x04;
-                                    manager.led_decimal_point_0_state = 0;
 									break;
         case LED_DECIMAL_POINT_1:   PORTD.OUTCLR = 0x01;
-                                    manager.led_decimal_point_1_state = 0;
 									break;
         case LED_DECIMAL_POINT_2:   PORTD.OUTCLR = 0x02;
-                                    manager.led_decimal_point_2_state = 0;
 									break;
     }
 }
 
-void set_LEDs_four_bits(uint8_t decimal){
-	const uint8_t power_of_two[4] = {1, 2, 4, 8};
-		
-	for (int i = 0; i<4; i++){
-		if (power_of_two[3-i] > decimal)
-		    set_LED_off(3-i);
-		else {
-			set_LED_on(3-i);
-			decimal -= power_of_two[3-i];
-		}
-	}
+void set_LEDs_nibble(uint8_t nibble){
+	manager.LEDs_states = 0x0F & nibble;
 }
 
-bool get_LED_state(LED_choose choice){
-	switch(choice){
-        case LED_STATUS:            return manager.led_status_state;
-        case LED_DECIMAL_POINT_0:   return manager.led_decimal_point_0_state;
-        case LED_DECIMAL_POINT_1:   return manager.led_decimal_point_1_state;
-        case LED_DECIMAL_POINT_2:   return manager.led_decimal_point_2_state;
-		
-		default: return false;
-	}
+bool get_LED(LED_choose choice){
+	return manager.LEDs_states & (1 << choice);
 }
 
-uint8_t get_LEDs_four_bits(){
-	uint8_t ret_val = 0;
-	
-	for (int i = 0; i < 4; i++){
-		ret_val |= get_LED_state(i) << i;
-	}
-	
-	return ret_val;
+uint8_t get_LEDs_nibble(){
+	return manager.LEDs_states;
 }
 
 static void initialize_switches(){

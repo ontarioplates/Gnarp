@@ -22,7 +22,7 @@ static MidiDevice midi_device;
 static HardwareManager* manager_ptr;
 
 ISR(USARTD1_RXC_vect){
-    midi_device_input(&midi_device,1,&(USARTD1.DATA));
+    midi_device_input(&midi_device,1, (uint8_t*)&(USARTD1.DATA));
     midi_device_process(&midi_device);
 }
 
@@ -53,7 +53,7 @@ ISR(TCC1_CCA_vect){
 
 
 void fake_midi_noteon_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velocity){
-    const uint8_t noteon_byte1 = 144;
+    uint8_t noteon_byte1 = 144;
     
     midi_device_input(midi_device, 1, &noteon_byte1);
     midi_device_input(midi_device, 1, &pitch);
@@ -62,7 +62,7 @@ void fake_midi_noteon_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velo
 }
 
 void fake_midi_noteoff_input(MidiDevice* midi_device, uint8_t pitch, uint8_t velocity){
-    const uint8_t noteoff_byte1 = 128;
+    uint8_t noteoff_byte1 = 128;
     
     midi_device_input(midi_device, 1, &noteoff_byte1);
     midi_device_input(midi_device, 1, &pitch);
